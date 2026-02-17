@@ -1,0 +1,81 @@
+# Habitat Data Files (too large for git)
+habitat-lab/data/
+!habitat-lab/data/.gitkeep
+
+# Habitat Output Files
+habitat-lab/outputs/
+habitat-lab/tb/
+habitat-lab/checkpoints/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# GraspNet checkpoints and build artifacts
+graspnet-baseline/checkpoints/
+graspnet-baseline/knn/build/
+graspnet-baseline/knn/*.egg-info/
+graspnet-baseline/pointnet2/build/
+graspnet-baseline/pointnet2/*.egg-info/
+
+# Affordance pipeline outputs
+affordance-pipeline/output/
+affordance-pipeline/results/
+
+# Large zip files
+*.zip
+
+# Video files
+*.mp4
+*.avi
+*.mov
