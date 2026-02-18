@@ -1,0 +1,43 @@
+{
+    "_comment": "Object catalog for the affordance pipeline. Add new objects here.",
+    "mug": {
+        "ycb_config": "data/objects/ycb/configs/025_mug.object_config.json",
+        "display_name": "Coffee Mug (YCB 025)",
+        "parts": {
+            "handle": "Protruding loop on the side for gripping",
+            "body": "Main cylindrical cup body",
+            "rim": "Circular top edge of the cup"
+        },
+        "offset": [0.0, 0.6, -0.4]
+    },
+    "power_drill": {
+        "ycb_config": "data/objects/ycb/configs/035_power_drill.object_config.json",
+        "display_name": "Power Drill (YCB 035)",
+        "parts": {
+            "handle": "Pistol grip for holding",
+            "body": "Main motor housing",
+            "chuck": "Front end where the drill bit attaches"
+        },
+        "offset": [0.0, 0.6, -0.4]
+    },
+    "pitcher": {
+        "ycb_config": "data/objects/ycb/configs/019_pitcher_base.object_config.json",
+        "display_name": "Pitcher (YCB 019)",
+        "parts": {
+            "handle": "Large handle on the back",
+            "spout": "Pouring lip at the front",
+            "body": "Main container body",
+            "rim": "Top circular edge"
+        },
+        "offset": [0.0, 0.6, -0.4]
+    },
+    "hammer": {
+        "ycb_config": "data/objects/ycb/configs/048_hammer.object_config.json",
+        "display_name": "Hammer (YCB 048)",
+        "parts": {
+            "head": "Metal striking head",
+            "handle": "Wooden grip handle"
+        },
+        "offset": [0.0, 0.6, -0.4]
+    }
+}

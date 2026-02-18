@@ -81,8 +81,17 @@ def parse_args():
         help="Part to highlight (e.g., handle, body, rim, chuck, head)",
     )
     parser.add_argument(
-        "--method", choices=["geometric", "neural"], default="neural",
-        help="Affordance method: neural (GraspNet, default) or geometric (PCA/heuristic)",
+        "--prompt", type=str, default=None,
+        help="Custom text prompt for language method (e.g., 'handle of the cup'). "
+             "If not provided, uses the part name.",
+    )
+    parser.add_argument(
+        "--box-threshold", type=float, default=0.25,
+        help="Grounding DINO detection confidence threshold (language method)",
+    )
+    parser.add_argument(
+        "--text-threshold", type=float, default=0.25,
+        help="Grounding DINO text matching threshold (language method)",
     )
     args = parser.parse_args()
 
@@ -152,33 +161,67 @@ def segment_mug(points, pcd):
     horiz_dist = np.linalg.norm(horiz_proj, axis=1)
     heights = centered @ vert_axis
 
+    # Define rim FIRST (top 12% of points) - more conservative threshold
+    rim_threshold = np.percentile(heights, 88)
+    rim_mask = heights > rim_threshold
+
+    # Define handle search region: middle 70% of height (exclude top rim and bottom)
+    # This prevents rim contamination
+    height_min = np.percentile(heights, 15)
+    height_max = np.percentile(heights, 85)
+    handle_search_mask = (heights >= height_min) & (heights <= height_max) & ~rim_mask
+
     # Step 1: Find candidate protrusion points (far from center axis)
-    median_dist = np.median(horiz_dist)
-    handle_threshold = median_dist + 0.8 * np.std(horiz_dist)
-    candidate_mask = horiz_dist > handle_threshold
+    # Only search in the middle region, not in rim area
+    median_dist = np.median(horiz_dist[handle_search_mask])
+    std_dist = np.std(horiz_dist[handle_search_mask])
+    
+    # More aggressive threshold to only get strong protrusions
+    handle_threshold = median_dist + 1.0 * std_dist
+    candidate_mask = (horiz_dist > handle_threshold) & handle_search_mask
 
     # Step 2: Find the dominant direction of the protrusion
-    # This prevents rim points on all sides from being included
+    # Stricter alignment to avoid rim spread
     if candidate_mask.sum() > 5:
         handle_dir = horiz_proj[candidate_mask].mean(axis=0)
         handle_dir_norm = np.linalg.norm(handle_dir)
         if handle_dir_norm > 1e-6:
             handle_dir /= handle_dir_norm
-            # Only keep points whose horizontal direction aligns with handle
-            # (dot product > 0 means same side as handle centroid)
+            # Stricter alignment threshold (0.5 instead of 0.3)
+            # This ensures only points strongly aligned with handle direction
             horiz_unit = horiz_proj / (horiz_dist[:, None] + 1e-8)
             alignment = horiz_unit @ handle_dir
-            handle_mask = candidate_mask & (alignment > 0.3)
+            
+            # Also require minimum distance from center (avoid body points)
+            min_handle_dist = median_dist + 0.5 * std_dist
+            handle_mask = (candidate_mask & 
+                          (alignment > 0.5) & 
+                          (horiz_dist > min_handle_dist))
         else:
             handle_mask = candidate_mask
     else:
         handle_mask = candidate_mask
 
-    # Rim: top ~15% of points by height, excluding handle
-    rim_threshold = np.percentile(heights, 85)
-    rim_mask = (heights > rim_threshold) & ~handle_mask
+    # Additional cleanup: Use DBSCAN-style spatial clustering to separate handle
+    # Remove isolated points that don't form a coherent handle cluster
+    if HAS_O3D and handle_mask.sum() > 20:
+        handle_indices = np.where(handle_mask)[0]
+        handle_pcd_temp = pcd.select_by_index(handle_indices)
+        
+        # Cluster with DBSCAN (eps=0.015m = 1.5cm, min 10 points)
+        labels = np.array(handle_pcd_temp.cluster_dbscan(eps=0.015, min_points=10))
+        
+        if len(labels) > 0 and labels.max() >= 0:
+            # Keep only the largest cluster (the actual handle)
+            largest_cluster = np.argmax(np.bincount(labels[labels >= 0]))
+            valid_handle_local = (labels == largest_cluster)
+            
+            # Update handle mask to only include largest cluster
+            handle_mask_new = np.zeros_like(handle_mask)
+            handle_mask_new[handle_indices[valid_handle_local]] = True
+            handle_mask = handle_mask_new
 
-    # Body: everything else
+    # Body: everything not rim or handle
     body_mask = ~handle_mask & ~rim_mask
 
     return {
@@ -804,16 +847,15 @@ def main():
     args = parse_args()
     obj_name  = args.object
     part_name = args.part
-    method    = args.method
+    method    = "language"  # DINO + SAM + GraspNet
 
-    # Set up method-specific results directory
+    # Results go into results/language/
     RESULTS_DIR = RESULTS_BASE / method
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
     print_header("Visualize Affordance — Stage 2")
     print(f"  Object: {obj_name}")
     print(f"  Part:   {part_name}")
-    print(f"  Method: {method}")
     print(f"  Output: {RESULTS_DIR}/")
 
     # ── Load Stage 1 outputs ────────────────────────────────────────
@@ -861,88 +903,168 @@ def main():
     fx = metadata["focal_length_px"]
     cx, cy = metadata["principal_point"]
 
-    # ── Segment object into parts ───────────────────────────────────
-    print_header(f"Segmenting {obj_name} into parts")
+    # ══════════════════════════════════════════════════════════════════
+    # LANGUAGE METHOD: Grounding DINO + SAM
+    # ══════════════════════════════════════════════════════════════════
+    if method == "language":
+        from language_segment import segment_part_by_language, draw_segmentation_overlay
 
-    parts = segment_object(obj_name, points, pcd)
+        # Build text prompt
+        text_prompt = args.prompt
+        if text_prompt is None:
+            # Auto-generate prompt from object + part
+            obj_cfg = get_object(obj_name)
+            part_desc = obj_cfg["parts"][part_name]
+            text_prompt = f"{part_name} of the {obj_name}"
+        print(f"  Text prompt: \"{text_prompt}\"")
 
-    for pname, indices in parts.items():
-        marker = "  ←" if pname == part_name else ""
-        print(f"  {pname:12s}: {len(indices):5d} points{marker}")
+        # Load depth
+        depth = np.load(INPUT_DIR / "depth_raw.npy")
+        print(f"  Depth: {depth.shape}")
 
-    part_indices = parts[part_name]
-    if len(part_indices) == 0:
-        print(f"\n  ERROR: No points found for part '{part_name}'")
-        print(f"  The part may not be visible from this camera angle.")
-        sys.exit(1)
+        # Load raw semantic mask (if available)
+        semantic_raw = None
+        semantic_id = None
+        sem_path = INPUT_DIR / "semantic_raw.npy"
+        if sem_path.exists():
+            semantic_raw = np.load(sem_path)
+            # Get semantic ID from metadata
+            if metadata.get("spawned_objects"):
+                semantic_id = metadata["spawned_objects"][0].get("semantic_id")
+            print(f"  Semantic mask: loaded (object id={semantic_id})")
+        else:
+            print(f"  Semantic mask: not found — using SAM-only mode")
 
-    # ── Propose grasp ───────────────────────────────────────────────
-    print_header(f"Proposing grasp for {part_name}")
+        # ── Segment with language model ─────────────────────────────
+        print_header(f"Language-guided segmentation: '{text_prompt}'")
 
-    if method == "geometric":
-        grasp = propose_grasp_geometric(obj_name, part_name, points, part_indices)
-    else:
-        grasp = propose_grasp_neural(obj_name, part_name, points, part_indices, metadata)
+        seg_result = segment_part_by_language(
+            rgb, depth, text_prompt, metadata,
+            part_name=part_name,
+            obj_name=obj_name,
+            box_threshold=args.box_threshold,
+            text_threshold=args.text_threshold,
+            semantic_raw=semantic_raw,
+            semantic_id=semantic_id,
+        )
 
-    print(f"  Type:       {grasp.grasp_type}")
-    print(f"  Position:   ({grasp.position[0]:.4f}, {grasp.position[1]:.4f}, {grasp.position[2]:.4f})")
-    print(f"  Approach:   ({grasp.approach_dir[0]:.3f}, {grasp.approach_dir[1]:.3f}, {grasp.approach_dir[2]:.3f})")
-    print(f"  Confidence: {grasp.confidence:.0%}")
-    print(f"  {grasp.description}")
+        if seg_result is None:
+            print(f"\n  ERROR: Language segmentation failed for '{text_prompt}'")
+            print(f"  Try a different prompt with --prompt, e.g.:")
+            print(f"    --prompt 'handle'")
+            print(f"    --prompt '{part_name}'")
+            print(f"    --prompt '{part_name} of the {obj_name}'")
+            sys.exit(1)
 
-    # ── Visualize on RGB ────────────────────────────────────────────
-    print_header("Rendering visualization")
+        part_3d_points = seg_result["world_points"]
+        mask = seg_result["mask"]
+        bbox = seg_result["bbox"]
 
-    img = cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
-    img = draw_affordance(
-        img, points, part_indices, grasp,
-        sensor_R, sensor_t, fx, cx, cy, width, height,
-        obj_name, part_name,
-    )
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        print(f"  Segmented {len(part_3d_points)} 3D points for '{part_name}'")
 
-    # Save single image
-    out_name = f"affordance_{obj_name}_{part_name}.png"
-    out_path = RESULTS_DIR / out_name
-    Image.fromarray(img_rgb).save(out_path)
-    print(f"  Saved: {out_path}")
+        # ── Propose grasp with GraspNet ──────────────────────────────
+        print_header(f"Proposing grasp for {part_name}")
 
-    # Save side-by-side comparison
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 9))
+        part_indices = np.arange(len(part_3d_points))
+        grasp = propose_grasp_neural(obj_name, part_name, part_3d_points, part_indices, metadata)
 
-    ax1.imshow(rgb)
-    ax1.set_title(f"Scene: {obj_name}", fontsize=16)
-    ax1.axis('off')
+        print(f"  Type:       {grasp.grasp_type}")
+        print(f"  Position:   ({grasp.position[0]:.4f}, {grasp.position[1]:.4f}, {grasp.position[2]:.4f})")
+        print(f"  Approach:   ({grasp.approach_dir[0]:.3f}, {grasp.approach_dir[1]:.3f}, {grasp.approach_dir[2]:.3f})")
+        print(f"  Confidence: {grasp.confidence:.0%}")
+        print(f"  {grasp.description}")
 
-    ax2.imshow(img_rgb)
-    obj_cfg = get_object(obj_name)
-    part_desc = obj_cfg["parts"][part_name]
-    ax2.set_title(f"Affordance: {part_name}\n({part_desc})", fontsize=14)
-    ax2.axis('off')
+        # ── Visualize ───────────────────────────────────────────────
+        print_header("Rendering visualization")
 
-    plt.tight_layout()
-    compare_name = f"comparison_{obj_name}_{part_name}.png"
-    compare_path = RESULTS_DIR / compare_name
-    plt.savefig(compare_path, dpi=150, bbox_inches='tight')
-    plt.close()
-    print(f"  Saved: {compare_path}")
+        part_color = PART_COLORS.get(part_name, (100, 255, 150))
 
-    # Save grasp poses JSON
-    grasp_json = {
-        "object_name": obj_name,
-        "part_name": part_name,
-        "method": method,
-        "part_points": len(part_indices),
-        "total_points": len(points),
-        "grasp": asdict(grasp),
-    }
-    json_path = RESULTS_DIR / "grasp_poses.json"
-    with open(json_path, "w") as f:
-        json.dump(grasp_json, f, indent=2)
-    print(f"  Saved: {json_path}")
+        # Draw SAM mask overlay with contours
+        img_annotated = draw_segmentation_overlay(
+            rgb, mask, bbox, part_name, color=part_color,
+        )
+
+        # Draw grasp crosshair on the annotated image
+        grasp_pos = np.array(grasp.position)
+        grasp_px = project_3d_to_2d(grasp_pos, sensor_R, sensor_t, fx, cx, cy, width, height)
+
+        if grasp_px is not None:
+            cv2.drawMarker(img_annotated, grasp_px, (255, 255, 255),
+                           cv2.MARKER_CROSS, 20, 2)
+            approach_end = grasp_pos + np.array(grasp.approach_dir) * 0.15
+            end_px = project_3d_to_2d(approach_end, sensor_R, sensor_t,
+                                       fx, cx, cy, width, height)
+            if end_px is not None:
+                cv2.arrowedLine(img_annotated, grasp_px, end_px,
+                                (255, 255, 255), 2, tipLength=0.3)
+
+        # Add grasp info label
+        label = f"{obj_name}/{part_name}: {grasp.grasp_type} (conf={grasp.confidence:.0%})"
+        if grasp_px is not None:
+            lx, ly = grasp_px[0] + 15, grasp_px[1] - 15
+        else:
+            lx, ly = 10, height - 40
+        (tw, th), _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+        cv2.rectangle(img_annotated, (lx - 5, ly - th - 5), (lx + tw + 5, ly + 5), (0, 0, 0), -1)
+        cv2.putText(img_annotated, label, (lx, ly),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, part_color, 2, cv2.LINE_AA)
+
+        # Save single image
+        out_name = f"affordance_{obj_name}_{part_name}.png"
+        out_path = RESULTS_DIR / out_name
+        Image.fromarray(img_annotated).save(out_path)
+        print(f"  Saved: {out_path}")
+
+        # Save comparison: original | SAM mask | overlay
+        fig, axes = plt.subplots(1, 3, figsize=(24, 8))
+
+        axes[0].imshow(rgb)
+        axes[0].set_title(f"Scene: {obj_name}", fontsize=16)
+        axes[0].axis('off')
+
+        axes[1].imshow(mask, cmap='gray')
+        axes[1].set_title(f"SAM Mask: \"{text_prompt}\"", fontsize=14)
+        axes[1].axis('off')
+
+        axes[2].imshow(img_annotated)
+        obj_cfg = get_object(obj_name)
+        part_desc = obj_cfg["parts"][part_name]
+        axes[2].set_title(
+            f"Affordance: {part_name} ({len(part_3d_points)} 3D pts)\n"
+            f"Grasp: {grasp.grasp_type} @ {grasp.confidence:.0%}",
+            fontsize=13,
+        )
+        axes[2].axis('off')
+
+        plt.tight_layout()
+        compare_name = f"comparison_{obj_name}_{part_name}.png"
+        compare_path = RESULTS_DIR / compare_name
+        plt.savefig(compare_path, dpi=150, bbox_inches='tight')
+        plt.close()
+        print(f"  Saved: {compare_path}")
+
+        # Save grasp instruction JSON
+        grasp_json = {
+            "object_name": obj_name,
+            "part_name": part_name,
+            "method": method,
+            "text_prompt": text_prompt,
+            "detection_confidence": seg_result["detection_confidence"],
+            "detection_label": seg_result["detection_label"],
+            "mask_pixels": seg_result["sam_mask_pixels"],
+            "part_3d_points": len(part_3d_points),
+            "total_object_points": len(points),
+            "grasp": asdict(grasp),
+        }
+        json_path = RESULTS_DIR / "grasp_poses.json"
+        with open(json_path, "w") as f:
+            json.dump(grasp_json, f, indent=2)
+        print(f"  Saved: {json_path}")
 
     # ── Summary ─────────────────────────────────────────────────────
     print_header("STAGE 2 COMPLETE")
+    obj_cfg = get_object(obj_name)
+    part_desc = obj_cfg["parts"][part_name]
     print(f"  Object: {obj_cfg['display_name']}")
     print(f"  Part:   {part_name} ({part_desc})")
     print(f"  Grasp:  {grasp.grasp_type} @ confidence {grasp.confidence:.0%}")

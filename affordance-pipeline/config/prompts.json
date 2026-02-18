@@ -1,0 +1,37 @@
+{
+    "_comment": "Grounding DINO prompt variants per part type. The pipeline tries each prompt and picks the detection with the smallest bounding box. Use {part} and {obj} as placeholders. Add new part types as needed.",
+    "_fallback": "If a part name is not found here, the pipeline uses: '{part} of the {obj}'",
+
+    "handle": [
+        "side handle",
+        "loop handle",
+        "handle",
+        "{part} of the {obj}"
+    ],
+    "body": [
+        "cup body",
+        "cylindrical body",
+        "{part} of the {obj}"
+    ],
+    "rim": [
+        "cup rim",
+        "top rim",
+        "rim edge",
+        "{part} of the {obj}"
+    ],
+    "chuck": [
+        "drill chuck",
+        "drill bit holder",
+        "{part} of the {obj}"
+    ],
+    "head": [
+        "hammer head",
+        "metal head",
+        "{part} of the {obj}"
+    ],
+    "spout": [
+        "pour spout",
+        "pouring lip",
+        "{part} of the {obj}"
+    ]
+}

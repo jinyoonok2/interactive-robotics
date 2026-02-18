@@ -1,61 +1,44 @@
 """
 Object Catalog for Affordance Pipeline
 =======================================
-Defines available objects, their YCB configs, and graspable parts.
+Loads object definitions from config/objects.json.
 
 Each object has:
   - ycb_config: path to YCB object config (relative to habitat-lab/)
   - display_name: human-readable name
   - parts: dict of part_name → description
   - offset: [x, y, z] spawn offset from agent position
+
+To add a new object, edit:
+  affordance-pipeline/config/objects.json
 """
 
+import json
+from pathlib import Path
+
 # ═══════════════════════════════════════════════════════════════════════════
-# OBJECT CATALOG
+# LOAD OBJECT CATALOG FROM JSON
 # ═══════════════════════════════════════════════════════════════════════════
 
-OBJECTS = {
-    "mug": {
-        "ycb_config": "data/objects/ycb/configs/025_mug.object_config.json",
-        "display_name": "Coffee Mug (YCB 025)",
-        "parts": {
-            "handle": "Protruding loop on the side for gripping",
-            "body":   "Main cylindrical cup body",
-            "rim":    "Circular top edge of the cup",
-        },
-        "offset": [0.0, 0.6, -1.0],
-    },
-    "power_drill": {
-        "ycb_config": "data/objects/ycb/configs/035_power_drill.object_config.json",
-        "display_name": "Power Drill (YCB 035)",
-        "parts": {
-            "handle": "Pistol grip for holding",
-            "body":   "Main motor housing",
-            "chuck":  "Front end where the drill bit attaches",
-        },
-        "offset": [0.0, 0.6, -1.0],
-    },
-    "pitcher": {
-        "ycb_config": "data/objects/ycb/configs/019_pitcher_base.object_config.json",
-        "display_name": "Pitcher (YCB 019)",
-        "parts": {
-            "handle": "Large handle on the back",
-            "spout":  "Pouring lip at the front",
-            "body":   "Main container body",
-            "rim":    "Top circular edge",
-        },
-        "offset": [0.0, 0.6, -1.0],
-    },
-    "hammer": {
-        "ycb_config": "data/objects/ycb/configs/048_hammer.object_config.json",
-        "display_name": "Hammer (YCB 048)",
-        "parts": {
-            "head":   "Metal striking head",
-            "handle": "Wooden grip handle",
-        },
-        "offset": [0.0, 0.6, -1.0],
-    },
-}
+_CONFIG_DIR = Path(__file__).resolve().parent / "config"
+_OBJECTS_PATH = _CONFIG_DIR / "objects.json"
+
+
+def _load_objects() -> dict:
+    """Load and cache the object catalog from objects.json."""
+    if not _OBJECTS_PATH.exists():
+        raise FileNotFoundError(
+            f"Object catalog not found at {_OBJECTS_PATH}\n"
+            f"Create it or copy from the template."
+        )
+    with open(_OBJECTS_PATH, "r") as f:
+        data = json.load(f)
+    # Strip JSON comment keys
+    return {k: v for k, v in data.items() if not k.startswith("_")}
+
+
+# Load once at import time
+OBJECTS = _load_objects()
 
 
 # ═══════════════════════════════════════════════════════════════════════════

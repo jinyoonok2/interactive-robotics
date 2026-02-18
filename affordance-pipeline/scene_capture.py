@@ -429,7 +429,11 @@ def save_images(rgb, depth, semantic):
     np.save(OUTPUT_DIR / "depth_raw.npy", depth)
     print(f"  Saved: depth_raw.npy")
 
-    # Semantic colorized
+    # Semantic — raw integer IDs (for downstream part segmentation)
+    np.save(OUTPUT_DIR / "semantic_raw.npy", semantic.astype(np.int32))
+    print(f"  Saved: semantic_raw.npy")
+
+    # Semantic — colorized visualisation
     unique_ids = np.unique(semantic)
     rng = np.random.RandomState(42)
     color_map = {sid: rng.randint(0, 255, 3) for sid in unique_ids}
