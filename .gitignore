@@ -72,6 +72,9 @@ graspnet-baseline/pointnet2/*.egg-info/
 affordance-pipeline/output/
 affordance-pipeline/results/
 
+# Model checkpoints (SAM, etc.)
+affordance-pipeline/models/
+
 # Large zip files
 *.zip
 
