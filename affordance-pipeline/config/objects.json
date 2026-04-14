@@ -1,42 +1,90 @@
 {
-    "_comment": "Object catalog for the affordance pipeline. Add new objects here.",
+    "_comment": "Object catalog for the affordance pipeline. Each part has: desc (description), prior (protrusion|extremity|boundary|none), query (UAD text query, use {obj} placeholder).",
     "mug": {
-        "ycb_config": "data/objects/ycb/configs/025_mug.object_config.json",
+        "ycb_config": "habitat-lab/data/versioned_data/ycb/configs/025_mug.object_config.json",
         "display_name": "Coffee Mug (YCB 025)",
         "parts": {
-            "handle": "Protruding loop on the side for gripping",
-            "body": "Main cylindrical cup body",
-            "rim": "Circular top edge of the cup"
-        },
-        "offset": [0.0, 0.6, -0.4]
-    },
-    "power_drill": {
-        "ycb_config": "data/objects/ycb/configs/035_power_drill.object_config.json",
-        "display_name": "Power Drill (YCB 035)",
-        "parts": {
-            "handle": "Pistol grip for holding",
-            "body": "Main motor housing",
-            "chuck": "Front end where the drill bit attaches"
+            "handle": {
+                "desc": "Protruding loop on the side for gripping",
+                "prior": "protrusion",
+                "query": "handle"
+            },
+            "body": {
+                "desc": "Main cylindrical cup body",
+                "prior": "none",
+                "query": "wall"
+            },
+            "rim": {
+                "desc": "Circular top edge of the cup",
+                "prior": "boundary",
+                "query": "rim"
+            }
         },
         "offset": [0.0, 0.6, -0.4]
     },
     "pitcher": {
-        "ycb_config": "data/objects/ycb/configs/019_pitcher_base.object_config.json",
+        "ycb_config": "habitat-lab/data/versioned_data/ycb/configs/019_pitcher_base.object_config.json",
         "display_name": "Pitcher (YCB 019)",
         "parts": {
-            "handle": "Large handle on the back",
-            "spout": "Pouring lip at the front",
-            "body": "Main container body",
-            "rim": "Top circular edge"
+            "handle": {
+                "desc": "Large handle on the back",
+                "prior": "protrusion",
+                "query": "handle"
+            },
+            "spout": {
+                "desc": "Pouring lip at the front",
+                "prior": "extremity",
+                "query": "spout"
+            },
+            "body": {
+                "desc": "Main container body",
+                "prior": "none",
+                "query": "wall"
+            },
+            "rim": {
+                "desc": "Top circular edge",
+                "prior": "boundary",
+                "query": "rim"
+            }
         },
         "offset": [0.0, 0.6, -0.4]
     },
     "hammer": {
-        "ycb_config": "data/objects/ycb/configs/048_hammer.object_config.json",
+        "ycb_config": "habitat-lab/data/versioned_data/ycb/configs/048_hammer.object_config.json",
         "display_name": "Hammer (YCB 048)",
         "parts": {
-            "head": "Metal striking head",
-            "handle": "Wooden grip handle"
+            "head": {
+                "desc": "Metal striking head",
+                "prior": "extremity",
+                "query": "head"
+            },
+            "handle": {
+                "desc": "Wooden grip handle",
+                "prior": "protrusion",
+                "query": "handle"
+            }
+        },
+        "offset": [0.0, 0.6, -0.4]
+    },
+    "drill": {
+        "ycb_config": "habitat-lab/data/versioned_data/ycb/configs/035_power_drill.object_config.json",
+        "display_name": "Power Drill (YCB 035)",
+        "parts": {
+            "chuck": {
+                "desc": "Front drill bit holder",
+                "prior": "extremity",
+                "query": "chuck"
+            },
+            "body": {
+                "desc": "Main motor housing",
+                "prior": "none",
+                "query": "body"
+            },
+            "handle": {
+                "desc": "Grip handle with trigger",
+                "prior": "protrusion",
+                "query": "handle"
+            }
         },
         "offset": [0.0, 0.6, -0.4]
     }

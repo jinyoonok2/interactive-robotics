@@ -64,6 +64,26 @@ def get_parts(name):
     return list(obj["parts"].keys())
 
 
+def get_part_info(obj_name, part_name):
+    """Get the full part config dict (desc, prior, query) for a part.
+
+    Returns a dict with at least 'desc'.  If the catalog still uses
+    the legacy format (part → string), the returned dict will have
+    'prior' = 'none' and 'query' = None as sensible defaults.
+    """
+    obj = get_object(obj_name)
+    part_data = obj["parts"].get(part_name)
+    if part_data is None:
+        available = ", ".join(obj["parts"].keys())
+        raise ValueError(
+            f"Unknown part '{part_name}' for {obj_name}. Available: {available}"
+        )
+    # Legacy format support
+    if isinstance(part_data, str):
+        return {"desc": part_data, "prior": "none", "query": None}
+    return part_data
+
+
 def validate_part(obj_name, part_name):
     """Validate that a part exists for the given object. Raises ValueError if not."""
     obj = get_object(obj_name)
@@ -80,7 +100,8 @@ def print_catalog():
     print("\n  Available Objects:")
     print("  " + "─" * 56)
     for name, obj in OBJECTS.items():
-        parts_str = ", ".join(obj["parts"].keys())
+        part_names = list(obj["parts"].keys())
+        parts_str = ", ".join(part_names)
         print(f"    {name:14s} │ {obj['display_name']:25s} │ {parts_str}")
     print("  " + "─" * 56)
 
@@ -89,7 +110,11 @@ def print_object_parts(obj_name):
     """Print parts for a specific object."""
     obj = get_object(obj_name)
     print(f"\n  Parts for {obj['display_name']}:")
-    print("  " + "─" * 44)
-    for part, desc in obj["parts"].items():
-        print(f"    {part:12s} │ {desc}")
-    print("  " + "─" * 44)
+    print("  " + "─" * 60)
+    for part_name, part_data in obj["parts"].items():
+        if isinstance(part_data, str):
+            desc, prior = part_data, "none"
+        else:
+            desc, prior = part_data.get("desc", ""), part_data.get("prior", "none")
+        print(f"    {part_name:12s} │ {prior:12s} │ {desc}")
+    print("  " + "─" * 60)

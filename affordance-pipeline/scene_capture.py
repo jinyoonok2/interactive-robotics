@@ -6,7 +6,7 @@ Entry point for Stage 1. Uses the modular SceneCapture class.
 Usage:
     cd habitat-lab
     python ../affordance-pipeline/scene_capture.py --object mug
-    python ../affordance-pipeline/scene_capture.py --object power_drill
+    python ../affordance-pipeline/scene_capture.py --object hammer
 """
 
 import sys

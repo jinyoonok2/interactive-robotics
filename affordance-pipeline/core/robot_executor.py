@@ -5,7 +5,7 @@ Handles:
   - FetchRobot wrapper creation and configuration
   - Inverse kinematics (position-only + wrist roll correction)
   - Motion planning and execution (joint interpolation)
-  - Magic grasp (rigid constraint attachment)
+  - Kinematic grasp (object transform tracks end-effector)
   - Video capture and snapshot saving
 
 The executor is independent of the affordance detection and grasp
@@ -33,9 +33,9 @@ from habitat.tasks.rearrange.utils import IkHelper
 
 PIPELINE_DIR = Path(__file__).resolve().parent.parent
 
-# Fetch robot URDFs
-FETCH_URDF     = "data/robots/hab_fetch/robots/hab_fetch.urdf"
-FETCH_ARM_URDF = "data/robots/hab_fetch/robots/fetch_onlyarm.urdf"
+# Fetch robot URDFs (relative to project root)
+FETCH_URDF     = "habitat-lab/data/robots/hab_fetch/robots/hab_fetch.urdf"
+FETCH_ARM_URDF = "habitat-lab/data/robots/hab_fetch/robots/fetch_onlyarm.urdf"
 
 
 class RobotExecutor:
@@ -62,8 +62,17 @@ class RobotExecutor:
         self.fetch = None
         self.ik_helper = None
 
-        # Output directory
+        # Kinematic grasp tracking
+        self._grasped_obj = None          # Attached object (KINEMATIC)
+        self._obj_in_ee_frame = None      # Object transform in EE local frame
+
+        # Output directory (set per-object via set_output_dir)
         self.output_dir = PIPELINE_DIR / "results" / "execution"
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    def set_output_dir(self, obj_name: str):
+        """Set per-object output directory: results/{obj_name}/execution/"""
+        self.output_dir = PIPELINE_DIR / "results" / obj_name / "execution"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     # ════════════════════════════════════════════════════════════════
@@ -280,6 +289,9 @@ class RobotExecutor:
         """
         Move robot arm to target joint configuration.
 
+        If a kinematic grasp is active (_grasped_obj is set), the grasped
+        object's transform is updated every step to follow the EE.
+
         Args:
             target_joints: 7-element target joint array
             duration_sec:  Duration of motion
@@ -295,6 +307,9 @@ class RobotExecutor:
         for step_i, wp in enumerate(waypoints):
             self.fetch.arm_joint_pos = wp
             self.sim.step_physics(self.PHYSICS_DT)
+
+            # Track grasped object with the EE (kinematic grasp)
+            self._sync_grasped_object()
 
             if frames is not None and step_i % self.RENDER_EVERY == 0:
                 obs = self.sim.get_sensor_observations()
@@ -340,13 +355,17 @@ class RobotExecutor:
         return [start + a * (end - start) for a in alphas]
 
     # ════════════════════════════════════════════════════════════════
-    # MAGIC GRASP (snap-to constraint)
+    # KINEMATIC GRASP (snap object to EE transform)
     # ════════════════════════════════════════════════════════════════
 
-    def attach_object(self, target_obj, grasp_world_pos: np.ndarray,
-                      grasp_threshold: float = 0.30) -> Optional[int]:
+    def attach_object_kinematic(self, target_obj, grasp_world_pos: np.ndarray,
+                                grasp_threshold: float = 0.30) -> bool:
         """
-        Attach target object to EE using a rigid constraint at the grasp point.
+        Attach target object to EE via kinematic tracking.
+
+        Instead of a physics constraint (which can fail under gravity),
+        the object is kept KINEMATIC and its world transform is updated
+        every simulation step to follow the end-effector.
 
         Args:
             target_obj:      Habitat rigid object to attach
@@ -354,7 +373,7 @@ class RobotExecutor:
             grasp_threshold: Maximum allowed EE-to-grasp distance
 
         Returns:
-            Constraint ID, or None if failed
+            True if attached, False on failure
         """
         ee_pos = self.ee_position
         grasp_pt = mn.Vector3(*grasp_world_pos)
@@ -369,40 +388,40 @@ class RobotExecutor:
             print(f"  WARNING: EE is {dist_ee_grasp:.3f}m from grasp target "
                   f"(threshold={grasp_threshold}m)")
 
-        # Compute pivots
+        # Compute object pose in EE local frame
         ee_link_id = self.fetch.ee_link_id()
         ee_T = self.fetch.sim_obj.get_link_scene_node(ee_link_id).transformation
-        pivot_a = ee_T.inverted().transform_point(grasp_pt)
-
         obj_T = target_obj.transformation
-        pivot_b = obj_T.inverted().transform_point(grasp_pt)
 
-        print(f"  Pivot on EE (local):     ({pivot_a[0]:.4f}, {pivot_a[1]:.4f}, {pivot_a[2]:.4f})")
-        print(f"  Pivot on object (local): ({pivot_b[0]:.4f}, {pivot_b[1]:.4f}, {pivot_b[2]:.4f})")
+        # obj_in_ee: the 4x4 transform that, when left-multiplied by ee_T,
+        # recovers the object's world transform.
+        obj_in_ee = ee_T.inverted().__matmul__(obj_T)
 
-        # Build constraint
-        c = habitat_sim.physics.RigidConstraintSettings()
-        c.object_id_a = self.fetch.sim_obj.object_id
-        c.link_id_a = ee_link_id
-        c.object_id_b = target_obj.object_id
-        c.link_id_b = -1
-        c.pivot_a = pivot_a
-        c.pivot_b = pivot_b
-        c.max_impulse = 1000.0
-        c.constraint_type = habitat_sim.physics.RigidConstraintType.Fixed
+        # Store for per-step tracking
+        self._grasped_obj = target_obj
+        self._obj_in_ee_frame = obj_in_ee
 
-        ee_rot = ee_T.rotation()
-        obj_rot = obj_T.rotation()
-        c.frame_a = ee_rot.inverted().__matmul__(obj_rot)
-        c.frame_b = mn.Matrix3.identity_init()
+        # Switch to KINEMATIC so we can move it programmatically
+        target_obj.motion_type = MotionType.KINEMATIC
 
-        try:
-            constraint_id = self.sim.create_rigid_constraint(c)
-            print(f"  Object attached at grasp point (constraint ID={constraint_id})")
-            return constraint_id
-        except Exception as e:
-            print(f"  WARNING: Failed to create constraint: {e}")
-            return None
+        print(f"  Object attached (kinematic grasp)")
+        return True
+
+    def _sync_grasped_object(self):
+        """Update grasped object transform to follow EE. Called each step."""
+        if self._grasped_obj is None:
+            return
+        ee_link_id = self.fetch.ee_link_id()
+        ee_T = self.fetch.sim_obj.get_link_scene_node(ee_link_id).transformation
+        new_obj_T = ee_T.__matmul__(self._obj_in_ee_frame)
+        self._grasped_obj.transformation = new_obj_T
+
+    def detach_object(self):
+        """Release the kinematically grasped object (switch to DYNAMIC)."""
+        if self._grasped_obj is not None:
+            self._grasped_obj.motion_type = MotionType.DYNAMIC
+            self._grasped_obj = None
+            self._obj_in_ee_frame = None
 
     # ════════════════════════════════════════════════════════════════
     # FULL GRASP EXECUTION
@@ -427,7 +446,7 @@ class RobotExecutor:
             record_video:   Whether to capture video frames
 
         Returns:
-            Dict with execution results (positions, constraint_id, etc.)
+            Dict with execution results (positions, kinematic_grasp, etc.)
         """
         if self.ik_helper is None:
             self.setup_ik()
@@ -488,16 +507,22 @@ class RobotExecutor:
         self.move_arm(ik_grasp, duration_sec=1.5, frames=frames, label="Final approach")
         self.save_snapshot("02_at_grasp.png", "At grasp position")
 
-        # Phase 3: Grasp
+        # Phase 3: Grasp (kinematic)
+        # Close gripper, then attach object to EE via kinematic tracking.
+        # The object stays KINEMATIC (no gravity) and its transform is
+        # updated every simulation step to follow the end-effector.
         print(f"\n  Phase 3: Grasp")
-        target_obj.motion_type = MotionType.DYNAMIC
         self.close_gripper(duration_sec=0.5, frames=frames)
-        constraint_id = self.attach_object(target_obj, grasp_pos)
+        self.attach_object_kinematic(target_obj, grasp_pos)
         self.save_snapshot("03_grasped.png", "Object grasped")
 
-        # Phase 4: Lift
+        # Phase 4: Lift (object follows EE automatically via _sync_grasped_object)
         print(f"\n  Phase 4: Lift")
+        obj_pre_lift_y = float(target_obj.translation[1])
         self.move_arm(ik_lift, duration_sec=2.0, frames=frames, label="Lift")
+        obj_post_lift_y = float(target_obj.translation[1])
+        lift_delta = obj_post_lift_y - obj_pre_lift_y
+        print(f"  Object Y: {obj_pre_lift_y:.4f} → {obj_post_lift_y:.4f} (lift={lift_delta:.4f}m)")
         self.save_snapshot("04_lifted.png", "Object lifted")
 
         # Hold
@@ -508,7 +533,7 @@ class RobotExecutor:
 
         return {
             "frames": frames,
-            "constraint_id": constraint_id,
+            "kinematic_grasp": self._grasped_obj is not None,
             "ik_solutions": {
                 "pre_grasp": ik_pre,
                 "grasp": ik_grasp,
@@ -597,7 +622,7 @@ class RobotExecutor:
             },
             "waypoints": result["waypoints"],
             "object_final_position": [float(obj_final[0]), float(obj_final[1]), float(obj_final[2])],
-            "magic_grasp_used": result["constraint_id"] is not None,
+            "magic_grasp_used": result.get("kinematic_grasp", False),
         }
 
         log_path = self.output_dir / "execution_log.json"

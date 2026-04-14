@@ -6,6 +6,7 @@ Entry point for Stage 3. Uses the RobotExecutor class.
 Usage:
     cd habitat-lab
     python ../affordance-pipeline/execute_grasp.py --object mug --part handle
+    python ../affordance-pipeline/execute_grasp.py --object hammer --part handle --method clipseg
 """
 
 import sys
@@ -25,15 +26,12 @@ from objects import get_object_names, get_object
 
 PIPELINE_DIR = Path(__file__).resolve().parent
 INPUT_DIR    = PIPELINE_DIR / "output"
-RESULT_DIR   = PIPELINE_DIR / "results" / "language"
-OUTPUT_DIR   = PIPELINE_DIR / "results" / "execution"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Sim config
 SENSOR_HEIGHT = 512
 SENSOR_WIDTH  = 512
 HFOV_DEG      = 70
-SCENE_DIR     = "data/scene_datasets/hssd-hab"
+SCENE_DIR     = "habitat-lab/data/versioned_data/hssd-hab"
 SCENE_ID      = "102344250"
 SCENE_FILE    = f"{SCENE_DIR}/scenes/{SCENE_ID}.scene_instance.json"
 SCENE_DATASET = f"{SCENE_DIR}/hssd-hab.scene_dataset_config.json"
@@ -61,6 +59,8 @@ def parse_args():
                         help="Part of the object to grasp")
     parser.add_argument("--no-video", action="store_true",
                         help="Skip video recording")
+    parser.add_argument("--method", choices=["clipseg", "uad"], default="clipseg",
+                        help="Which affordance method's grasp to execute (default: clipseg)")
     return parser.parse_args()
 
 
@@ -92,10 +92,17 @@ def main():
     obj_name = args.object
     part_name = args.part
 
+    # Per-object output directories
+    method = args.method
+    RESULT_DIR = PIPELINE_DIR / "results" / obj_name / method
+    OUTPUT_DIR = PIPELINE_DIR / "results" / obj_name / "execution"
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
     # Load Stage 1 & 2 data
     print_header("Execute Grasp — Stage 3")
     print(f"  Object: {obj_name}")
     print(f"  Part:   {part_name}")
+    print(f"  Method: {method}")
     print(f"  Output: {OUTPUT_DIR}")
 
     meta_path = INPUT_DIR / "metadata.json"
@@ -173,6 +180,7 @@ def main():
         # Spawn robot
         print_header("Spawning Fetch robot")
         executor = RobotExecutor(sim)
+        executor.set_output_dir(obj_name)
         robot_pos = mn.Vector3(
             grasp_pos[0],
             agent_pos[1],

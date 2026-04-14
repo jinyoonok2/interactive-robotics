@@ -3,21 +3,13 @@ AffordancePipeline — Orchestrator for the full 3-stage pipeline.
 
 Ties together:
   1. SceneCapture:       Setup scene, spawn object, capture sensors
-  2. AffordanceDetector: DINO + SAM language-guided segmentation
+  2. Affordance Detector (UAD or CLIPSeg)
   3. GraspPlanner:       Geometric / GraspNet grasp proposals
   4. RobotExecutor:      Fetch arm IK + motion + magic grasp
 
-Can run all stages end-to-end, or individual stages.
-
 Usage:
-    # Full pipeline
-    pipeline = AffordancePipeline()
+    pipeline = AffordancePipeline(method="clipseg")
     pipeline.run("mug", "handle")
-
-    # Individual stages
-    pipeline.run_capture("mug")
-    pipeline.run_affordance("mug", "handle")
-    pipeline.run_grasp("mug", "handle")
 """
 
 import json
@@ -30,7 +22,6 @@ from habitat_sim.physics import MotionType
 import magnum as mn
 
 from core.scene_capture import SceneCapture
-from core.affordance_detector import AffordanceDetector
 from core.grasp_planner import GraspPlanner
 from core.robot_executor import RobotExecutor
 
@@ -54,34 +45,39 @@ class AffordancePipeline:
     def __init__(
         self,
         scene_id: str = None,
-        box_threshold: float = 0.25,
-        text_threshold: float = 0.25,
+        affordance_threshold: float = 0.5,
+        method: str = "clipseg",
     ):
         """
         Initialize the pipeline.
 
         Args:
-            scene_id:       HSSD scene ID
-            box_threshold:  Grounding DINO detection threshold
-            text_threshold: Grounding DINO text matching threshold
+            scene_id:             HSSD scene ID
+            affordance_threshold: Affordance binarization threshold (0-1)
+            method:               "clipseg" or "uad"
         """
+        self.method = method
         self.capture = SceneCapture(scene_id=scene_id)
-        self.detector = AffordanceDetector(
-            box_threshold=box_threshold,
-            text_threshold=text_threshold,
-        )
+
+        if method == "clipseg":
+            from core.clipseg_detector import CLIPSegDetector
+            self.detector = CLIPSegDetector(threshold=affordance_threshold)
+        else:
+            from core.affordance_detector import AffordanceDetector
+            self.detector = AffordanceDetector(threshold=affordance_threshold)
+
         self.planner = GraspPlanner()
 
         # Paths for inter-stage data
         self.input_dir = PIPELINE_DIR / "output"
-        self.result_dir = PIPELINE_DIR / "results" / "language"
+        self.result_dir = PIPELINE_DIR / "results" / method
         self.output_dir = PIPELINE_DIR / "results" / "execution"
 
     # ════════════════════════════════════════════════════════════════
     # FULL PIPELINE
     # ════════════════════════════════════════════════════════════════
 
-    def run(self, obj_name: str, part_name: str, prompt: str = None,
+    def run(self, obj_name: str, part_name: str, query: str = None,
             record_video: bool = True):
         """
         Run the complete 3-stage pipeline.
@@ -89,13 +85,13 @@ class AffordancePipeline:
         Args:
             obj_name:     Object name (e.g., "mug")
             part_name:    Part name (e.g., "handle")
-            prompt:       Custom text prompt for affordance detection
+            query:        Custom text query for UAD (auto-generated if None)
             record_video: Whether to capture execution video
         """
         print_header(f"Full Pipeline: {obj_name}/{part_name}")
 
         self.run_capture(obj_name)
-        self.run_affordance(obj_name, part_name, prompt=prompt)
+        self.run_affordance(obj_name, part_name, query=query)
         self.run_grasp(obj_name, part_name, record_video=record_video)
 
     # ════════════════════════════════════════════════════════════════
@@ -125,14 +121,14 @@ class AffordancePipeline:
     # STAGE 2: AFFORDANCE DETECTION + GRASP PLANNING
     # ════════════════════════════════════════════════════════════════
 
-    def run_affordance(self, obj_name: str, part_name: str, prompt: str = None):
+    def run_affordance(self, obj_name: str, part_name: str, query: str = None):
         """
         Stage 2: Detect affordance and plan grasp.
 
         Args:
             obj_name:  Object name
             part_name: Part to detect
-            prompt:    Custom text prompt
+            query:     Custom text query for UAD (auto-generated if None)
         """
         print_header("Stage 2: Affordance Detection + Grasp Planning")
         print(f"  Object: {obj_name}")
@@ -149,7 +145,7 @@ class AffordancePipeline:
         # Detect affordance
         print_header(f"Detecting: '{part_name}'")
         seg_result = self.detector.detect(
-            obj_name, part_name, rgb, depth, metadata, prompt=prompt,
+            obj_name, part_name, rgb, depth, metadata, query=query,
         )
         if seg_result is None:
             raise RuntimeError(f"Affordance detection failed for '{part_name}'")
@@ -184,10 +180,9 @@ class AffordancePipeline:
         )
 
         # Save
-        text_prompt = prompt or f"{part_name} of the {obj_name}"
         self.detector.save_results(
             rgb, img_annotated, seg_result, grasp,
-            obj_name, part_name, metadata, text_prompt,
+            obj_name, part_name, metadata,
         )
 
         print_header("Stage 2 Complete")

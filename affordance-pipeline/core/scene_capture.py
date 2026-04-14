@@ -40,7 +40,7 @@ class SceneCapture:
     DEFAULT_HFOV_DEG      = 70
     DEFAULT_MAX_DEPTH     = 10.0
 
-    DEFAULT_SCENE_DIR     = "data/scene_datasets/hssd-hab"
+    DEFAULT_SCENE_DIR     = "habitat-lab/data/versioned_data/hssd-hab"
     DEFAULT_SCENE_ID      = "102344250"
 
     def __init__(
@@ -66,7 +66,11 @@ class SceneCapture:
             output_dir:    Output directory path (default: affordance-pipeline/output)
         """
         self.scene_id      = scene_id or self.DEFAULT_SCENE_ID
-        self.scene_dir     = scene_dir or self.DEFAULT_SCENE_DIR
+        # Resolve scene_dir relative to the project root so the script can be
+        # invoked from any working directory.
+        _project_root = Path(__file__).resolve().parent.parent.parent  # …/interactive-robotics
+        _default_abs  = str(_project_root / self.DEFAULT_SCENE_DIR)
+        self.scene_dir = scene_dir or _default_abs
         self.sensor_width  = sensor_width or self.DEFAULT_SENSOR_WIDTH
         self.sensor_height = sensor_height or self.DEFAULT_SENSOR_HEIGHT
         self.hfov_deg      = hfov_deg or self.DEFAULT_HFOV_DEG
@@ -162,7 +166,7 @@ class SceneCapture:
         Position the agent at a navigable point and spawn a YCB object.
 
         Args:
-            obj_name: Key from objects.json (e.g., "mug", "power_drill")
+            obj_name: Key from objects.json (e.g., "mug", "hammer")
 
         Returns:
             (agent_pos, obj_info) tuple
@@ -243,7 +247,10 @@ class SceneCapture:
     def _spawn_single_object(self, obj_name: str):
         """Spawn a single YCB object in front of the agent."""
         obj_cfg = get_object(obj_name)
-        config_path = obj_cfg["ycb_config"]
+        _project_root = Path(__file__).resolve().parent.parent.parent
+        # Resolve ycb_config relative to project root so the script runs from any cwd
+        config_path_raw = obj_cfg["ycb_config"]
+        config_path = str(_project_root / config_path_raw) if not Path(config_path_raw).is_absolute() else config_path_raw
         offset = np.array(obj_cfg["offset"])
 
         obj_templates_mgr = self.sim.get_object_template_manager()
