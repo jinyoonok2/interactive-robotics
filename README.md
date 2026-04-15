@@ -1,29 +1,35 @@
 # Interactive Robotics
 
-Affordance-guided robotic manipulation in Habitat-Sim. A Fetch robot identifies *where* to grasp objects using affordance detection, plans 6-DoF grasps with GraspNet, and executes pick-and-place in simulated indoor scenes.
+Language-instructed robotic manipulation in Habitat-Sim. A user gives a natural language task instruction (e.g., *"pour coffee,"* *"cut the bread"*), and a Fetch robot must understand **which part** of **which object** to interact with — then plan and execute a grasp accordingly.
 
-**Status:** The original affordance module (UAD / FiLM) was evaluated and found insufficient for part-level localization. A replacement using supervised training on AGD20K + Habitat-rendered augmentation with a cross-attention architecture is planned. See [UAD_EVALUATION.md](UAD_EVALUATION.md) for full details.
+The core challenge is **part-aware affordance detection conditioned on language**: the same object has different interaction regions depending on the task. *"Pour coffee"* → grip the mug **by the handle**. *"Cut the bread"* → grip the knife **by the handle**, not the blade. The affordance model must ground the instruction to the correct object part.
+
+**Status:** The original affordance module (UAD / FiLM) was evaluated and found insufficient for part-level localization (SIM=0.407). A replacement using supervised cross-attention (DINOv2 ViT-L/14 + Flan-T5 encoder) trained on AGD20K with LLM-enriched descriptions is in development. The architecture produces reusable Task-Grounded Features designed to transfer from affordance detection to RL-based manipulation policy learning. See [PROPOSAL.md](PROPOSAL.md) for the full approach, [RESEARCH_JUSTIFICATION.md](RESEARCH_JUSTIFICATION.md) for positioning against related work, and [UAD_EVALUATION.md](UAD_EVALUATION.md) for the UAD evaluation.
 
 ---
 
 ## Architecture
 
 ```
-Stage 1: SceneCapture      → Habitat-Sim loads HSSD scene, spawns YCB object, captures RGB + Depth + Semantic
-Stage 2: AffordanceDetector → (affordance model) → heatmap → 3D point cloud
-         GraspPlanner       → GraspNet neural inference or geometric heuristics → 6-DoF grasp pose
-Stage 3: RobotExecutor     → Fetch robot IK + motion planning + grasp execution in Habitat-Sim
+Input:   "pour coffee"                          ← Natural language task instruction
+           │
+Stage 1: SceneCapture      → Habitat-Sim loads HSSD scene, captures RGB + Depth + Semantic
+Stage 2: AffordanceDetector → Language-conditioned model → part-level heatmap (e.g., mug handle)
+         GraspPlanner       → GraspNet + affordance weighting → 6-DoF grasp on the correct part
+Stage 3: RobotExecutor     → Fetch robot IK + motion planning → execute grasp in Habitat-Sim
 ```
+
+The instruction drives everything: the affordance model takes both the image and the text, and produces a heatmap highlighting the task-relevant object part. The grasp planner then targets that region specifically.
 
 ### Key Modules
 
 | Module | File | Purpose |
 |--------|------|---------|
 | `SceneCapture` | `affordance-pipeline/core/scene_capture.py` | Habitat-Sim scene/sensor config, agent positioning, YCB spawning, RGB/D/Semantic capture |
-| `AffordanceDetector` | `affordance-pipeline/core/affordance_detector.py` | Affordance heatmap prediction (currently wired to UAD, pending replacement) |
+| `AffordanceDetector` | `affordance-pipeline/core/affordance_detector.py` | Language-conditioned affordance heatmap — takes image + task instruction, outputs part-level heatmap (pending replacement) |
 | `GraspPlanner` | `affordance-pipeline/core/grasp_planner.py` | Geometric + GraspNet neural grasp planning with affordance-weighted selection |
 | `RobotExecutor` | `affordance-pipeline/core/robot_executor.py` | FetchRobot wrapper, PyBullet IK, motion planning, magic grasp |
-| `Pipeline` | `affordance-pipeline/pipeline.py` | Main orchestrator combining all stages |
+| `Pipeline` | `affordance-pipeline/pipeline.py` | Main orchestrator: instruction → scene capture → affordance → grasp → execute |
 
 ### Robot
 
@@ -38,6 +44,8 @@ FetchRobot (7-DoF arm) via Habitat's articulated agent framework:
 ```
 interactive-robotics/
 ├── README.md                  # This file
+├── PROPOSAL.md                # Architecture, phased plan (1–4), model choices
+├── RESEARCH_JUSTIFICATION.md  # Why supervised + positioning vs LOCATE, UAD, VLMs
 ├── UAD_EVALUATION.md          # UAD setup, evaluation results, and failure analysis
 ├── affordance-pipeline/       # Main pipeline code
 │   ├── pipeline.py            # 3-stage orchestrator
@@ -190,9 +198,11 @@ bash tests/check_all.sh uad          # uad env packages + DINOv2
 
 ## Next Steps
 
-1. **Replace affordance detector** — cross-attention (DINOv2 + CLIP) trained on AGD20K with Habitat augmentation
-2. **End-to-end pipeline test** — SceneCapture → new affordance model → GraspNet → RobotExecutor
-3. **Evaluate on Habitat scenes** — part-level affordance accuracy on YCB objects in HSSD environments
+1. **Phase 1: Train affordance model** — DINOv2 ViT-L/14 (visual) + Flan-T5 encoder (per-token language) + cross-attention fusion + affordance head, trained on AGD20K GT heatmaps (see [PROPOSAL.md](PROPOSAL.md))
+2. **Phase 1.5: Validate DINOv2 correspondence** — verify patch-level feature matching between AGD20K objects and HSSD objects across 5 categories
+3. **Phase 2: Habitat dataset augmentation** — render HSSD objects from multiple viewpoints, transfer AGD20K labels via DINOv2 correspondence
+4. **Phase 3: Retrain with augmented data** — zero domain gap between training and Habitat deployment
+5. **Phase 4 (future): RL policy learning** — attach Policy/Value heads to frozen Task-Grounded Features, train with RL in Habitat
 
 ---
 
