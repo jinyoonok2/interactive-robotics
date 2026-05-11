@@ -1,0 +1,40 @@
+name: part_action_mlp_synth
+heads: [heatmap, contact, approach, action]
+
+data:
+  train_hdf5:
+    - results/synth/bottle.hdf5
+    - results/synth/kettle.hdf5
+  val_hdf5: []
+  action_chunk: 8
+  sample_stride: 2
+  max_demos_per_file: null
+  num_workers: 2
+  batch_size: 8
+  pin_memory: true
+
+model:
+  img_size: 98
+  out_size: 96
+  hidden_dim: 128
+  num_fusion_layers: 1
+  text_device: cpu
+
+train:
+  device: cuda
+  epochs: 5
+  lr: 3.0e-4
+  weight_decay: 1.0e-5
+  grad_clip: 1.0
+  log_every: 25
+  save_every_epoch: 1
+  amp: true
+  seed: 42
+
+losses:
+  heatmap_weight: 1.0
+  contact_weight: 0.5
+  approach_weight: 0.5
+  action_weight: 1.0
+
+output_dir: results/part_action_mlp_synth

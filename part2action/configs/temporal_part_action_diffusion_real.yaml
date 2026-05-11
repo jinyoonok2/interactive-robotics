@@ -1,0 +1,46 @@
+name: temporal_part_action_diffusion_real
+heads: [heatmap, contact, approach, action]
+
+data:
+  train_hdf5:
+    - ../datasets/PartInstruct/demos/scissors.hdf5
+    - ../datasets/PartInstruct/demos/pliers.hdf5
+  val_hdf5: []
+  action_chunk: 8
+  n_obs_steps: 2
+  sample_stride: 2
+  max_demos_per_file: null
+  num_workers: 2
+  batch_size: 8
+  pin_memory: true
+
+model:
+  img_size: 252
+  out_size: 252
+  hidden_dim: 256
+  num_fusion_layers: 2
+  text_device: cuda
+  temporal_encoder_type: transformer
+  temporal_layers: 1
+  temporal_heads: 4
+  action_head_type: diffusion
+  diffusion_steps: 50
+
+train:
+  device: cuda
+  epochs: 30
+  lr: 3.0e-4
+  weight_decay: 1.0e-5
+  grad_clip: 1.0
+  log_every: 50
+  save_every_epoch: 5
+  amp: true
+  seed: 42
+
+losses:
+  heatmap_weight: 1.0
+  contact_weight: 0.5
+  approach_weight: 0.5
+  action_weight: 1.0
+
+output_dir: results/temporal_part_action_diffusion_real
