@@ -12,6 +12,7 @@ It is **not** a Habitat integration. The goal is fast concept validation on a sm
 part2action/
   README.md                           This file
   setup_env.sh                        Create the part2action conda env
+  setup_vastai.sh                     Set up Part2Action on a Vast.ai GPU instance
   download_subset.sh                  Download scissors.hdf5 + pliers.hdf5 from HF
   configs/
     heatmap_synth.yaml                Synthetic heatmap-only config
@@ -57,3 +58,22 @@ python scripts/evaluate.py --config configs/part_action_mlp_synth.yaml --ckpt re
 ```
 
 See [`docs/SETUP.md`](docs/SETUP.md) for the full setup and install notes.
+
+## Vast.ai setup
+
+On a fresh Vast.ai instance:
+
+```bash
+git clone https://github.com/jinyoonok2/interactive-robotics.git
+cd interactive-robotics/part2action
+HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_vastai.sh
+```
+
+Then run the real-data tracks:
+
+```bash
+conda activate part2action
+bash train_tracks.sh heatmap
+bash train_tracks.sh mlp
+bash train_tracks.sh diffusion
+```
