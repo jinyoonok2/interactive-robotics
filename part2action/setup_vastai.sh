@@ -10,24 +10,26 @@
 #   HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_vastai.sh
 #
 # Options:
-#   ENV_NAME=part2action          Conda/micromamba env name
-#   DOWNLOAD_DATA=1              Download scissors + pliers PartInstruct subset
+#   ENV_NAME=part2action310       Conda/micromamba env name
+#   DOWNLOAD_DATA=1               Download scissors + pliers PartInstruct subset
 #   DATA_DIR=/workspace/datasets/PartInstruct
-#   CUDA_INDEX_URL=https://download.pytorch.org/whl/cu121
+#   TORCH_INSTALL=stable-cu121     PyTorch wheels for RTX 30/40/A-series GPUs
+#   TORCH_INSTALL=nightly-cu128    PyTorch nightly wheels for newer GPUs
 
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(cd "$ROOT_DIR/.." && pwd)"
-ENV_NAME="${ENV_NAME:-part2action}"
+ENV_NAME="${ENV_NAME:-part2action310}"
 PYTHON_VERSION="${PYTHON_VERSION:-3.10}"
-CUDA_INDEX_URL="${CUDA_INDEX_URL:-https://download.pytorch.org/whl/cu121}"
+TORCH_INSTALL="${TORCH_INSTALL:-stable-cu121}"
 DATA_DIR="${DATA_DIR:-$REPO_DIR/datasets/PartInstruct}"
 DOWNLOAD_DATA="${DOWNLOAD_DATA:-0}"
 
 echo "[setup_vastai] Repo: $REPO_DIR"
 echo "[setup_vastai] Env:  $ENV_NAME"
 echo "[setup_vastai] Data: $DATA_DIR"
+echo "[setup_vastai] Torch install: $TORCH_INSTALL"
 
 create_conda_env() {
     source "$(conda info --base)/etc/profile.d/conda.sh"
@@ -69,7 +71,21 @@ fi
 python -m pip install --upgrade pip
 
 echo "[setup_vastai] Installing PyTorch CUDA wheels..."
-python -m pip install "torch==2.4.1" "torchvision==0.19.1" --index-url "$CUDA_INDEX_URL"
+case "$TORCH_INSTALL" in
+    stable-cu121)
+        python -m pip install "torch==2.4.1" "torchvision==0.19.1" \
+            --index-url https://download.pytorch.org/whl/cu121
+        ;;
+    nightly-cu128)
+        python -m pip install --pre torch torchvision \
+            --index-url https://download.pytorch.org/whl/nightly/cu128
+        ;;
+    *)
+        echo "[setup_vastai] ERROR: unknown TORCH_INSTALL='$TORCH_INSTALL'"
+        echo "[setup_vastai] Use stable-cu121 or nightly-cu128."
+        exit 2
+        ;;
+esac
 
 echo "[setup_vastai] Installing Part2Action dependencies..."
 python -m pip install \
@@ -81,10 +97,27 @@ python -m pip install \
     "pyyaml>=6.0" \
     "scikit-image>=0.22" \
     "matplotlib>=3.8" \
-    "transformers>=4.41" \
+    "transformers>=4.41,<5" \
     "sentence-transformers>=2.7" \
     "huggingface_hub>=0.23" \
     "einops>=0.7"
+
+echo "[setup_vastai] Verifying Python/PyTorch/CUDA..."
+python - <<'PY'
+import sys
+import torch
+import torchvision
+
+print("python", sys.version)
+print("torch", torch.__version__)
+print("torchvision", torchvision.__version__)
+print("cuda available", torch.cuda.is_available())
+print("cuda", torch.version.cuda)
+if torch.cuda.is_available():
+    print("gpu", torch.cuda.get_device_name(0))
+    x = torch.ones(1, device="cuda")
+    print("cuda smoke", (x + 1).item())
+PY
 
 mkdir -p "$DATA_DIR/demos" "$ROOT_DIR/results" "$HOME/.cache/huggingface" "$HOME/.cache/torch"
 
@@ -112,6 +145,9 @@ elif command -v micromamba >/dev/null 2>&1; then
 else
     echo "  source $REPO_DIR/.venv-part2action/bin/activate"
 fi
+echo ""
+echo "For newer GPUs that fail with 'no kernel image is available', recreate with:"
+echo "  ENV_NAME=$ENV_NAME TORCH_INSTALL=nightly-cu128 bash setup_vastai.sh"
 echo ""
 echo "Run first three experiments sequentially:"
 echo "  cd $REPO_DIR"

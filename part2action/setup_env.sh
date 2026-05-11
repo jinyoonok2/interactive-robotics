@@ -30,7 +30,7 @@ pip install \
     "pyyaml>=6.0" \
     "scikit-image>=0.22" \
     "matplotlib>=3.8" \
-    "transformers>=4.41" \
+    "transformers>=4.41,<5" \
     "sentence-transformers>=2.7" \
     "huggingface_hub>=0.23" \
     "einops>=0.7"

@@ -69,10 +69,17 @@ cd interactive-robotics/part2action
 HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_vastai.sh
 ```
 
+For newer GPUs that fail with `no kernel image is available`, use newer
+PyTorch CUDA wheels:
+
+```bash
+TORCH_INSTALL=nightly-cu128 HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_vastai.sh
+```
+
 Then run the real-data tracks:
 
 ```bash
-conda activate part2action
+conda activate part2action310
 bash train_tracks.sh heatmap
 bash train_tracks.sh mlp
 bash train_tracks.sh diffusion
