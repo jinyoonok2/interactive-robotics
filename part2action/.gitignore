@@ -1,6 +1,10 @@
 results/
+third_party/PartInstruct/
 __pycache__/
 *.pyc
 *.pt
 *.ckpt
+*.zip
+*.mp4
+*.gif
 .DS_Store

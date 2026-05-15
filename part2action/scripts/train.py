@@ -10,6 +10,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import shutil
 import time
 from pathlib import Path
 
@@ -113,13 +114,15 @@ def main() -> None:
     p.add_argument("--resume", default=None, help="Resume model weights/history from a checkpoint")
     args = p.parse_args()
 
-    cfg = load_yaml(args.config)
+    config_src = Path(args.config).expanduser().resolve()
+    cfg = load_yaml(config_src)
     cfg = resolve_paths(cfg, ROOT)
     if args.override_out:
         cfg["output_dir"] = args.override_out
 
     set_seed(int(cfg.get("train", {}).get("seed", 42)))
     out_dir = ensure_dir(cfg["output_dir"])
+    shutil.copy2(config_src, out_dir / "config_source.yaml")
 
     device = select_device(cfg["train"].get("device", "cuda"))
     print(f"[train] device={device}  cfg={args.config}")
