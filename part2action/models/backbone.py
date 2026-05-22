@@ -102,6 +102,7 @@ class FrozenT5(nn.Module):
         max_length: int = 32,
     ) -> None:
         super().__init__()
+        model_name = os.environ.get("FLAN_T5_MODEL", model_name)
         self.device_str = device
         self.max_length = int(max_length)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)

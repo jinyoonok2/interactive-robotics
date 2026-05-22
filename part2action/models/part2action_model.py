@@ -91,6 +91,13 @@ class Part2ActionModel(nn.Module):
             else:
                 self.action_head = ActionChunkHead(in_dim=hidden_dim, chunk=action_chunk, action_dim=action_dim)
 
+    def to(self, *args, **kwargs):
+        module = super().to(*args, **kwargs)
+        # Keep the frozen text encoder on its configured device after callers
+        # move the trainable model to CUDA.
+        self.text.model.to(self.text.device_str)
+        return module
+
     def trainable_parameters(self):
         for p in self.parameters():
             if p.requires_grad:

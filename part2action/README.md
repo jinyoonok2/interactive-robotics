@@ -15,6 +15,24 @@ integration. The current workflow has two parts:
 The first successful simulator smoke result so far is the MLP action model on a
 PartGym scissors grasp task. Pliers still fails in the current prototype.
 
+## Current Direction
+
+The immediate goal is to validate whether part-conditioned action prediction can
+outperform a heatmap-only part-localization baseline on PartInstruct tasks.
+
+The current plan is:
+
+1. Train offline on selected PartInstruct object HDF5 files.
+2. Compare `heatmap_real` against action-capable heads such as
+   `part_action_mlp_real`.
+3. Use PartGym rollouts only after the offline metrics look promising.
+4. Carry the best part-action model into the larger Habitat integration.
+
+For a fresh GPU server or SSH agent workflow, start with
+[`docs/UNIVERSITY_GPU.md`](docs/UNIVERSITY_GPU.md). For Hugging Face token setup
+and selected-object data downloads, see
+[`docs/DATA_SUBSETS.md`](docs/DATA_SUBSETS.md).
+
 ## Directory Layout
 
 ```text
@@ -96,6 +114,22 @@ huggingface-cli login
 bash download_subset.sh
 ```
 
+If Hugging Face CLI hangs on this machine, save your token to
+`~/.cache/huggingface/token`; `download_subset.sh` uses `curl -4` to force IPv4.
+See [`docs/DATA_SUBSETS.md`](docs/DATA_SUBSETS.md) for the full token and
+selected-object workflow.
+
+Or choose a custom object subset while still downloading every task/demo for
+those objects:
+
+```bash
+OBJECTS="mug bottle scissors" bash download_subset.sh
+python scripts/make_object_configs.py --objects mug bottle scissors --tag mug_bottle_scissors
+```
+
+Use the generated configs under `configs/generated/` for training that selected
+object subset.
+
 Expected output:
 
 ```text
@@ -160,7 +194,7 @@ so it uses a **separate conda env** named `partinstruct`.
 We avoid git submodules. Clone upstream directly into `third_party/`:
 
 ```bash
-cd /home/jinyoon/workspace/interactive-robotics/part2action
+cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
 mkdir -p third_party
 git clone --recurse-submodules https://github.com/SCAI-JHU/PartInstruct.git third_party/PartInstruct
 ```
@@ -176,7 +210,7 @@ conda create -n partinstruct -c conda-forge \
 conda activate partinstruct
 pip install torch torchvision torchaudio
 
-cd /home/jinyoon/workspace/interactive-robotics/part2action/third_party/PartInstruct
+cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/third_party/PartInstruct
 pip install -r requirements.txt
 pip install omegaconf
 
@@ -198,7 +232,7 @@ The HDF5 demos are enough for offline training, but **not** for simulator
 rollouts. PartGym also needs robot/object/scene assets.
 
 ```bash
-cd /home/jinyoon/workspace/interactive-robotics/part2action/third_party/PartInstruct
+cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/third_party/PartInstruct
 huggingface-cli download SCAI-JHU/PartInstruct \
   --repo-type dataset \
   --local-dir ./data \
@@ -226,7 +260,7 @@ rm ./data/assets.zip
 Run from `part2action/` using the `partinstruct` env:
 
 ```bash
-cd /home/jinyoon/workspace/interactive-robotics/part2action
+cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
 ```
 
 Scissors, 200 max steps, record video:

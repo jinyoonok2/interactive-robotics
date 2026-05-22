@@ -5,10 +5,15 @@ It assumes a single workstation with a CUDA GPU (the workstation already
 has the `habitat-grasp` env and DINOv2 ViT-S/14 reg4 weights cached at
 `~/.cache/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth`).
 
+For a university SSH/GPU server, first read
+[`UNIVERSITY_GPU.md`](UNIVERSITY_GPU.md). In particular, do not train on a
+login/portal node unless your cluster explicitly allows it; request a GPU
+allocation first.
+
 ## 1. Create the training env
 
 ```bash
-cd /home/jinyoon/workspace/interactive-robotics/part2action
+cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
 bash setup_env.sh
 ```
 
@@ -41,12 +46,24 @@ The dataset is gated. Accept the terms once at
 <https://huggingface.co/datasets/SCAI-JHU/PartInstruct>, then:
 
 ```bash
-huggingface-cli login         # one-time
-bash download_subset.sh       # scissors.hdf5 + pliers.hdf5 + metadata jsons
+huggingface-cli login         # one-time, or write HF_TOKEN to ~/.cache/huggingface/token
+bash download_subset.sh       # default: scissors.hdf5 + pliers.hdf5 + metadata jsons
 ```
 
+To download all demonstrations for a different object subset without downloading
+the full dataset:
+
+```bash
+OBJECTS="mug bottle scissors" bash download_subset.sh
+python scripts/make_object_configs.py --objects mug bottle scissors --tag mug_bottle_scissors
+```
+
+Then train with the generated configs under `configs/generated/`.
+For token setup, IPv4 downloads, and selected-object examples, see
+[`DATA_SUBSETS.md`](DATA_SUBSETS.md).
+
 Output goes to
-`/home/jinyoon/workspace/interactive-robotics/datasets/PartInstruct/`.
+`/home/jinyoon/workspace/research_projects/interactive-robotics/datasets/PartInstruct/`.
 This subset is much smaller than the full 83 GB dataset
 (scissors + pliers only, about 3.8 GB).
 
@@ -97,7 +114,7 @@ only when you are ready to run simulator rollouts.
 
 ```bash
 conda activate partinstruct
-python /home/jinyoon/workspace/interactive-robotics/part2action/scripts/evaluate.py \
+python /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/scripts/evaluate.py \
     --config configs/part_action_mlp_real.yaml \
     --ckpt   results/part_action_mlp_real/last.pt \
     --use_partgym \
