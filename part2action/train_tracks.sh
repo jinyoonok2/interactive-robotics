@@ -3,10 +3,11 @@
 #
 # Examples:
 #   bash train_tracks.sh heatmap
-#   bash train_tracks.sh mlp
-#   bash train_tracks.sh diffusion
-#   bash train_tracks.sh temporal-mlp
-#   bash train_tracks.sh temporal-diffusion
+#   bash train_tracks.sh heatmap-contact
+#   bash train_tracks.sh heatmap-approach
+#   bash train_tracks.sh heatmap-contact-approach
+#   bash train_tracks.sh action-mlp
+#   bash train_tracks.sh action-diffusion
 #   bash train_tracks.sh all
 
 set -euo pipefail
@@ -21,15 +22,20 @@ Usage:
   bash train_tracks.sh <track>
 
 Tracks:
-  heatmap              Heatmap only, single frame
-  mlp                  Heatmap + contact + approach + MLP action, single frame
-  diffusion            Heatmap + contact + approach + diffusion action, single frame
-  temporal-mlp         2-frame temporal + MLP action
-  temporal-diffusion   2-frame temporal + diffusion action
-  all                  Run all tracks sequentially
+  heatmap                    Heatmap-only baseline
+  heatmap-contact            Heatmap + contact heads
+  heatmap-approach           Heatmap + approach heads
+  heatmap-contact-approach   Heatmap + contact + approach heads
+  action-mlp                 Heatmap + contact + approach + MLP action head
+  action-diffusion           Heatmap + contact + approach + diffusion action head
+  all                        Run all non-temporal tracks sequentially
+
+Aliases:
+  mlp                  Alias for action-mlp
+  diffusion            Alias for action-diffusion
 
 Optional:
-  PYTHON_BIN=/path/to/python bash train_tracks.sh mlp
+  PYTHON_BIN=/path/to/python bash train_tracks.sh action-mlp
   RUN_ID=my_run bash train_tracks.sh all
   RESULTS_ROOT=part2action/results/runs bash train_tracks.sh all
 
@@ -41,10 +47,11 @@ EOF
 config_for_track() {
     case "$1" in
         heatmap) echo "configs/heatmap_real.yaml" ;;
-        mlp) echo "configs/part_action_mlp_real.yaml" ;;
-        diffusion) echo "configs/part_action_diffusion_real.yaml" ;;
-        temporal-mlp) echo "configs/temporal_part_action_mlp_real.yaml" ;;
-        temporal-diffusion) echo "configs/temporal_part_action_diffusion_real.yaml" ;;
+        heatmap-contact) echo "configs/heatmap_contact_real.yaml" ;;
+        heatmap-approach) echo "configs/heatmap_approach_real.yaml" ;;
+        heatmap-contact-approach) echo "configs/heatmap_contact_approach_real.yaml" ;;
+        action-mlp|mlp) echo "configs/part_action_mlp_real.yaml" ;;
+        action-diffusion|diffusion) echo "configs/part_action_diffusion_real.yaml" ;;
         *)
             echo "[train_tracks] Unknown track: $1" >&2
             usage >&2
@@ -106,10 +113,11 @@ main() {
     case "$1" in
         all)
             run_track heatmap
-            run_track mlp
-            run_track diffusion
-            run_track temporal-mlp
-            run_track temporal-diffusion
+            run_track heatmap-contact
+            run_track heatmap-approach
+            run_track heatmap-contact-approach
+            run_track action-mlp
+            run_track action-diffusion
             ;;
         -h|--help|help)
             usage

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Set up Part2Action on a fresh Vast.ai GPU instance.
+# Create the lightweight Part2Action environment for offline training/evaluation.
 #
-# This installs only the lightweight Part2Action training stack, not the
-# upstream PartInstruct/PartGym simulator environment.
+# This installs only the Part2Action training stack, not the upstream
+# PartInstruct/PartGym simulator environment.
 #
 # Typical use:
 #   git clone https://github.com/jinyoonok2/interactive-robotics.git
 #   cd interactive-robotics/part2action
-#   HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_vastai.sh
+#   HF_TOKEN=hf_... DOWNLOAD_DATA=1 bash setup_training_env.sh
 #
 # Options:
 #   ENV_NAME=part2action310       Conda/micromamba env name
@@ -26,17 +26,17 @@ TORCH_INSTALL="${TORCH_INSTALL:-stable-cu121}"
 DATA_DIR="${DATA_DIR:-$REPO_DIR/datasets/PartInstruct}"
 DOWNLOAD_DATA="${DOWNLOAD_DATA:-0}"
 
-echo "[setup_vastai] Repo: $REPO_DIR"
-echo "[setup_vastai] Env:  $ENV_NAME"
-echo "[setup_vastai] Data: $DATA_DIR"
-echo "[setup_vastai] Torch install: $TORCH_INSTALL"
+echo "[setup_training_env] Repo: $REPO_DIR"
+echo "[setup_training_env] Env:  $ENV_NAME"
+echo "[setup_training_env] Data: $DATA_DIR"
+echo "[setup_training_env] Torch install: $TORCH_INSTALL"
 
 create_conda_env() {
     source "$(conda info --base)/etc/profile.d/conda.sh"
     if conda env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
-        echo "[setup_vastai] Conda env '$ENV_NAME' already exists."
+        echo "[setup_training_env] Conda env '$ENV_NAME' already exists."
     else
-        echo "[setup_vastai] Creating conda env '$ENV_NAME'..."
+        echo "[setup_training_env] Creating conda env '$ENV_NAME'..."
         conda create -y -n "$ENV_NAME" "python=$PYTHON_VERSION"
     fi
     conda activate "$ENV_NAME"
@@ -45,16 +45,16 @@ create_conda_env() {
 create_micromamba_env() {
     eval "$(micromamba shell hook --shell bash)"
     if micromamba env list | awk '{print $1}' | grep -qx "$ENV_NAME"; then
-        echo "[setup_vastai] Micromamba env '$ENV_NAME' already exists."
+        echo "[setup_training_env] Micromamba env '$ENV_NAME' already exists."
     else
-        echo "[setup_vastai] Creating micromamba env '$ENV_NAME'..."
+        echo "[setup_training_env] Creating micromamba env '$ENV_NAME'..."
         micromamba create -y -n "$ENV_NAME" "python=$PYTHON_VERSION" -c conda-forge
     fi
     micromamba activate "$ENV_NAME"
 }
 
 create_venv() {
-    echo "[setup_vastai] Conda/micromamba not found; creating .venv instead."
+    echo "[setup_training_env] Conda/micromamba not found; creating .venv instead."
     python3 -m venv "$REPO_DIR/.venv-part2action"
     # shellcheck disable=SC1091
     source "$REPO_DIR/.venv-part2action/bin/activate"
@@ -70,7 +70,7 @@ fi
 
 python -m pip install --upgrade pip
 
-echo "[setup_vastai] Installing PyTorch CUDA wheels..."
+echo "[setup_training_env] Installing PyTorch CUDA wheels..."
 case "$TORCH_INSTALL" in
     stable-cu121)
         python -m pip install "torch==2.4.1" "torchvision==0.19.1" \
@@ -81,13 +81,13 @@ case "$TORCH_INSTALL" in
             --index-url https://download.pytorch.org/whl/nightly/cu128
         ;;
     *)
-        echo "[setup_vastai] ERROR: unknown TORCH_INSTALL='$TORCH_INSTALL'"
-        echo "[setup_vastai] Use stable-cu121 or nightly-cu128."
+        echo "[setup_training_env] ERROR: unknown TORCH_INSTALL='$TORCH_INSTALL'"
+        echo "[setup_training_env] Use stable-cu121 or nightly-cu128."
         exit 2
         ;;
 esac
 
-echo "[setup_vastai] Installing Part2Action dependencies..."
+echo "[setup_training_env] Installing Part2Action dependencies..."
 python -m pip install \
     "numpy<2" \
     "h5py>=3.10" \
@@ -102,7 +102,7 @@ python -m pip install \
     "huggingface_hub>=0.23" \
     "einops>=0.7"
 
-echo "[setup_vastai] Verifying Python/PyTorch/CUDA..."
+echo "[setup_training_env] Verifying Python/PyTorch/CUDA..."
 python - <<'PY'
 import sys
 import torch
@@ -124,18 +124,18 @@ mkdir -p "$DATA_DIR/demos" "$ROOT_DIR/results" "$HOME/.cache/huggingface" "$HOME
 if [ -n "${HF_TOKEN:-}" ]; then
     printf "%s" "$HF_TOKEN" > "$HOME/.cache/huggingface/token"
     chmod 600 "$HOME/.cache/huggingface/token"
-    echo "[setup_vastai] Saved HF token to ~/.cache/huggingface/token"
+    echo "[setup_training_env] Saved HF token to ~/.cache/huggingface/token"
 fi
 
 if [ "$DOWNLOAD_DATA" = "1" ]; then
-    echo "[setup_vastai] Downloading PartInstruct subset..."
+    echo "[setup_training_env] Downloading PartInstruct subset..."
     DATA_DIR="$DATA_DIR" bash "$ROOT_DIR/download_subset.sh"
 else
-    echo "[setup_vastai] Skipping dataset download. Set DOWNLOAD_DATA=1 to download now."
+    echo "[setup_training_env] Skipping dataset download. Set DOWNLOAD_DATA=1 to download now."
 fi
 
 echo ""
-echo "[setup_vastai] Setup complete."
+echo "[setup_training_env] Setup complete."
 echo ""
 echo "Activate later with:"
 if command -v conda >/dev/null 2>&1; then
@@ -147,7 +147,7 @@ else
 fi
 echo ""
 echo "For newer GPUs that fail with 'no kernel image is available', recreate with:"
-echo "  ENV_NAME=$ENV_NAME TORCH_INSTALL=nightly-cu128 bash setup_vastai.sh"
+echo "  ENV_NAME=$ENV_NAME TORCH_INSTALL=nightly-cu128 bash setup_training_env.sh"
 echo ""
 echo "Run first three experiments sequentially:"
 echo "  cd $REPO_DIR"

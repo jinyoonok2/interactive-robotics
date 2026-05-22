@@ -14,7 +14,9 @@
 
 set -euo pipefail
 
-DATA_DIR="${DATA_DIR:-$HOME/workspace/research_projects/interactive-robotics/datasets/PartInstruct}"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(cd "$ROOT_DIR/.." && pwd)"
+DATA_DIR="${DATA_DIR:-$REPO_DIR/datasets/PartInstruct}"
 OBJECTS="${OBJECTS:-scissors pliers}"
 OBJECTS="${OBJECTS//,/ }"
 FORCE="${FORCE:-0}"

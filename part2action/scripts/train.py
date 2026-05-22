@@ -4,8 +4,8 @@ Selects active heads + loss weights from the YAML config so the same
 script trains all variants with no code duplication.
 
 Usage:
-    python scripts/train.py --config configs/heatmap_synth.yaml
-    python scripts/train.py --config configs/part_action_mlp_synth.yaml
+    python scripts/train.py --config configs/heatmap_real.yaml
+    python scripts/train.py --config configs/part_action_mlp_real.yaml
 """
 from __future__ import annotations
 

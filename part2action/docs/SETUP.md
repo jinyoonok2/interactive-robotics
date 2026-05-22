@@ -5,15 +5,15 @@ It assumes a single workstation with a CUDA GPU (the workstation already
 has the `habitat-grasp` env and DINOv2 ViT-S/14 reg4 weights cached at
 `~/.cache/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth`).
 
-For a university SSH/GPU server, first read
-[`UNIVERSITY_GPU.md`](UNIVERSITY_GPU.md). In particular, do not train on a
-login/portal node unless your cluster explicitly allows it; request a GPU
-allocation first.
+For the UVA Slurm cluster, first read [`UVA_SLURM.md`](UVA_SLURM.md). For other
+university SSH/GPU servers, read [`UNIVERSITY_GPU.md`](UNIVERSITY_GPU.md). In
+particular, do not train on a login/portal node unless your cluster explicitly
+allows it; use Slurm or your cluster scheduler for GPU work.
 
 ## 1. Create the training env
 
 ```bash
-cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
+cd /path/to/interactive-robotics/part2action
 bash setup_env.sh
 ```
 
@@ -31,9 +31,9 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
     python scripts/make_synthetic_demo.py --out results/synth/kettle.hdf5 --n_demos 4 --steps 24 --img 96 --seed 1
 
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
-    python scripts/train_heatmap.py     --config configs/heatmap_synth.yaml --override-out results/_smoke_a
+    python scripts/train_heatmap.py     --config configs/unused/heatmap_synth.yaml --override-out results/_smoke_a
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
-    python scripts/train_part_action.py --config configs/part_action_mlp_synth.yaml --override-out results/_smoke_b
+    python scripts/train_part_action.py --config configs/unused/part_action_mlp_synth.yaml --override-out results/_smoke_b
 ```
 
 Expected: training loss decreases for both; checkpoints land in
@@ -62,30 +62,31 @@ Then train with the generated configs under `configs/generated/`.
 For token setup, IPv4 downloads, and selected-object examples, see
 [`DATA_SUBSETS.md`](DATA_SUBSETS.md).
 
-Output goes to
-`/home/jinyoon/workspace/research_projects/interactive-robotics/datasets/PartInstruct/`.
-This subset is much smaller than the full 83 GB dataset
-(scissors + pliers only, about 3.8 GB).
+Output goes to the clone-relative path
+`../datasets/PartInstruct/` by default. This subset is much smaller than the
+full 83 GB dataset (scissors + pliers only, about 3.8 GB).
 
 ## 4. Real-data configs
 
 Use the real-data configs directly:
 
 - `configs/heatmap_real.yaml`
+- `configs/heatmap_contact_real.yaml`
+- `configs/heatmap_approach_real.yaml`
+- `configs/heatmap_contact_approach_real.yaml`
 - `configs/part_action_mlp_real.yaml`
 - `configs/part_action_diffusion_real.yaml`
-- `configs/temporal_part_action_mlp_real.yaml`
-- `configs/temporal_part_action_diffusion_real.yaml`
 
 ## 5. Train tracks
 
 ```bash
 conda activate part2action
 python scripts/train.py --config configs/heatmap_real.yaml
+python scripts/train.py --config configs/heatmap_contact_real.yaml
+python scripts/train.py --config configs/heatmap_approach_real.yaml
+python scripts/train.py --config configs/heatmap_contact_approach_real.yaml
 python scripts/train.py --config configs/part_action_mlp_real.yaml
 python scripts/train.py --config configs/part_action_diffusion_real.yaml
-python scripts/train.py --config configs/temporal_part_action_mlp_real.yaml
-python scripts/train.py --config configs/temporal_part_action_diffusion_real.yaml
 ```
 
 ## 6. Offline evaluation (always available)
@@ -114,7 +115,7 @@ only when you are ready to run simulator rollouts.
 
 ```bash
 conda activate partinstruct
-python /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/scripts/evaluate.py \
+python scripts/evaluate.py \
     --config configs/part_action_mlp_real.yaml \
     --ckpt   results/part_action_mlp_real/last.pt \
     --use_partgym \
@@ -146,7 +147,7 @@ Habitat integration phase. Otherwise revise [PROPOSAL.md](../../PROPOSAL.md).
   or set `model.num_fusion_layers: 1`.
 - **DINOv2 download attempt**: the backbone falls back to torch.hub if
   the local cache is missing. To force offline, set
-  `DINOV2_CKPT=/home/jinyoon/.cache/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth`.
+  `DINOV2_CKPT=~/.cache/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth`.
 - **HF model download attempt**: set
   `HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1` if Flan-T5-base is already
   cached at `~/.cache/huggingface/hub/`.

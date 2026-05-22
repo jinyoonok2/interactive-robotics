@@ -36,6 +36,10 @@ Run from `part2action/`:
 OBJECTS="mug bottle scissors" bash download_subset.sh
 ```
 
+By default, `download_subset.sh` writes to the clone-relative path
+`../datasets/PartInstruct/`. Override this with `DATA_DIR=/path/to/PartInstruct`
+if your data must live elsewhere.
+
 This downloads the shared metadata:
 
 ```text

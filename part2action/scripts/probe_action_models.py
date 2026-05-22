@@ -31,7 +31,7 @@ MODEL_SPECS = {
         "ckpt": ROOT / "results" / "prototype" / "part_action_mlp_real" / "last.pt",
     },
     "temporal_part_action_mlp_real": {
-        "config": ROOT / "configs" / "temporal_part_action_mlp_real.yaml",
+        "config": ROOT / "configs" / "unused" / "temporal_part_action_mlp_real.yaml",
         "ckpt": ROOT / "results" / "prototype" / "temporal_part_action_mlp_real" / "last.pt",
     },
     "part_action_diffusion_real": {
@@ -39,7 +39,7 @@ MODEL_SPECS = {
         "ckpt": ROOT / "results" / "prototype" / "part_action_diffusion_real" / "last.pt",
     },
     "temporal_part_action_diffusion_real": {
-        "config": ROOT / "configs" / "temporal_part_action_diffusion_real.yaml",
+        "config": ROOT / "configs" / "unused" / "temporal_part_action_diffusion_real.yaml",
         "ckpt": ROOT / "results" / "prototype" / "temporal_part_action_diffusion_real" / "last.pt",
     },
 }
@@ -298,7 +298,7 @@ def main() -> None:
     parser.add_argument(
         "--models",
         nargs="+",
-        default=["part_action_mlp_real", "temporal_part_action_mlp_real"],
+        default=["part_action_mlp_real"],
         choices=sorted(MODEL_SPECS),
     )
     parser.add_argument("--num-samples", type=int, default=8)

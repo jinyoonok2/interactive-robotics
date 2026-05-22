@@ -4,6 +4,10 @@ This guide is for running `part2action` on a university GPU server over SSH.
 It is written for a new reader or coding agent who did not follow the original
 chat history.
 
+If you are on the UVA Slurm cluster, use [`UVA_SLURM.md`](UVA_SLURM.md)
+instead. It includes the micromamba bootstrap, UVA paths, and `sbatch` scripts
+validated for that environment.
+
 ## Goal
 
 We are training a lightweight Part2Action model:
@@ -52,7 +56,7 @@ tmux new -s part2action
 Inside the session:
 
 ```bash
-cd ~/workspace/live-robotics-lab/part2action
+cd ~/workspace/live-robotics-lab/interactive-robotics/part2action
 ```
 
 If your clone uses a different directory name, use that path instead.
@@ -139,9 +143,9 @@ HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
   python scripts/make_synthetic_demo.py --out results/synth/kettle.hdf5 --n_demos 4 --steps 24 --img 96 --seed 1
 
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
-  python scripts/train_heatmap.py --config configs/heatmap_synth.yaml --override-out results/_smoke_a
+  python scripts/train_heatmap.py --config configs/unused/heatmap_synth.yaml --override-out results/_smoke_a
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 \
-  python scripts/train_part_action.py --config configs/part_action_mlp_synth.yaml --override-out results/_smoke_b
+  python scripts/train_part_action.py --config configs/unused/part_action_mlp_synth.yaml --override-out results/_smoke_b
 ```
 
 Expected output:
@@ -176,4 +180,5 @@ If a coding agent is operating on this SSH server:
 - Prefer `tmux` for long downloads/training runs.
 - Confirm `nvidia-smi` on a GPU node before starting training.
 - Do not assume `/home/jinyoon/...` paths on the server; use the actual clone
-  path, for example `~/workspace/live-robotics-lab/part2action`.
+  path, for example
+  `~/workspace/live-robotics-lab/interactive-robotics/part2action`.

@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--config", default=str(ROOT / "configs" / "part_action_mlp_synth.yaml"))
+    p.add_argument("--config", default=str(ROOT / "configs" / "unused" / "part_action_mlp_synth.yaml"))
     p.add_argument("--override-out", default=None)
     args, extra = p.parse_known_args()
 

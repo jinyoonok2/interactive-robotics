@@ -1,6 +1,7 @@
 # Habitat Data Files (too large for git)
 habitat-lab/data/
 !habitat-lab/data/.gitkeep
+datasets/
 
 # Habitat Output Files
 habitat-lab/outputs/

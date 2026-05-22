@@ -1,5 +1,6 @@
 results/
 third_party/PartInstruct/
+logs/
 __pycache__/
 *.pyc
 *.pt

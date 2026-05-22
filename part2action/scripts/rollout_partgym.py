@@ -32,7 +32,7 @@ MODEL_DEFAULTS = {
         "ckpt": ROOT / "results" / "prototype" / "part_action_mlp_real" / "last.pt",
     },
     "temporal_mlp": {
-        "config": ROOT / "configs" / "temporal_part_action_mlp_real.yaml",
+        "config": ROOT / "configs" / "unused" / "temporal_part_action_mlp_real.yaml",
         "ckpt": ROOT / "results" / "prototype" / "temporal_part_action_mlp_real" / "last.pt",
     },
 }

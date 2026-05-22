@@ -23,14 +23,15 @@ outperform a heatmap-only part-localization baseline on PartInstruct tasks.
 The current plan is:
 
 1. Train offline on selected PartInstruct object HDF5 files.
-2. Compare `heatmap_real` against action-capable heads such as
-   `part_action_mlp_real`.
+2. Compare `heatmap_real` against explicit head-output ablations and
+   action-capable heads such as `part_action_mlp_real`.
 3. Use PartGym rollouts only after the offline metrics look promising.
 4. Carry the best part-action model into the larger Habitat integration.
 
-For a fresh GPU server or SSH agent workflow, start with
-[`docs/UNIVERSITY_GPU.md`](docs/UNIVERSITY_GPU.md). For Hugging Face token setup
-and selected-object data downloads, see
+For the UVA Slurm cluster, start with
+[`docs/UVA_SLURM.md`](docs/UVA_SLURM.md). For other university GPU servers or
+SSH agent workflows, see [`docs/UNIVERSITY_GPU.md`](docs/UNIVERSITY_GPU.md).
+For Hugging Face token setup and selected-object data downloads, see
 [`docs/DATA_SUBSETS.md`](docs/DATA_SUBSETS.md).
 
 ## Directory Layout
@@ -54,6 +55,7 @@ part2action/
 Large files are intentionally ignored by git:
 
 - `third_party/PartInstruct/`
+- `../datasets/`
 - `results/`
 - `*.pt`, `*.ckpt`, `*.mp4`, `*.zip`
 
@@ -153,10 +155,11 @@ Run individual tracks:
 conda activate part2action
 
 python scripts/train.py --config configs/heatmap_real.yaml
+python scripts/train.py --config configs/heatmap_contact_real.yaml
+python scripts/train.py --config configs/heatmap_approach_real.yaml
+python scripts/train.py --config configs/heatmap_contact_approach_real.yaml
 python scripts/train.py --config configs/part_action_mlp_real.yaml
 python scripts/train.py --config configs/part_action_diffusion_real.yaml
-python scripts/train.py --config configs/temporal_part_action_mlp_real.yaml
-python scripts/train.py --config configs/temporal_part_action_diffusion_real.yaml
 ```
 
 Or use the launcher:
@@ -164,6 +167,10 @@ Or use the launcher:
 ```bash
 bash train_tracks.sh all
 ```
+
+The current `all` launcher runs only single-frame, non-temporal tracks:
+`heatmap`, `heatmap-contact`, `heatmap-approach`,
+`heatmap-contact-approach`, `action-mlp`, and `action-diffusion`.
 
 Outputs go under `results/`. Each run typically contains:
 
@@ -194,7 +201,7 @@ so it uses a **separate conda env** named `partinstruct`.
 We avoid git submodules. Clone upstream directly into `third_party/`:
 
 ```bash
-cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
+cd /path/to/interactive-robotics/part2action
 mkdir -p third_party
 git clone --recurse-submodules https://github.com/SCAI-JHU/PartInstruct.git third_party/PartInstruct
 ```
@@ -210,7 +217,7 @@ conda create -n partinstruct -c conda-forge \
 conda activate partinstruct
 pip install torch torchvision torchaudio
 
-cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/third_party/PartInstruct
+cd /path/to/interactive-robotics/part2action/third_party/PartInstruct
 pip install -r requirements.txt
 pip install omegaconf
 
@@ -232,7 +239,7 @@ The HDF5 demos are enough for offline training, but **not** for simulator
 rollouts. PartGym also needs robot/object/scene assets.
 
 ```bash
-cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action/third_party/PartInstruct
+cd /path/to/interactive-robotics/part2action/third_party/PartInstruct
 huggingface-cli download SCAI-JHU/PartInstruct \
   --repo-type dataset \
   --local-dir ./data \
@@ -260,7 +267,7 @@ rm ./data/assets.zip
 Run from `part2action/` using the `partinstruct` env:
 
 ```bash
-cd /home/jinyoon/workspace/research_projects/interactive-robotics/part2action
+cd /path/to/interactive-robotics/part2action
 ```
 
 Scissors, 200 max steps, record video:
@@ -362,7 +369,7 @@ python scripts/evaluate.py --config configs/part_action_mlp_real.yaml --ckpt res
 ```bash
 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 conda run -n part2action \
 python scripts/probe_action_models.py \
-  --models part_action_mlp_real temporal_part_action_mlp_real \
+  --models part_action_mlp_real \
   --num-samples 12 \
   --text-device cpu
 ```
