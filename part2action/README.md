@@ -1,9 +1,9 @@
 # part2action
 
-`part2action` is a small concept-validation project for learning:
+`part2action` now defaults to the 3D-grounded hierarchical skill policy:
 
 ```text
-RGB observation + part-level instruction -> robot action chunk
+high-level task -> latent skill plan -> state-selected skill -> robot action chunk
 ```
 
 It uses PartInstruct data, but it is still separate from the larger Habitat
@@ -15,18 +15,22 @@ integration. The current workflow has two parts:
 The first successful simulator smoke result so far is the MLP action model on a
 PartGym scissors grasp task. Pliers still fails in the current prototype.
 
-## Current Direction
+## Default Architecture
 
-The immediate goal is to validate whether part-conditioned action prediction can
-outperform a heatmap-only part-localization baseline on PartInstruct tasks.
+The maintained policy uses frozen DINOv2 and T5 encoders, learned visual part
+gating, full-scene point-cloud/TCP conditioning, an ordered latent skill-slot
+decoder, a 3D-aware phase selector, a termination head, and the Part2Action
+low-level action head. Ground-truth part masks and target-part point clouds are
+training labels only and are not deployment inputs.
 
-The current plan is:
+Run the default training configuration with:
 
-1. Train offline on selected PartInstruct object HDF5 files.
-2. Compare `heatmap_real` against explicit head-output ablations and
-   action-capable heads such as `part_action_mlp_real`.
-3. Use PartGym rollouts only after the offline metrics look promising.
-4. Carry the best part-action model into the larger Habitat integration.
+```bash
+python scripts/train.py
+```
+
+Legacy architecture code and configs are preserved on the
+`part2action-legacy` branch. Existing `results/` artifacts are not modified.
 
 For the UVA Slurm cluster, start with
 [`docs/UVA_SLURM.md`](docs/UVA_SLURM.md). For other university GPU servers or

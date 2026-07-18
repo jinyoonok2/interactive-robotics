@@ -79,6 +79,72 @@ class CrossAttentionFusion(nn.Module):
         return v
 
 
+class PartMaskGate(nn.Module):
+    """Predict an early per-patch part gate over visual tokens."""
+
+    def __init__(self, visual_dim: int = 384) -> None:
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.LayerNorm(visual_dim),
+            nn.Linear(visual_dim, visual_dim // 2),
+            nn.GELU(),
+            nn.Linear(visual_dim // 2, 1),
+        )
+
+    def forward(self, visual_tokens: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+        logits = self.net(visual_tokens).squeeze(-1)
+        gate = torch.sigmoid(logits).unsqueeze(-1)
+        return visual_tokens * (1.0 + gate), logits
+
+
+class PointCloudEncoder(nn.Module):
+    """PointNet-style full-scene encoder with TCP-relative geometry."""
+
+    def __init__(self, in_dim: int = 10, out_dim: int = 384, hidden: int = 128) -> None:
+        super().__init__()
+        self.point_mlp = nn.Sequential(
+            nn.Linear(in_dim, hidden),
+            nn.GELU(),
+            nn.Linear(hidden, hidden),
+            nn.GELU(),
+            nn.Linear(hidden, out_dim),
+        )
+        self.out_norm = nn.LayerNorm(out_dim)
+
+    def forward(
+        self,
+        agentview_pcd: torch.Tensor | None = None,
+        agentview_part_pcd: torch.Tensor | None = None,
+        tcp_pose: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        if agentview_pcd is None and agentview_part_pcd is None:
+            raise ValueError("PointCloudEncoder requires at least one point cloud")
+        base = agentview_part_pcd if agentview_part_pcd is not None else agentview_pcd
+        assert base is not None
+        scene = (
+            torch.zeros(base.shape[0], base.shape[1], 3, device=base.device, dtype=base.dtype)
+            if agentview_pcd is None
+            else agentview_pcd[..., :3]
+        )
+        if agentview_part_pcd is None:
+            part_xyz = torch.zeros_like(scene)
+            part_flag = torch.zeros(*scene.shape[:2], 1, device=scene.device, dtype=scene.dtype)
+        else:
+            part_xyz = agentview_part_pcd[..., :3]
+            part_flag = (
+                agentview_part_pcd[..., 3:4]
+                if agentview_part_pcd.shape[-1] >= 4
+                else torch.ones(*part_xyz.shape[:2], 1, device=part_xyz.device, dtype=part_xyz.dtype)
+            )
+        tcp_delta = (
+            torch.zeros_like(scene)
+            if tcp_pose is None
+            else scene - tcp_pose[:, None, :3].to(dtype=scene.dtype)
+        )
+        tokens = self.point_mlp(torch.cat([scene, part_xyz, part_flag, tcp_delta], dim=-1))
+        return self.out_norm(tokens.max(dim=1).values)
+
+
 class HeatmapHead(nn.Module):
     def __init__(self, in_dim: int = 256, grid: int = 18, out_size: int = 96) -> None:
         super().__init__()
@@ -126,6 +192,11 @@ class ContactHead2D(_PooledMLP):
 
     def forward(self, fused: torch.Tensor) -> torch.Tensor:
         return torch.sigmoid(super().forward(fused))
+
+
+class ContactHead3D(_PooledMLP):
+    def __init__(self, in_dim: int = 256) -> None:
+        super().__init__(in_dim=in_dim, out_dim=3)
 
 
 class ApproachHead(_PooledMLP):

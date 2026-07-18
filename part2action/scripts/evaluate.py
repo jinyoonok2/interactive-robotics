@@ -36,6 +36,8 @@ from _common import (
 from data.partinstruct_loader import PartInstructDataset, collate_part2action
 from models.part2action_model import Part2ActionModel
 
+DEFAULT_CONFIG = ROOT / "configs" / "architecture_update" / "hierarchical_gated_pcd_contact3d_all_demos.yaml"
+
 
 def build_eval_loader(cfg: dict) -> DataLoader:
     data_cfg = cfg["data"]
@@ -46,6 +48,12 @@ def build_eval_loader(cfg: dict) -> DataLoader:
         sample_stride=max(1, data_cfg.get("sample_stride", 1) * 2),
         max_demos_per_file=data_cfg.get("max_demos_per_file"),
         n_obs_steps=data_cfg.get("n_obs_steps", 1),
+        use_pcd=data_cfg.get("use_pcd", False),
+        use_part_pcd=data_cfg.get("use_part_pcd", False),
+        use_tcp_pose=data_cfg.get("use_tcp_pose", False),
+        use_contact_xyz=data_cfg.get("use_contact_xyz", False),
+        use_hierarchy=data_cfg.get("use_hierarchy", False),
+        max_skill_slots=data_cfg.get("max_skill_slots", 4),
     )
     return DataLoader(
         ds,
@@ -66,7 +74,10 @@ def iou_score(pred_logits: torch.Tensor, gt_mask: torch.Tensor, threshold: float
     return float(iou.item())
 
 
-def offline_eval(model: Part2ActionModel, dl: DataLoader, device: torch.device) -> Dict[str, float]:
+def offline_eval(
+    model: Part2ActionModel, dl: DataLoader, device: torch.device,
+    hierarchy_mode: str = "predicted_hierarchy",
+) -> Dict[str, float]:
     model.eval()
     n = 0
     sums: Dict[str, float] = {}
@@ -75,7 +86,23 @@ def offline_eval(model: Part2ActionModel, dl: DataLoader, device: torch.device) 
             for k, v in batch.items():
                 if isinstance(v, torch.Tensor):
                     batch[k] = v.to(device)
-            out = model(batch["rgb"], batch["instruction"])
+            extra = {k: batch[k] for k in ("agentview_pcd", "tcp_pose") if k in batch}
+            if model.use_hierarchy:
+                instructions = batch["task_instruction"]
+                if hierarchy_mode == "direct_task":
+                    extra["hierarchy_mode"] = "direct"
+                else:
+                    extra.update(
+                        skill_plan=batch["skill_plan"],
+                        skill_valid_mask=batch["skill_valid_mask"],
+                        phase_index=batch["phase_index"],
+                        hierarchy_mode="oracle" if hierarchy_mode == "oracle_skill" else "predicted",
+                    )
+                    if hierarchy_mode == "oracle_skill":
+                        extra["oracle_skill_instructions"] = batch["instruction"]
+            else:
+                instructions = batch["instruction"]
+            out = model(batch["rgb"], instructions, **extra)
 
             if "heatmap_logits" in out:
                 sums["iou"] = sums.get("iou", 0.0) + iou_score(out["heatmap_logits"], batch["part_mask"])
@@ -86,6 +113,18 @@ def offline_eval(model: Part2ActionModel, dl: DataLoader, device: torch.device) 
                 sums["approach_cos"] = sums.get("approach_cos", 0.0) + float(cos.item())
             if "action_chunk" in out:
                 sums["action_l1"] = sums.get("action_l1", 0.0) + float(F.smooth_l1_loss(out["action_chunk"], batch["action_chunk"]).item())
+            if "phase_logits" in out:
+                sums["phase_accuracy"] = sums.get("phase_accuracy", 0.0) + float(
+                    (out["phase_logits"].argmax(-1) == batch["phase_index"]).float().mean()
+                )
+                sums["termination_accuracy"] = sums.get("termination_accuracy", 0.0) + float(
+                    ((out["termination_logits"] >= 0) == batch["phase_termination"].bool()).float().mean()
+                )
+                valid = batch["skill_valid_mask"]
+                similarity = F.cosine_similarity(out["plan_slots"], out["skill_target_slots"], dim=-1)
+                sums["plan_slot_similarity"] = sums.get("plan_slot_similarity", 0.0) + float(
+                    (similarity * valid).sum() / valid.sum().clamp(min=1)
+                )
             n += 1
     return {k: v / max(1, n) for k, v in sums.items()}
 
@@ -112,8 +151,13 @@ def maybe_partgym_rollout(model: Part2ActionModel, device: torch.device, n_episo
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--config", required=True)
+    p.add_argument("--config", default=str(DEFAULT_CONFIG))
     p.add_argument("--ckpt", required=True)
+    p.add_argument(
+        "--hierarchy-modes", nargs="+",
+        choices=["direct_task", "oracle_skill", "predicted_hierarchy"],
+        default=["oracle_skill", "predicted_hierarchy"],
+    )
     p.add_argument("--use_partgym", action="store_true")
     p.add_argument("--rollout_episodes", type=int, default=10)
     p.add_argument("--rollout_splits", nargs="+", default=["test1"], help="PartInstruct test splits.")
@@ -122,6 +166,8 @@ def main() -> None:
     cfg = resolve_paths(load_yaml(args.config), ROOT)
     set_seed(int(cfg.get("train", {}).get("seed", 42)))
     device = select_device(cfg["train"].get("device", "cuda"))
+    if device.type == "cpu":
+        cfg["model"]["text_device"] = "cpu"
 
     model = Part2ActionModel(
         heads=cfg["heads"],
@@ -137,6 +183,13 @@ def main() -> None:
         n_obs_steps=int(cfg["data"].get("n_obs_steps", 1)),
         temporal_layers=int(cfg["model"].get("temporal_layers", 1)),
         temporal_heads=int(cfg["model"].get("temporal_heads", 4)),
+        use_part_gate=bool(cfg["model"].get("use_part_gate", False)),
+        use_pcd=bool(cfg["model"].get("use_pcd", False)),
+        use_contact_xyz=bool(cfg["model"].get("use_contact_xyz", False)),
+        use_hierarchy=bool(cfg["model"].get("use_hierarchy", False)),
+        max_skill_slots=int(cfg["model"].get("max_skill_slots", 4)),
+        hierarchy_layers=int(cfg["model"].get("hierarchy_layers", 2)),
+        phase_selector_use_3d=bool(cfg["model"].get("phase_selector_use_3d", True)),
     ).to(device)
 
     state = torch.load(args.ckpt, map_location=device, weights_only=False)
@@ -149,8 +202,11 @@ def main() -> None:
 
     dl = build_eval_loader(cfg)
     results: Dict[str, Any] = {"config": args.config, "ckpt": args.ckpt}
-    results["offline"] = offline_eval(model, dl, device)
-    print(f"[eval] offline: {results['offline']}")
+    results["offline_modes"] = {
+        mode: offline_eval(model, dl, device, hierarchy_mode=mode)
+        for mode in args.hierarchy_modes
+    }
+    print(f"[eval] offline modes: {results['offline_modes']}")
 
     if args.use_partgym:
         results["partgym"] = maybe_partgym_rollout(

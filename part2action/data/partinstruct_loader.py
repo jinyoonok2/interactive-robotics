@@ -32,7 +32,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-from .targets import derive_contact_and_approach
+from .targets import derive_contact_and_approach, derive_contact_xyz
 
 
 @dataclass
@@ -65,6 +65,15 @@ class PartInstructDataset(Dataset):
         sample_stride: int = 1,
         require_part_mask: bool = True,
         n_obs_steps: int = 1,
+        use_pcd: bool = False,
+        use_part_pcd: bool = False,
+        use_tcp_pose: bool = False,
+        use_contact_xyz: bool = False,
+        use_hierarchy: bool = False,
+        max_skill_slots: int = 8,
+        pcd_key: str = "agentview_pcd",
+        part_pcd_key: str = "agentview_part_pcd",
+        tcp_pose_key: str = "tcp_pose",
     ) -> None:
         super().__init__()
         if not hdf5_paths:
@@ -77,8 +86,18 @@ class PartInstructDataset(Dataset):
         self.joints_key = joints_key
         self.require_part_mask = bool(require_part_mask)
         self.n_obs_steps = max(1, int(n_obs_steps))
+        self.use_pcd = bool(use_pcd)
+        self.use_part_pcd = bool(use_part_pcd)
+        self.use_tcp_pose = bool(use_tcp_pose)
+        self.use_contact_xyz = bool(use_contact_xyz)
+        self.use_hierarchy = bool(use_hierarchy)
+        self.max_skill_slots = max(1, int(max_skill_slots))
+        self.pcd_key = pcd_key
+        self.part_pcd_key = part_pcd_key
+        self.tcp_pose_key = tcp_pose_key
 
         self._files: dict[str, h5py.File] = {}
+        self._hierarchy_cache: dict[tuple[str, str], dict] = {}
         self._samples: List[SampleSpec] = []
         self._index_demos(max_demos_per_file=max_demos_per_file, sample_stride=sample_stride)
 
@@ -113,6 +132,16 @@ class PartInstructDataset(Dataset):
                 if self.require_part_mask:
                     if "obs" not in demo or self.mask_key not in demo["obs"]:
                         continue
+                if self.use_pcd and ("obs" not in demo or self.pcd_key not in demo["obs"]):
+                    continue
+                if (self.use_part_pcd or self.use_contact_xyz) and (
+                    "obs" not in demo or self.part_pcd_key not in demo["obs"]
+                ):
+                    continue
+                if (self.use_tcp_pose or self.use_contact_xyz) and (
+                    "obs" not in demo or self.tcp_pose_key not in demo["obs"]
+                ):
+                    continue
                 n_steps = int(demo["actions"].shape[0])
                 if n_steps < self.action_chunk + 1:
                     continue
@@ -125,10 +154,8 @@ class PartInstructDataset(Dataset):
     def __len__(self) -> int:
         return len(self._samples)
 
-    def _decode_instruction(self, demo: h5py.Group, t: int) -> str:
-        if "skill_instructions" not in demo:
-            return ""
-        raw = demo["skill_instructions"][t]
+    @staticmethod
+    def _decode_text(raw) -> str:
         if isinstance(raw, bytes):
             return raw.decode("utf-8", errors="ignore")
         if isinstance(raw, np.ndarray):
@@ -137,6 +164,55 @@ class PartInstructDataset(Dataset):
             except Exception:
                 return str(raw)
         return str(raw)
+
+    def _decode_instruction(self, demo: h5py.Group, t: int, key: str = "skill_instructions") -> str:
+        if key not in demo:
+            return ""
+        return self._decode_text(demo[key][t])
+
+    def _hierarchy_labels(self, spec: SampleSpec, demo: h5py.Group) -> dict:
+        cache_key = (spec.file_path, spec.demo_key)
+        if cache_key not in self._hierarchy_cache:
+            if "skill_instructions" not in demo or len(demo["skill_instructions"]) == 0:
+                raise ValueError(f"{spec.file_path}:{spec.demo_key} has no skill_instructions")
+            skill_texts = [self._decode_text(raw).strip() for raw in demo["skill_instructions"][:]]
+            task_instruction = (
+                self._decode_text(demo["task_instructions"][0]).strip()
+                if "task_instructions" in demo and len(demo["task_instructions"]) > 0
+                else skill_texts[0]
+            )
+            skill_plan: list[str] = []
+            phase_indices: list[int] = []
+            phase_ends: list[int] = []
+            for t, text in enumerate(skill_texts):
+                if not skill_plan or text != skill_plan[-1]:
+                    if skill_plan:
+                        phase_ends[-1] = t - 1
+                    skill_plan.append(text)
+                    phase_ends.append(len(skill_texts) - 1)
+                phase_indices.append(len(skill_plan) - 1)
+            if len(skill_plan) > self.max_skill_slots:
+                raise ValueError(
+                    f"{spec.file_path}:{spec.demo_key} has {len(skill_plan)} phases, "
+                    f"exceeding max_skill_slots={self.max_skill_slots}"
+                )
+            self._hierarchy_cache[cache_key] = {
+                "task_instruction": task_instruction,
+                "skill_plan": skill_plan,
+                "phase_indices": phase_indices,
+                "phase_ends": phase_ends,
+            }
+        labels = self._hierarchy_cache[cache_key]
+        phase_index = int(labels["phase_indices"][spec.t])
+        valid = np.zeros(self.max_skill_slots, dtype=np.float32)
+        valid[: len(labels["skill_plan"])] = 1.0
+        return {
+            "task_instruction": labels["task_instruction"],
+            "skill_plan": list(labels["skill_plan"]),
+            "phase_index": phase_index,
+            "phase_termination": float(spec.t >= int(labels["phase_ends"][phase_index])),
+            "skill_valid_mask": valid,
+        }
 
     def __getitem__(self, idx: int) -> dict:
         spec = self._samples[idx]
@@ -190,7 +266,7 @@ class PartInstructDataset(Dataset):
             window=4,
         )
 
-        return {
+        sample = {
             "rgb": rgb_tensor,
             "part_mask": torch.from_numpy(mask).float(),
             "instruction": instruction,
@@ -206,6 +282,31 @@ class PartInstructDataset(Dataset):
                 "contact_t": int(contact_t),
             },
         }
+        if self.use_pcd:
+            sample["agentview_pcd"] = torch.from_numpy(
+                np.asarray(obs[self.pcd_key][spec.t]).astype(np.float32)
+            )
+        if self.use_part_pcd or self.use_contact_xyz:
+            part_pcd_current = np.asarray(obs[self.part_pcd_key][spec.t]).astype(np.float32)
+            if self.use_part_pcd:
+                sample["agentview_part_pcd"] = torch.from_numpy(part_pcd_current)
+        if self.use_tcp_pose or self.use_contact_xyz:
+            tcp_pose_demo = np.asarray(obs[self.tcp_pose_key][:]).astype(np.float32)
+            if self.use_tcp_pose:
+                sample["tcp_pose"] = torch.from_numpy(tcp_pose_demo[spec.t])
+        if self.use_contact_xyz:
+            part_pcd_demo = np.asarray(obs[self.part_pcd_key][:]).astype(np.float32)
+            contact_xyz, valid = derive_contact_xyz(part_pcd_demo, tcp_pose_demo, contact_t)
+            sample["contact_xyz"] = torch.from_numpy(contact_xyz).float()
+            sample["contact_xyz_valid"] = torch.tensor(valid, dtype=torch.float32)
+        if self.use_hierarchy:
+            hierarchy = self._hierarchy_labels(spec, demo)
+            sample["task_instruction"] = hierarchy["task_instruction"]
+            sample["skill_plan"] = hierarchy["skill_plan"]
+            sample["phase_index"] = torch.tensor(hierarchy["phase_index"], dtype=torch.long)
+            sample["phase_termination"] = torch.tensor(hierarchy["phase_termination"], dtype=torch.float32)
+            sample["skill_valid_mask"] = torch.from_numpy(hierarchy["skill_valid_mask"])
+        return sample
 
     def close(self) -> None:
         for f in self._files.values():
@@ -227,7 +328,7 @@ def collate_part2action(batch: List[dict]) -> dict:
     out: dict = {}
     keys = batch[0].keys()
     for k in keys:
-        if k == "instruction":
+        if k in {"instruction", "task_instruction", "skill_plan"}:
             out[k] = [b[k] for b in batch]
         elif k == "meta":
             out[k] = [b[k] for b in batch]

@@ -27,13 +27,9 @@ from models.part2action_model import Part2ActionModel
 
 
 MODEL_DEFAULTS = {
-    "mlp": {
-        "config": ROOT / "configs" / "part_action_mlp_real.yaml",
-        "ckpt": ROOT / "results" / "prototype" / "part_action_mlp_real" / "last.pt",
-    },
-    "temporal_mlp": {
-        "config": ROOT / "configs" / "unused" / "temporal_part_action_mlp_real.yaml",
-        "ckpt": ROOT / "results" / "prototype" / "temporal_part_action_mlp_real" / "last.pt",
+    "hierarchical": {
+        "config": ROOT / "configs" / "architecture_update" / "hierarchical_gated_pcd_contact3d_all_demos.yaml",
+        "ckpt": ROOT / "results" / "hierarchical_gated_pcd_contact3d_all_demos" / "last.pt",
     },
 }
 
@@ -57,6 +53,13 @@ def _load_model(cfg: dict[str, Any], ckpt_path: Path, device: torch.device) -> P
         n_obs_steps=int(cfg["data"].get("n_obs_steps", 1)),
         temporal_layers=int(cfg["model"].get("temporal_layers", 1)),
         temporal_heads=int(cfg["model"].get("temporal_heads", 4)),
+        use_part_gate=bool(cfg["model"].get("use_part_gate", False)),
+        use_pcd=bool(cfg["model"].get("use_pcd", False)),
+        use_contact_xyz=bool(cfg["model"].get("use_contact_xyz", False)),
+        use_hierarchy=bool(cfg["model"].get("use_hierarchy", False)),
+        max_skill_slots=int(cfg["model"].get("max_skill_slots", 4)),
+        hierarchy_layers=int(cfg["model"].get("hierarchy_layers", 2)),
+        phase_selector_use_3d=bool(cfg["model"].get("phase_selector_use_3d", True)),
     )
     text_device = cfg["model"].get("text_device", "cpu")
     model.to(device)
@@ -77,6 +80,20 @@ def _make_rgb_tensor(obs_history: deque[np.ndarray], n_obs_steps: int, device: t
             frames.insert(0, frames[0])
         rgb = torch.from_numpy(np.stack(frames[-n_obs_steps:], axis=0)).float().unsqueeze(0) / 255.0
     return rgb.to(device)
+
+
+def _model_observations(obs: dict[str, Any], device: torch.device) -> dict:
+    kwargs = {}
+    if "agentview_pcd" in obs:
+        pcd = torch.from_numpy(np.asarray(obs["agentview_pcd"])).float()
+        if pcd.ndim == 2:
+            pcd = pcd.unsqueeze(0)
+        if pcd.ndim == 3 and pcd.shape[1] in {3, 4} and pcd.shape[-1] not in {3, 4}:
+            pcd = pcd.transpose(1, 2)
+        kwargs["agentview_pcd"] = pcd.to(device)
+    if "tcp_pose" in obs:
+        kwargs["tcp_pose"] = torch.from_numpy(np.asarray(obs["tcp_pose"])).float().reshape(1, -1).to(device)
+    return kwargs
 
 
 def _load_partgym_env(partinstruct_root: Path):
@@ -146,13 +163,32 @@ def rollout_one(
     history.append(np.asarray(obs["agentview_rgb"], dtype=np.uint8))
 
     action_trace: list[list[float]] = []
+    phase_trace: list[int] = []
     info: dict[str, Any] = {}
     done = False
+    current_phase = None
+    cached_slots = cached_valid = None
+    phase_steps = 0
     try:
         for _ in range(max_steps):
             rgb = _make_rgb_tensor(history, n_obs_steps, device)
+            kwargs = _model_observations(obs, device)
+            model_instruction = [instruction]
+            if cached_slots is not None:
+                kwargs.update(
+                    plan_slots_override=cached_slots,
+                    slot_valid_logits_override=cached_valid,
+                    current_phase=current_phase,
+                    force_current_phase=True,
+                )
+                model_instruction = None
             with torch.no_grad():
-                out = model(rgb, [instruction])
+                out = model(rgb, model_instruction, **kwargs)
+            if cached_slots is None:
+                cached_slots = out["plan_slots"].detach()
+                cached_valid = out["slot_valid_logits"].detach()
+                current_phase = out["predicted_phase"].detach()
+            phase_trace.append(int(current_phase.item()))
             chunk = out["action_chunk"][0].detach().cpu().float().numpy()
             for action in chunk[:execute_steps]:
                 obs, reward, done, info = env.step(action.astype(np.float32))
@@ -160,6 +196,15 @@ def rollout_one(
                 history.append(np.asarray(obs["agentview_rgb"], dtype=np.uint8))
                 if done:
                     break
+            phase_steps += 1
+            valid_count = max(1, int((cached_valid[0].sigmoid() >= 0.5).sum().item()))
+            if (
+                float(torch.sigmoid(out["termination_logits"][0])) >= 0.5
+                and phase_steps >= 2
+                and int(current_phase.item()) + 1 < valid_count
+            ):
+                current_phase = current_phase + 1
+                phase_steps = 0
             if done:
                 break
     finally:
@@ -179,13 +224,14 @@ def rollout_one(
         "steps": int(info.get("Steps", len(action_trace))) if info else len(action_trace),
         "num_actions": len(action_trace),
         "actions": action_trace,
+        "phase_trace": phase_trace,
         "info": {k: v for k, v in info.items() if k not in {"Action"}},
     }
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--model-key", choices=sorted(MODEL_DEFAULTS), default="mlp")
+    parser.add_argument("--model-key", choices=sorted(MODEL_DEFAULTS), default="hierarchical")
     parser.add_argument("--config", type=Path, default=None)
     parser.add_argument("--ckpt", type=Path, default=None)
     parser.add_argument("--partinstruct-root", type=Path, default=DEFAULT_PARTINSTRUCT_ROOT)
@@ -218,6 +264,12 @@ def main() -> None:
     device = select_device(args.device)
     partgym_cfg = OmegaConf.load(partgym_config)
     partgym_cfg.data_root = str(data_root)
+    model_cfg = resolve_paths(load_yaml(config_path), ROOT)
+    full_cfg = OmegaConf.load(
+        partinstruct_root / "PartInstruct" / "PartGym" / "config" / "config.yaml"
+    )
+    if "agentview_pcd" not in partgym_cfg.shape_meta.obs:
+        partgym_cfg.shape_meta.obs["agentview_pcd"] = full_cfg.shape_meta.obs["agentview_pcd"]
     if str(device) == "cpu":
         partgym_cfg.device = "cpu"
 
@@ -230,7 +282,6 @@ def main() -> None:
             "into the PartInstruct data directory before running rollouts."
         )
 
-    model_cfg = resolve_paths(load_yaml(config_path), ROOT)
     model = _load_model(model_cfg, ckpt_path, device)
     env_cls = _load_partgym_env(partinstruct_root)
 

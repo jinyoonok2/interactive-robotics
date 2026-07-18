@@ -113,3 +113,26 @@ def derive_contact_and_approach(
         approach_dir = (approach / n).astype(np.float32)
 
     return contact_xy_norm, approach_dir, int(contact_t)
+
+
+def derive_contact_xyz(
+    part_pcd: np.ndarray,
+    tcp_pose: np.ndarray,
+    contact_t: int,
+) -> tuple[np.ndarray, float]:
+    """Return the target-part point nearest the TCP at inferred contact."""
+    part_pcd = np.asarray(part_pcd, dtype=np.float32)
+    tcp_pose = np.asarray(tcp_pose, dtype=np.float32)
+    if part_pcd.ndim != 3 or part_pcd.shape[-1] < 3 or tcp_pose.ndim != 2 or tcp_pose.shape[-1] < 3:
+        return np.zeros(3, dtype=np.float32), 0.0
+    t = int(np.clip(contact_t, 0, min(part_pcd.shape[0], tcp_pose.shape[0]) - 1))
+    points = part_pcd[t, :, :3]
+    finite = np.isfinite(points).all(axis=-1)
+    if part_pcd.shape[-1] >= 4:
+        finite = finite & (part_pcd[t, :, 3] > 0.5)
+    valid_points = points[finite]
+    if valid_points.size == 0:
+        return np.zeros(3, dtype=np.float32), 0.0
+    tcp_xyz = tcp_pose[t, :3]
+    nearest = int(np.argmin(np.linalg.norm(valid_points - tcp_xyz[None, :], axis=-1)))
+    return valid_points[nearest].astype(np.float32), 1.0
