@@ -37,10 +37,10 @@ Aliases:
 Optional:
   PYTHON_BIN=/path/to/python bash train_tracks.sh action-mlp
   RUN_ID=my_run bash train_tracks.sh all
-  RESULTS_ROOT=part2action/results/runs bash train_tracks.sh all
+  RESULTS_ROOT=../results/part2action/runs bash train_tracks.sh all
 
 Each run writes a terminal log to the track result folder:
-  results/runs/<run_id>/<track_name>/train_<track>_<timestamp>.log
+  results/part2action/runs/<run_id>/<track_name>/train_<track>_<timestamp>.log
 EOF
 }
 
@@ -84,9 +84,11 @@ print(out.name)
 PY
     )"
     out_dir="$RESULTS_ROOT/$RUN_ID/$track_name"
+    if [[ "$out_dir" != /* ]]; then out_dir="$REPO_DIR/$out_dir"; fi
     timestamp="$(date +%Y%m%d_%H%M%S)"
-    log_path="$REPO_DIR/$out_dir/train_${track}_${timestamp}.log"
-    mkdir -p "$REPO_DIR/$out_dir"
+    log_path="$out_dir/train_${track}_${timestamp}.log"
+    mkdir -p "$out_dir"
+    "$PYTHON_BIN" "$REPO_DIR/part2action/scripts/register_result.py" --section part2action/runs --target "$(dirname "$out_dir")" --name "$RUN_ID"
     echo ""
     echo "[train_tracks] Starting '$track' with $cfg"
     echo "[train_tracks] Log: $log_path"
@@ -94,7 +96,7 @@ PY
         cd "$REPO_DIR"
         PYTHONPATH=part2action "$PYTHON_BIN" part2action/scripts/train.py \
             --config "part2action/$cfg" \
-            --override-out "$REPO_DIR/$out_dir" 2>&1 | tee "$log_path"
+            --override-out "$out_dir" 2>&1 | tee "$log_path"
     )
     echo "[train_tracks] Finished '$track'"
 }
@@ -106,7 +108,7 @@ main() {
     fi
 
     RUN_ID="${RUN_ID:-$(date +%Y%m%d_%H%M%S)}"
-    RESULTS_ROOT="${RESULTS_ROOT:-part2action/results/runs}"
+    RESULTS_ROOT="${RESULTS_ROOT:-/p/part2action/results/part2action/runs}"
     echo "[train_tracks] RUN_ID=$RUN_ID"
     echo "[train_tracks] RESULTS_ROOT=$RESULTS_ROOT"
 

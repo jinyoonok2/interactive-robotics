@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Contact label review</title>
+<style>body{font:16px system-ui;background:#111923;color:#eaf0f5;max-width:1200px;margin:30px auto;padding:0 20px}h1{font-size:28px}select,button{font:inherit;padding:8px;background:#233444;color:white;border:1px solid #597086;border-radius:5px}#panels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}img{width:100%;border-radius:8px}input[type=range]{width:65%}.note{color:#b7c8d5;line-height:1.5}svg{width:100%;background:#182532;border-radius:8px}#metrics{line-height:1.8}textarea{box-sizing:border-box;width:100%;height:90px;background:#182532;color:white;padding:12px} .legend{padding:8px 0} </style>
+<h1>Contact-label review: recorded demonstrations</h1>
+<p class="note">Compare the same frame in all three panels. These are derived labels, not model predictions or verified physical contacts. Green tint: dataset target part. Yellow circle and trail: recorded TCP and recent motion. Red: legacy surface label. Cyan: skill-specific surface label. Projection assumes PartGym's fixed camera.</p>
+<select id="example"></select><h2 id="instruction"></h2><p id="identity"></p>
+<div id="panels"><img id="a" alt="Recorded RGB"><img id="b" alt="Legacy label overlay"><img id="c" alt="Skill-specific overlay"></div>
+<p><button id="play">Play</button> <button id="prev">Previous</button> <button id="next">Next</button> <input id="slider" type="range" min="0" value="0"></p>
+<p><button id="start">Start</button> <button id="legacy">Legacy event at start</button> <button id="skill">Skill-specific event</button> <button id="end">End</button></p>
+<p><label for="threshold">Diagnostic distance threshold: </label><select id="threshold"><option value="3">3 cm (current model)</option><option value="5">5 cm</option><option value="7">7 cm</option><option value="10">10 cm</option></select> <button id="firstgate">First legacy activation</button></p>
+<div id="gate" style="padding:12px;background:#233444;border-radius:8px"></div>
+<p id="coverage"></p>
+<p class="note">Activation here means the demonstration label passes the training distance gate. Legacy is the current training label mode; skill-specific is a diagnostic alternative. Threshold selection changes this visualization only. It does not change model configuration, the bounded action offset, or establish physical contact.</p>
+<div id="metrics"></div><div class="legend">Timeline: <span style="color:#92bfff">nearest target surface</span>, <span style="color:#ff6565">legacy label distance</span>, <span style="color:#00ddff">skill-specific label distance</span>. Dashed line: selected threshold. Red/cyan strips: frames eligible for the corresponding contact gate. White cursor: current frame.</div>
+<svg id="distance" viewBox="0 0 1000 210" role="img" aria-label="TCP distance timeline"></svg>
+<p class="note">TCP is a reference point, not a fingertip. The distance plot alone cannot verify contact. Command and opening below use raw dataset units; inspect their semantics before treating either as finger contact.</p>
+<svg id="gripper" viewBox="0 0 1000 170" role="img" aria-label="Gripper command and measured opening timeline"></svg>
+<h3>Review notes</h3><p class="note">Check: Does the marker stay on the intended part? Is the event near visible interaction? Does the TCP come within 3 cm? Is the part occluded or missing? Notes are saved in this browser when local storage is available; export to retain them.</p>
+<textarea id="notes" placeholder="Describe observations; distinguish visible evidence from assumptions."></textarea><p><button id="export">Export review notes</button></p>
+<script>
+const data=__DATA__;let idx=0,frame=0,timer=null;const $=id=>document.getElementById(id),ns='http://www.w3.org/2000/svg';let notes={};try{notes=JSON.parse(localStorage.getItem('contact-review-notes')||'{}')}catch(e){}
+data.forEach((e,i)=>{let o=document.createElement('option');o.value=i;o.textContent=e.object+' / '+e.kind+' / '+e.demo;$('example').append(o)});
+function key(){let e=data[idx];return e.object+'/'+e.demo+'/'+e.kind}
+function el(svg,tag,attrs,text){let n=document.createElementNS(ns,tag);for(let k in attrs)n.setAttribute(k,attrs[k]);if(text)n.textContent=text;svg.append(n)}
+function chart(id,fields,height,minimum){let e=data[idx],svg=$(id);svg.replaceChildren();let values=e.timeline.flatMap(r=>fields.map(f=>r[f[0]])).filter(v=>v!==null&&Number.isFinite(v));let low=Math.min(0,...values),high=Math.max(minimum,...values);let x=t=>70+900*(t-e.start)/Math.max(1,e.end-e.start), y=v=>height-30-(height-55)*(v-low)/(high-low||1);
+for(let n=0;n<4;n++){let v=low+(high-low)*n/3;el(svg,'line',{x1:70,x2:970,y1:y(v),y2:y(v),stroke:'#33485b'});el(svg,'text',{x:5,y:y(v)+5,fill:'#b7c8d5','font-size':13},v.toFixed(2))}
+for(let [field,color,label] of fields){let run=[];function flush(){if(run.length)el(svg,'polyline',{points:run.join(' '),fill:'none',stroke:color,'stroke-width':2});run=[]}e.timeline.forEach(r=>{if(r[field]===null)flush();else run.push(x(r.t)+','+y(r[field]))});flush()}
+if(id==='distance'){
+let threshold=+$('threshold').value;
+for(let [field,color,offset] of [['legacy_cm','#ff6565',0],['skill_cm','#00ddff',7]])for(let r of e.timeline)if(eligible(r[field]))el(svg,'rect',{x:x(r.t),y:height-28+offset,width:Math.max(1,900/Math.max(1,e.end-e.start)),height:5,fill:color});
+el(svg,'line',{x1:70,x2:970,y1:y(threshold),y2:y(threshold),stroke:'#f4d78c','stroke-dasharray':'6 5'});
+el(svg,'text',{x:75,y:y(threshold)-5,fill:'#f4d78c','font-size':12},threshold+' cm');
+}
+for(let [t,color] of [[e.legacy_start_event,'#ff6565'],[e.skill_event,'#00ddff']])if(t>=e.start&&t<=e.end)el(svg,'line',{x1:x(t),x2:x(t),y1:15,y2:height-30,stroke:color,'stroke-dasharray':'3 5'});
+el(svg,'line',{x1:x(e.frames[frame].t),x2:x(e.frames[frame].t),y1:15,y2:height-30,stroke:'white'});el(svg,'text',{x:70,y:height-7,fill:'#b7c8d5'},'frame '+e.start);el(svg,'text',{x:880,y:height-7,fill:'#b7c8d5'},'frame '+e.end)}
+function eligible(v){return v!==null&&Number.isFinite(v)&&v<=+$('threshold').value}
+function gateStatus(v){return v===null?'UNAVAILABLE':eligible(v)?'ACTIVE':'INACTIVE'}
+function updateGate(e,r){
+$('gate').textContent='Legacy gate: '+gateStatus(r.legacy_cm)+' | Skill-specific gate: '+gateStatus(r.skill_cm)+' | threshold '+$('threshold').value+' cm';
+$('coverage').textContent=['legacy_cm','skill_cm'].map((field,i)=>{let valid=e.timeline.filter(v=>v[field]!==null),active=valid.filter(v=>eligible(v[field])),first=active[0];return (i?'Skill-specific':'Legacy')+': '+active.length+'/'+e.timeline.length+' frames eligible ('+(100*active.length/e.timeline.length).toFixed(1)+'%); '+(e.timeline.length-valid.length)+' unavailable; first activation '+(first?'frame '+first.t:'never')}).join(' | ');
+}
+function fmt(v){return v===null?'unavailable':v.toFixed(2)}
+function render(){let e=data[idx],f=e.frames[frame],r=e.timeline.find(r=>r.t===f.t);['a','b','c'].forEach((id,i)=>$(id).src='data:image/jpeg;base64,'+f.images[i]);$('slider').max=e.frames.length-1;$('slider').value=frame;$('instruction').textContent=e.instruction;$('identity').textContent=e.object+' / '+e.demo+' • skill segment '+e.start+'–'+e.end;$('metrics').textContent='Frame '+f.t+' • legacy event from this frame: '+f.legacy_event+' • skill-specific event: '+f.skill_event+' | TCP → legacy: '+fmt(r.legacy_cm)+' cm; TCP → skill-specific: '+fmt(r.skill_cm)+' cm | command: '+fmt(r.command)+'; measured opening: '+fmt(r.opening);updateGate(e,r);chart('distance',[['surface_cm','#92bfff'],['legacy_cm','#ff6565'],['skill_cm','#00ddff']],210,Math.max(5,+$('threshold').value*1.1));chart('gripper',[['command','#ffa36c'],['opening','#a7e094']],170,.01)}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='Play'}function jump(t){frame=data[idx].frames.reduce((best,f,i)=>Math.abs(f.t-t)<Math.abs(data[idx].frames[best].t-t)?i:best,0);render()}
+$('threshold').onchange=()=>render();$('firstgate').onclick=()=>{stop();let r=data[idx].timeline.find(r=>eligible(r.legacy_cm));if(r)jump(r.t)};
+$('example').onchange=()=>{stop();idx=+$('example').value;frame=0;$('notes').value=notes[key()]||'';render()};$('slider').oninput=()=>{stop();frame=+$('slider').value;render()};$('play').onclick=()=>{if(timer)return stop();$('play').textContent='Pause';timer=setInterval(()=>{frame=(frame+1)%data[idx].frames.length;render()},170)};$('prev').onclick=()=>{stop();frame=Math.max(0,frame-1);render()};$('next').onclick=()=>{stop();frame=Math.min(data[idx].frames.length-1,frame+1);render()};for(let [id,field] of [['start','start'],['end','end'],['legacy','legacy_start_event'],['skill','skill_event']])$(id).onclick=()=>{stop();jump(data[idx][field])};$('notes').oninput=()=>{notes[key()]=$('notes').value;try{localStorage.setItem('contact-review-notes',JSON.stringify(notes))}catch(e){}};$('export').onclick=()=>{let blob=new Blob([JSON.stringify(notes,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='contact-review-notes.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};$('notes').value=notes[key()]||'';render();
+</script></html>

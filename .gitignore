@@ -1,12 +1,4 @@
-# Habitat Data Files (too large for git)
-habitat-lab/data/
-!habitat-lab/data/.gitkeep
 datasets/
-
-# Habitat Output Files
-habitat-lab/outputs/
-habitat-lab/tb/
-habitat-lab/checkpoints/
 
 # Python
 __pycache__/
@@ -83,3 +75,16 @@ affordance-pipeline/models/
 *.mp4
 *.avi
 *.mov
+
+# Personal project storage shortcut
+part2action/storage
+
+# Independently maintained framework clones and local caches
+/PartInstruct/
+/ManiSkill3/
+/cache/
+
+# Experiment outputs and personal analysis stay local; publish the layout guide
+/results/*
+!/results/README.md
+/part2action/docs/CONTACT_LABEL_AUDIT.md

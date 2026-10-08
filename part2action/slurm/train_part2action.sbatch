@@ -7,8 +7,8 @@
 #   sbatch --export=ALL,TRACK=all part2action/slurm/train_part2action.sbatch
 
 #SBATCH --partition=gpu
-#SBATCH --gres=gpu:a100:1
-#SBATCH --constraint=a100_80gb
+#SBATCH --gres=gpu:1
+#SBATCH --constraint="a40|a100_40gb|a100_80gb|h100_94gb"
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32G
 #SBATCH --time=08:00:00
@@ -23,13 +23,13 @@ if [ -d "${SLURM_SUBMIT_DIR:-}/part2action" ]; then
 elif [ -f "${SLURM_SUBMIT_DIR:-}/train_tracks.sh" ]; then
     ROOT_DIR="$(cd "$SLURM_SUBMIT_DIR" && pwd)"
 else
-    ROOT_DIR="/u/xna8aw/workspace/live-robotics-lab/interactive-robotics/part2action"
+    ROOT_DIR="/u/xna8aw/workspace/research_projects/interactive-robotics/part2action"
 fi
 WORKSPACE_ROOT="${WORKSPACE_ROOT:-/u/xna8aw/workspace}"
 TRACK="${TRACK:-action-mlp}"
 TIME_TAG="${TIME_TAG:-${SLURM_JOB_ID:-manual}}"
 RUN_ID="${RUN_ID:-slurm_${TIME_TAG}}"
-RESULTS_ROOT="${RESULTS_ROOT:-part2action/results/runs}"
+RESULTS_ROOT="${RESULTS_ROOT:-/p/part2action/results/part2action/runs}"
 
 export PATH="$WORKSPACE_ROOT/.bin:$PATH"
 export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$WORKSPACE_ROOT/.micromamba}"
@@ -45,7 +45,7 @@ echo "[slurm] run_id=$RUN_ID"
 nvidia-smi || true
 
 eval "$(micromamba shell hook --shell bash)"
-micromamba activate part2action310
+micromamba activate part2action_train
 
 python - <<'PY'
 import torch

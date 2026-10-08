@@ -1,4 +1,6 @@
-name: hierarchical_gated_pcd_contact3d_all_demos
+name: hierarchical_world_geometry_30epoch_no_residual
+# Baseline: one camera frame, cloned world XYZ, measured finger opening.
+# No ±2 cm residual and no last-centimeter contact. Train from scratch.
 heads: [heatmap, approach, action]
 
 data:
@@ -12,8 +14,10 @@ data:
   n_obs_steps: 1
   sample_stride: 2
   max_demos_per_file: null
-  num_workers: 2
-  batch_size: 8
+  num_workers: 4
+  batch_size: 16
+  eval_num_workers: 4
+  eval_batch_size: 16
   pin_memory: true
   use_pcd: true
   use_part_pcd: false
@@ -31,35 +35,59 @@ model:
   temporal_encoder_type: none
   action_head_type: mlp
   use_part_gate: true
+  use_skill_gate: false
   use_pcd: true
   use_contact_xyz: true
+  use_contact_action_token: true
+  use_point_part_head: false
+  split_action_heads: false
+  use_contact_residual: false
+  use_contact_relative_actions: false
+  use_action_deltas: false
+  use_gripper_state: true
   use_hierarchy: true
   max_skill_slots: 4
   hierarchy_layers: 2
   phase_selector_use_3d: true
 
 hierarchy:
-  warmup_epochs: 2
-  planner_epochs: 3
-  scheduled_sampling_epochs: 5
+  warmup_epochs: 0
+  planner_epochs: 0
+  scheduled_sampling_epochs: 1
   max_predicted_probability: 1.0
+
+rollout:
+  termination_mode: legacy
+  min_phase_cycles: 2
 
 train:
   device: cuda
-  epochs: 10
-  lr: 3.0e-4
+  epochs: 30
+  lr: 1.0e-4
+  lr_scales:
+    part_gate: 0.5
+    action_head: 1.0
+    skill_planner: 0.5
+    phase_selector: 0.5
+    termination_head: 0.5
   weight_decay: 1.0e-5
   grad_clip: 1.0
   log_every: 50
   save_every_epoch: 1
   amp: true
   seed: 42
+  freeze_prefixes:
+    - visual
+    - text
 
 losses:
-  heatmap_weight: 1.0
-  gate_weight: 0.25
-  contact_xyz_weight: 0.5
-  approach_weight: 0.5
+  heatmap_weight: 0.0
+  gate_weight: 0.5
+  gate_pos_weight: 10.0
+  gate_focal_gamma: 2.0
+  gate_dice_weight: 1.0
+  contact_xyz_weight: 1.0
+  approach_weight: 0.0
   action_weight: 1.0
   skill_embedding_weight: 1.0
   slot_validity_weight: 0.25
@@ -67,4 +95,4 @@ losses:
   termination_weight: 0.5
   termination_pos_weight: 10.0
 
-output_dir: results/hierarchical_gated_pcd_contact3d_all_demos
+output_dir: results/hierarchical_world_geometry_30epoch_no_residual

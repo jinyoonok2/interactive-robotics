@@ -1,0 +1,103 @@
+# Matched two-frame unified MLP; predicted geometry only, detached action-conditioning path.
+data:
+  action_chunk: 8
+  batch_size: 16
+  eval_batch_size: 16
+  eval_num_workers: 4
+  max_demos_per_file: null
+  max_skill_slots: 4
+  n_obs_steps: 2
+  num_workers: 4
+  pin_memory: true
+  sample_stride: 2
+  train_hdf5:
+  - ../datasets/PartInstruct/demos/bottle.hdf5
+  - ../datasets/PartInstruct/demos/mug.hdf5
+  - ../datasets/PartInstruct/demos/pliers.hdf5
+  - ../datasets/PartInstruct/demos/scissors.hdf5
+  use_contact_xyz: true
+  use_hierarchy: true
+  use_part_pcd: false
+  use_pcd: true
+  use_tcp_pose: true
+  val_hdf5: []
+heads:
+- heatmap
+- approach
+- action
+hierarchy:
+  max_predicted_probability: 1.0
+  planner_epochs: 0
+  scheduled_sampling_epochs: 1
+  warmup_epochs: 0
+losses:
+  action_weight: 1.0
+  approach_weight: 0.0
+  contact_xyz_weight: 1.0
+  gate_dice_weight: 1.0
+  gate_focal_gamma: 2.0
+  gate_pos_weight: 10.0
+  gate_weight: 0.5
+  heatmap_weight: 0.0
+  phase_weight: 0.5
+  skill_embedding_weight: 1.0
+  slot_validity_weight: 0.25
+  termination_pos_weight: 10.0
+  termination_weight: 0.5
+model:
+  action_head_type: mlp
+  hidden_dim: 256
+  hierarchy_layers: 2
+  img_size: 252
+  max_skill_slots: 4
+  near_contact_distance: 0.03
+  near_contact_max_translation: 0.03
+  num_fusion_layers: 2
+  out_size: 252
+  phase_selector_use_3d: true
+  split_action_heads: false
+  temporal_encoder_type: transformer
+  temporal_heads: 4
+  temporal_layers: 1
+  text_device: cuda
+  use_action_deltas: false
+  use_contact_action_token: true
+  use_contact_relative_actions: false
+  use_contact_residual: false
+  use_contact_xyz: true
+  use_gripper_state: true
+  use_hierarchy: true
+  use_near_contact_actions: false
+  use_part_gate: true
+  use_pcd: true
+  use_point_part_head: false
+  use_skill_gate: false
+  use_unified_contact_conditioning: true
+  contact_conditioning_enabled: true
+  contact_geometry_scale_m: 0.1
+name: hierarchical_world_geometry_30epoch_unified_contact
+output_dir: ../results/part2action/runs/hierarchical_world_geometry_30epoch_unified_contact
+rollout:
+  min_phase_cycles: 2
+  termination_mode: legacy
+train:
+  amp: true
+  device: cuda
+  epochs: 30
+  freeze_prefixes:
+  - visual
+  - text
+  grad_clip: 1.0
+  log_every: 50
+  lr: 0.0001
+  lr_scales:
+    action_head: 1.0
+    part_gate: 0.5
+    phase_selector: 0.5
+    skill_planner: 0.5
+    temporal: 1.0
+    termination_head: 0.5
+    contact_geometry_conditioner: 1.0
+  save_every_epoch: 1
+  seed: 42
+  weight_decay: 1.0e-05

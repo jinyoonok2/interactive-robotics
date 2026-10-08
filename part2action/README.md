@@ -1,402 +1,119 @@
-# part2action
+# Part2Action
 
-`part2action` now defaults to the 3D-grounded hierarchical skill policy:
+Part2Action predicts robot actions from visual observations, robot state, and
+instructions naming an object part. Training uses PartInstruct demonstrations;
+closed-loop evaluation uses the PartGym Franka Panda environment.
+
+This README describes the model and implementation. The repository
+[README](../README.md) provides the wider project overview. Read
+[PROJECT_ENVIRONMENT.md](docs/PROJECT_ENVIRONMENT.md) for current runs, paths,
+environments, and Slurm rules, and [SETUP.md](docs/SETUP.md) for run commands.
+
+## Inputs and outputs
+
+At deployment the policy receives RGB, the full scene point cloud, the task
+sentence, the TCP pose, and measured gripper opening. Current recipes exclude
+joint angles. Dataset part masks, target-part clouds, and per-step skill labels
+provide training supervision; they are not deployment inputs.
+
+The model predicts an **8 × 7 action chunk**:
 
 ```text
-high-level task -> latent skill plan -> state-selected skill -> robot action chunk
+world x, world y, world z, roll, pitch, yaw, gripper
 ```
 
-It uses PartInstruct data, but it is still separate from the larger Habitat
-integration. The current workflow has two parts:
+Current rollouts execute the first action, observe the scene again, and predict
+another chunk. The contact head separately predicts a 3D location on the scene
+cloud. Its influence on actions depends on the architecture variant.
 
-- **Offline training** from PartInstruct HDF5 demonstrations.
-- **Closed-loop simulation** in PartGym using the trained action checkpoints.
+## Shared architecture
 
-The first successful simulator smoke result so far is the MLP action model on a
-PartGym scissors grasp task. Pliers still fails in the current prototype.
+- Frozen DINOv2 ViT-S/14 with register tokens encodes RGB; frozen Flan-T5-base
+  encodes task language.
+- A learned hierarchy predicts skill slots, selects the current skill from
+  observations/state, and predicts termination.
+- A skill-conditioned part gate reweights visual tokens. Ground-truth masks
+  supervise that prediction; predicted gating influences the policy features.
+- Point-cloud features and contact attention predict a world-frame contact point.
+- An MLP action head predicts the action chunk. The near-contact and unified
+  recipes also use a two-frame temporal transformer.
 
-## Default Architecture
+The unified variants retain the hierarchy, part gate, and auxiliary contact
+head. “Unified” refers to using the action policy throughout the motion without
+switching XYZ commands at a contact-distance threshold.
 
-The maintained policy uses frozen DINOv2 and T5 encoders, learned visual part
-gating, full-scene point-cloud/TCP conditioning, an ordered latent skill-slot
-decoder, a 3D-aware phase selector, a termination head, and the Part2Action
-low-level action head. Ground-truth part masks and target-part point clouds are
-training labels only and are not deployment inputs.
+## Architecture variants
 
-Run the default training configuration with:
+| Variant | Observation history | How predicted contact coordinates affect actions |
+| --- | --- | --- |
+| Baseline | One frame | Auxiliary supervision; coordinates do not directly enter the action head or replace XYZ |
+| Near-contact | Two frames | Within 3 cm, replace XYZ with predicted contact plus a bounded 3 cm offset; otherwise use MLP XYZ |
+| Unified control | Two frames | Same conditioning projection as unified contact, supplied with zeros; no XYZ switching |
+| Unified contact | Two frames | Feed predicted contact relative to the TCP into action features throughout motion; no XYZ switching |
 
-```bash
-python scripts/train.py
-```
+Unified contact projects the detached vector
+`(predicted_contact_world - TCP_world) / 0.1` into action features. It uses
+predictions during both training and deployment. Ground-truth contact targets
+remain auxiliary supervision. Contact confidence is not an implemented input.
+The old bounded contact-relative action offset and residual are disabled in the
+unified pair.
 
-Legacy architecture code and configs are preserved on the
-`part2action-legacy` branch. Existing `results/` artifacts are not modified.
+The near-contact training gate uses demonstration contact labels; rollout gating
+uses predictions. The unified control/contact pair is the matched comparison for
+explicit geometry conditioning. The original baseline also differs in temporal
+history, so comparisons against it involve more than that single change.
 
-For the UVA Slurm cluster, start with
-[`docs/UVA_SLURM.md`](docs/UVA_SLURM.md). For other university GPU servers or
-SSH agent workflows, see [`docs/UNIVERSITY_GPU.md`](docs/UNIVERSITY_GPU.md).
-For Hugging Face token setup and selected-object data downloads, see
-[`docs/DATA_SUBSETS.md`](docs/DATA_SUBSETS.md).
+Configs are under [configs/architecture_update/](configs/architecture_update/),
+with names ending in `no_residual`, `near_contact`, `unified_control`, and
+`unified_contact`. Model construction uses config flags; keep matched experiments
+consistent outside the module being tested.
 
-## Directory Layout
+## Dataset and evaluation
+
+The full released dataset contains 11 categories at
+`/p/part2action/data/PartInstruct`. Current trained variants use only bottle,
+mug, pliers, and scissors, with train/test separation and no held-out validation
+split. Training losses and offline training-data checks are not test success rates.
+
+All four variants completed 30 epochs and passed five-action H100 smoke tests on
+2026-10-08. Their matched evaluation uses 13 supported object/task combinations
+and three trials each: **39 test1 rollouts per model**, with a 120-step limit,
+legacy learned termination, and one action executed per policy cycle.
+Point-cloud sampling uses deterministic PyTorch3D CPU FPS; policy inference uses
+GPU. Detailed progress and job IDs belong in the environment guide.
+
+Official PartInstruct DP3-S is a separate privileged-input baseline: its completed
+scissors pilot used ground-truth part clouds and succeeded in 1 of 5 trials.
+Its protocol differs from the 39-trial Part2Action evaluation. DP-S training was
+stopped at the user's request; its latest epoch2500 checkpoint is retained.
+
+## Implementation layout
 
 ```text
 part2action/
-  configs/                         Training configs
-  data/                            HDF5 dataset loader and target derivation
-  docs/                            Extra setup notes
-  models/                          DINOv2/T5 backbone, fusion, heads
+  configs/                    Experiment recipes and module flags
+  data/                       HDF5 loading, coordinate transforms, target derivation
+  models/                     Encoders, fusion, hierarchy, contact and action heads
+  diagnostics/                Rollout diagnostic helpers
   scripts/
-    train.py                       Unified offline trainer
-    evaluate.py                    Offline metrics
-    probe_action_models.py         Offline action/visualization probe
-    rollout_partgym.py             Closed-loop PartGym rollout runner
-  third_party/
-    PartInstruct/                  Local upstream PartInstruct clone, gitignored
-  results/                         Checkpoints, rollouts, videos, GIFs, gitignored
+    train.py                  Offline training
+    evaluate.py               Offline metrics
+    rollout_partgym.py        Closed-loop simulator evaluation
+    register_result.py        Register external outputs in root results/
+  slurm/                      Batch launchers and GPU smoke checks
+  tests/                      Geometry, conditioning, gate, and action checks
+  docs/                       Environment guide, setup, research plan, slides
+  storage -> /p/part2action    Dataset, caches, environments, heavy outputs, logs
 ```
 
-Large files are intentionally ignored by git:
-
-- `third_party/PartInstruct/`
-- `../datasets/`
-- `results/`
-- `*.pt`, `*.ckpt`, `*.mp4`, `*.zip`
-
-## What The Model Trains
-
-The action-capable models train on PartInstruct HDF5 demonstrations. Each sample
-contains:
-
-- `agentview_rgb`: camera image
-- `skill_instructions`: language instruction
-- `actions`: 7D robot actions, shaped `(T, 7)`
-- `agentview_part_mask`: target part mask
-- `gripper_state`, `joint_states`
-
-The action models predict an `8 x 7` future action chunk. The 7D action is the
-same format used by PartGym:
-
-```text
-x, y, z, roll, pitch, yaw, gripper
-```
-
-Extra heads predict heatmap/contact/approach targets for auxiliary supervision.
-The action labels come directly from demos; contact/approach are heuristic.
-
-## Fresh Machine Setup
-
-From a clean machine:
-
-```bash
-git clone https://github.com/jinyoonok2/interactive-robotics.git
-cd interactive-robotics/part2action
-```
-
-### 1. Training Environment
-
-Create the lightweight offline training env:
-
-```bash
-bash setup_env.sh
-conda activate part2action
-```
-
-This env is used for HDF5 training and offline metrics. It does not install
-PartGym.
-
-### 2. Download The HDF5 Demo Subset
-
-PartInstruct is gated on Hugging Face. First accept the dataset terms at:
-
-```text
-https://huggingface.co/datasets/SCAI-JHU/PartInstruct
-```
-
-Then log in and download the small scissors/pliers subset:
-
-```bash
-huggingface-cli login
-bash download_subset.sh
-```
-
-If Hugging Face CLI hangs on this machine, save your token to
-`~/.cache/huggingface/token`; `download_subset.sh` uses `curl -4` to force IPv4.
-See [`docs/DATA_SUBSETS.md`](docs/DATA_SUBSETS.md) for the full token and
-selected-object workflow.
-
-Or choose a custom object subset while still downloading every task/demo for
-those objects:
-
-```bash
-OBJECTS="mug bottle scissors" bash download_subset.sh
-python scripts/make_object_configs.py --objects mug bottle scissors --tag mug_bottle_scissors
-```
-
-Use the generated configs under `configs/generated/` for training that selected
-object subset.
-
-Expected output:
-
-```text
-../datasets/PartInstruct/
-  demos/
-    scissors.hdf5
-    pliers.hdf5
-  episodes_meta_test.json
-  episodes_meta_train.json
-  object_meta.json
-  part_semantic_lexicon.json
-```
-
-The subset is about `3.8 GB`. The full PartInstruct demos are much larger.
-
-### 3. Train Offline Models
-
-Run individual tracks:
-
-```bash
-conda activate part2action
-
-python scripts/train.py --config configs/heatmap_real.yaml
-python scripts/train.py --config configs/heatmap_contact_real.yaml
-python scripts/train.py --config configs/heatmap_approach_real.yaml
-python scripts/train.py --config configs/heatmap_contact_approach_real.yaml
-python scripts/train.py --config configs/part_action_mlp_real.yaml
-python scripts/train.py --config configs/part_action_diffusion_real.yaml
-```
-
-Or use the launcher:
-
-```bash
-bash train_tracks.sh all
-```
-
-The current `all` launcher runs only single-frame, non-temporal tracks:
-`heatmap`, `heatmap-contact`, `heatmap-approach`,
-`heatmap-contact-approach`, `action-mlp`, and `action-diffusion`.
-
-Outputs go under `results/`. Each run typically contains:
-
-- `last.pt`
-- `history.json`
-- `config_source.yaml`
-- `config_resolved.json`
-
-For action rollouts, start with:
-
-```text
-results/prototype/part_action_mlp_real/last.pt
-```
-
-or your newly trained:
-
-```text
-results/part_action_mlp_real/last.pt
-```
-
-## PartGym Simulator Setup
-
-PartGym uses the upstream PartInstruct repo and heavier simulator dependencies,
-so it uses a **separate conda env** named `partinstruct`.
-
-### 1. Clone PartInstruct Locally Under part2action
-
-We avoid git submodules. Clone upstream directly into `third_party/`:
-
-```bash
-cd /path/to/interactive-robotics/part2action
-mkdir -p third_party
-git clone --recurse-submodules https://github.com/SCAI-JHU/PartInstruct.git third_party/PartInstruct
-```
-
-### 2. Create The Simulator Env
-
-Follow upstream dependency versions:
-
-```bash
-conda create -n partinstruct -c conda-forge \
-  python=3.9 cmake=3.24.3 open3d ninja gcc_linux-64=12 gxx_linux-64=12 -y
-
-conda activate partinstruct
-pip install torch torchvision torchaudio
-
-cd /path/to/interactive-robotics/part2action/third_party/PartInstruct
-pip install -r requirements.txt
-pip install omegaconf
-
-pip install -e .
-pip install -e ./third_party/pybullet_planning/
-pip install -e ./third_party/diffusion_policy/
-pip install -e ./third_party/3D-Diffusion-Policy/
-pip install -e ./third_party/gym-0.21.0/
-pip install -e ./third_party/pytorch3d/
-```
-
-`sam_2` is only needed for SAM-based PartGym variants. The current rollout
-script uses non-SAM `PartInstruct.PartGym.env.bullet_env`, so SAM2 is not
-required for first tests.
-
-### 3. Download PartGym Assets
-
-The HDF5 demos are enough for offline training, but **not** for simulator
-rollouts. PartGym also needs robot/object/scene assets.
-
-```bash
-cd /path/to/interactive-robotics/part2action/third_party/PartInstruct
-huggingface-cli download SCAI-JHU/PartInstruct \
-  --repo-type dataset \
-  --local-dir ./data \
-  --include "*.json" "assets.zip"
-
-unzip ./data/assets.zip -d ./data/
-```
-
-Expected paths:
-
-```text
-third_party/PartInstruct/data/episodes_meta_test.json
-third_party/PartInstruct/data/assets/urdfs/robots/franka_panda/panda.urdf
-third_party/PartInstruct/data/assets/partnet-grasping/
-```
-
-You can remove the zip after unzipping:
-
-```bash
-rm ./data/assets.zip
-```
-
-## PartGym Rollouts
-
-Run from `part2action/` using the `partinstruct` env:
-
-```bash
-cd /path/to/interactive-robotics/part2action
-```
-
-Scissors, 200 max steps, record video:
-
-```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 conda run -n partinstruct \
-python scripts/rollout_partgym.py \
-  --model-key mlp \
-  --obj-classes scissors \
-  --task-types 1 \
-  --num-episodes 1 \
-  --max-steps 200 \
-  --execute-steps 1 \
-  --device cpu \
-  --record
-```
-
-Pliers:
-
-```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 conda run -n partinstruct \
-python scripts/rollout_partgym.py \
-  --model-key mlp \
-  --obj-classes pliers \
-  --task-types 1 \
-  --num-episodes 1 \
-  --max-steps 200 \
-  --execute-steps 1 \
-  --device cpu \
-  --record
-```
-
-`rollout_partgym.py` defaults to:
-
-```text
-third_party/PartInstruct
-```
-
-so you do not need `--partinstruct-root` if the local clone is in the expected
-location.
-
-### Rollout Outputs
-
-Results are saved under:
-
-```text
-results/prototype/partgym_rollouts/mlp/
-```
-
-Important files:
-
-```text
-rollout_results_test1_scissors_1.json
-rollout_results_test1_pliers_1.json
-videos/scissors_1_test1/rollout.mp4
-videos/pliers_1_test1/rollout.mp4
-```
-
-Current prototype result:
-
-- `scissors`, task `1`: succeeded with the MLP model.
-- `pliers`, task `1`: failed with the MLP model.
-
-## GIFs For Slides
-
-Convert rollout MP4s into smaller GIFs:
-
-```bash
-conda run -n partinstruct python -c "from pathlib import Path; import cv2, imageio.v2 as imageio
-base=Path('results/prototype/partgym_rollouts/mlp/videos')
-for name in ['scissors_1_test1','pliers_1_test1']:
-    mp4=base/name/'rollout.mp4'; gif=base/name/'rollout_slide.gif'
-    cap=cv2.VideoCapture(str(mp4)); fps=cap.get(cv2.CAP_PROP_FPS) or 20
-    frames=[]; idx=0; stride=max(1, round(fps/10))
-    while True:
-        ok, frame=cap.read()
-        if not ok: break
-        if idx % stride == 0:
-            frame=cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame=cv2.resize(frame, (300,300), interpolation=cv2.INTER_AREA)
-            frames.append(frame)
-        idx += 1
-    cap.release()
-    imageio.mimsave(str(gif), frames, duration=0.1, loop=0)
-    print(gif)"
-```
-
-## Offline Evaluation
-
-Offline metrics are still useful before simulation:
-
-```bash
-conda activate part2action
-python scripts/evaluate.py --config configs/part_action_mlp_real.yaml --ckpt results/part_action_mlp_real/last.pt
-```
-
-`scripts/probe_action_models.py` creates qualitative overlays and action plots:
-
-```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 conda run -n part2action \
-python scripts/probe_action_models.py \
-  --models part_action_mlp_real \
-  --num-samples 12 \
-  --text-device cpu
-```
-
-Outputs:
-
-```text
-results/prototype/action_model_probe/
-```
-
-## Notes And Troubleshooting
-
-- `part2action` env is for offline training.
-- `partinstruct` env is for PartGym simulation.
-- `third_party/PartInstruct` is intentionally gitignored. Re-clone it on a
-  fresh machine.
-- If Hugging Face returns `401 GatedRepo`, accept the dataset terms and run
-  `huggingface-cli login`.
-- If VLC reports GPU/VDPAU errors, play videos with CPU decoding:
-
-```bash
-vlc --avcodec-hw=none results/prototype/partgym_rollouts/mlp/videos/scissors_1_test1/rollout.mp4
-```
-
-- If CUDA is unavailable in PyTorch, fall back to `--device cpu` for rollouts.
-- DINOv2/Flan-T5 may need internet the first time unless cached locally.
+The framework clone is [../PartInstruct/](../PartInstruct/). Outputs are indexed
+under root [../results/](../results/README.md); source/configs and small reports
+remain in the repository. Follow that guide for new experiments.
+
+## Results and research
+
+- [DP3 success GIFs](../results/partinstruct/visualizations/dp3_success/) and
+  [failure GIFs](../results/partinstruct/visualizations/dp3_failures/).
+- [Research plan](docs/RESEARCH_PLAN.md): first measure the unified contact
+  conditioning effect, then consider a diffusion or flow-matching action decoder.
+- [Meeting slides](docs/slide_history/) preserve dated research discussions.
