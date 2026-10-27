@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Matched unified MLP variants: VARIANT=control or contact.
+# Matched unified variants: VARIANT=control or contact; DECODER=mlp or diffusion.
 # Writes to /p/part2action. Does not init from the 8/39 residual checkpoint.
 #
 #   sbatch part2action/slurm/train_world_geometry_unified_h100.sbatch
@@ -21,8 +21,12 @@ WORKSPACE_ROOT="${WORKSPACE_ROOT:-/u/xna8aw/workspace}"
 STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
 VARIANT="${VARIANT:-contact}"
 case "$VARIANT" in control|contact) ;; *) echo "VARIANT must be control or contact" >&2; exit 2;; esac
-CONFIG="part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_unified_${VARIANT}.yaml"
-RUN_NAME="world_geometry_30epoch_unified_${VARIANT}_${SLURM_JOB_ID:-manual}"
+DECODER="${DECODER:-mlp}"
+case "$DECODER" in mlp|diffusion) ;; *) echo "DECODER must be mlp or diffusion" >&2; exit 2;; esac
+DECODER_SUFFIX=""
+if [[ "$DECODER" == "diffusion" ]]; then DECODER_SUFFIX="_diffusion"; fi
+CONFIG="part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_unified${DECODER_SUFFIX}_${VARIANT}.yaml"
+RUN_NAME="world_geometry_30epoch_unified${DECODER_SUFFIX}_${VARIANT}_${SLURM_JOB_ID:-manual}"
 OUT_DIR="$STORAGE_ROOT/runs/$RUN_NAME"
 # Set RESUME to a last.pt to continue that run. Empty starts from scratch.
 RESUME="${RESUME:-}"
@@ -31,6 +35,8 @@ mkdir -p "$PART_DIR/logs/slurm" "$OUT_DIR" "$ROOT_DIR/results/part2action"
 cd "$ROOT_DIR"
 export PATH="$WORKSPACE_ROOT/.bin:$PATH"
 export MAMBA_ROOT_PREFIX="$WORKSPACE_ROOT/.micromamba"
+export PYTHONNOUSERSITE=1
+export PYTHONUNBUFFERED=1
 set +u
 eval "$(micromamba shell hook --shell bash)"
 micromamba activate part2action_train

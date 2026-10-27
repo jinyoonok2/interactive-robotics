@@ -1,0 +1,32 @@
+{
+  "CONTACT_LABEL_AUDIT.md": {
+    "source_sha256": "42f14b57ef43d053d8134fbd92c63629cd89177e921d250e151613e96b0c9b24",
+    "archived_sha256": "72dd4186bdbbaa8bea9cfcb3f53b1d3a3a7ad71e4a8d939ef6289cbc471d2550",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  },
+  "DATASET.md": {
+    "source_sha256": "6182e6aefe079c16b3bada1cb9e2c8ba1d0026061f20259e90e693086b2fb3e7",
+    "archived_sha256": "6c42824f9f625f77bef3b47d8ff1437767e34c9397fbda6039434fc914cf42dd",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  },
+  "DIFFUSION_ABLATION.md": {
+    "source_sha256": "6672b36f9d23fb5f92a74683e00f6da44c81c9a33baa943f77fa4b4fd3f33a9f",
+    "archived_sha256": "6672b36f9d23fb5f92a74683e00f6da44c81c9a33baa943f77fa4b4fd3f33a9f",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  },
+  "PROJECT_ENVIRONMENT.md": {
+    "source_sha256": "6610a7cd3ee4322b0b9904b27b52bee1c836bce63099c68849f52dfc226a398a",
+    "archived_sha256": "6b4278c951a40dc566ffd7baae6d58c7e388a877191f2613fa1a8d46b3c8e89a",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  },
+  "RESEARCH_PLAN.md": {
+    "source_sha256": "9ef71efe2c6e54e41051063c0e2676a83ac037f3a266a4a3727de52f511a13be",
+    "archived_sha256": "9ef71efe2c6e54e41051063c0e2676a83ac037f3a266a4a3727de52f511a13be",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  },
+  "SETUP.md": {
+    "source_sha256": "12a15ef151fc8a93fa950e5f23e65aff4fe9933c75161c5b767c927ebaaffb09",
+    "archived_sha256": "12a15ef151fc8a93fa950e5f23e65aff4fe9933c75161c5b767c927ebaaffb09",
+    "change": "Relative Markdown links adjusted for archive location; historical prose retained."
+  }
+}

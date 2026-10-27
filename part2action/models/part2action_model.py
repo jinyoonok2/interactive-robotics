@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from data.geometry import (
-    apply_near_contact_translation, camera_to_world_torch, near_contact_mask,
+    apply_near_contact_translation, camera_to_world_torch, near_contact_mask, tcp_position_torch,
 )
 from .backbone import FrozenDINOv2, FrozenT5
 from .heads import (
@@ -49,12 +49,23 @@ class Part2ActionModel(nn.Module):
         use_unified_contact_conditioning: bool = False,
         contact_conditioning_enabled: bool = True,
         contact_geometry_scale_m: float = 0.1,
+        contact_conditioning_mode: str = "additive",
+        contact_conditioning_initial_weight: float = 0.01,
+        contact_conditioning_stage: str = "late",
         use_near_contact_actions: bool = False,
         near_contact_distance: float = 0.03,
         near_contact_max_translation: float = 0.03,
         use_action_deltas: bool = False,
         use_point_part_head: bool = False,
         use_gripper_state: bool = False,
+        diffusion_schedule: str = "linear",
+        diffusion_action_scale: Optional[list[float]] = None,
+        diffusion_action_offset: Optional[list[float]] = None,
+        diffusion_clip_sample: Optional[float] = None,
+        diffusion_denoiser_type: str = "mlp",
+        diffusion_transformer_layers: int = 2,
+        diffusion_transformer_heads: int = 4,
+        diffusion_transformer_dropout: float = 0.0,
     ) -> None:
         super().__init__()
         heads_set: Set[str] = set(heads)
@@ -63,6 +74,14 @@ class Part2ActionModel(nn.Module):
             raise ValueError(f"Invalid heads {heads_set}; valid: {_VALID_HEADS}")
         self.active_heads = heads_set
         self.action_head_type = action_head_type.lower()
+        if self.action_head_type not in {"mlp", "diffusion"}:
+            raise ValueError("action_head_type must be mlp or diffusion")
+        if diffusion_denoiser_type not in {"mlp", "transformer"}:
+            raise ValueError("diffusion_denoiser_type must be mlp or transformer")
+        if diffusion_denoiser_type == "transformer" and (self.action_head_type != "diffusion" or split_action_heads):
+            raise ValueError("Transformer denoiser requires a monolithic diffusion action head")
+        if split_action_heads and (diffusion_action_scale is not None or diffusion_action_offset is not None or diffusion_schedule != "linear" or diffusion_clip_sample is not None):
+            raise ValueError("configured diffusion normalization/schedule requires a monolithic action head")
         self.n_obs_steps = max(1, int(n_obs_steps))
         self.use_part_gate = bool(use_part_gate)
         self.use_pcd = bool(use_pcd)
@@ -77,12 +96,27 @@ class Part2ActionModel(nn.Module):
         self.use_contact_relative_actions = bool(use_contact_relative_actions)
         self.use_unified_contact_conditioning = bool(use_unified_contact_conditioning)
         self.contact_conditioning_enabled = bool(contact_conditioning_enabled)
+        self.contact_conditioning_stage = str(contact_conditioning_stage)
+        if self.contact_conditioning_stage not in {"late", "early_temporal"}:
+            raise ValueError("contact_conditioning_stage must be late or early_temporal")
+        early_contact = self.contact_conditioning_stage == "early_temporal"
+        if early_contact and (not self.use_unified_contact_conditioning or
+                              self.n_obs_steps < 2 or temporal_encoder_type not in {"transformer", "patch_transformer"}):
+            raise ValueError("early_temporal requires unified conditioning and a multi-frame transformer")
+        if early_contact and not use_gripper_state:
+            raise ValueError("early_temporal requires measured gripper state")
+        self.contact_geometry_scale_m = float(contact_geometry_scale_m)
         if self.use_unified_contact_conditioning:
             if not (self.use_contact_action_token and "action" in heads_set):
                 raise ValueError("unified contact conditioning requires contact action token, TCP, and action head")
-            if action_head_type != "mlp" or split_action_heads or use_near_contact_actions or use_contact_relative_actions or use_contact_residual or use_action_deltas:
-                raise ValueError("unified conditioning requires monolithic world-action MLP without contact switching/residuals")
-            self.contact_geometry_conditioner = ContactGeometryConditioner(hidden_dim, contact_geometry_scale_m)
+            if split_action_heads or use_near_contact_actions or use_contact_relative_actions or use_contact_residual or use_action_deltas:
+                raise ValueError("unified conditioning requires a monolithic world-action head without contact switching/residuals")
+            if contact_geometry_scale_m <= 0:
+                raise ValueError("contact_geometry_scale_m must be positive")
+            if not early_contact:
+                self.contact_geometry_conditioner = ContactGeometryConditioner(
+                    hidden_dim, contact_geometry_scale_m, contact_conditioning_mode,
+                    contact_conditioning_initial_weight)
         self.use_near_contact_actions = bool(use_near_contact_actions)
         self.near_contact_distance = float(near_contact_distance)
         self.near_contact_max_translation = float(near_contact_max_translation)
@@ -143,6 +177,12 @@ class Part2ActionModel(nn.Module):
             n_obs_steps=self.n_obs_steps, num_layers=temporal_layers,
             num_heads=temporal_heads,
         )
+        if early_contact:
+            # Relative contact XYZ, attention peak, TCP XYZ, measured opening.
+            self.early_contact_encoder = nn.Sequential(
+                nn.Linear(8, self.visual.embed_dim), nn.GELU(),
+                nn.Linear(self.visual.embed_dim, self.visual.embed_dim),
+                nn.LayerNorm(self.visual.embed_dim))
         if self.use_part_gate:
             self.part_gate = (
                 SkillConditionedPartGate(self.visual.embed_dim, self.text.embed_dim)
@@ -195,7 +235,13 @@ class Part2ActionModel(nn.Module):
                 )
             else:
                 self.action_head = (
-                    DiffusionActionHead(hidden_dim, action_chunk, action_dim, num_steps=diffusion_steps)
+                    DiffusionActionHead(hidden_dim, action_chunk, action_dim, num_steps=diffusion_steps,
+                                        schedule=diffusion_schedule, action_scale=diffusion_action_scale,
+                                        action_offset=diffusion_action_offset, clip_sample=diffusion_clip_sample,
+                                        denoiser_type=diffusion_denoiser_type,
+                                        transformer_layers=diffusion_transformer_layers,
+                                        transformer_heads=diffusion_transformer_heads,
+                                        transformer_dropout=diffusion_transformer_dropout)
                     if self.action_head_type == "diffusion"
                     else ActionChunkHead(hidden_dim, action_chunk, action_dim)
                 )
@@ -261,7 +307,7 @@ class Part2ActionModel(nn.Module):
                 targets[b, s] = embedding
         return targets
 
-    def _encode_visual(self, rgb: torch.Tensor) -> torch.Tensor:
+    def _encode_visual(self, rgb: torch.Tensor, return_history: bool = False) -> torch.Tensor:
         with torch.no_grad():
             if rgb.ndim == 5:
                 b, t, c, h, w = rgb.shape
@@ -271,7 +317,24 @@ class Part2ActionModel(nn.Module):
                 tokens = self.visual(rgb)
             else:
                 raise RuntimeError(f"Unexpected RGB shape {tuple(rgb.shape)}")
-        return self.temporal(tokens)
+        return tokens if return_history else self.temporal(tokens)
+
+    def _early_contact_context(self, contact_xyz, point_logits, tcp_pose, gripper_state):
+        if tcp_pose is None or gripper_state is None:
+            raise ValueError("early_temporal requires TCP pose and measured gripper state")
+        tcp = tcp_position_torch(tcp_pose).detach()
+        relative = (contact_xyz.detach() - tcp) / self.contact_geometry_scale_m
+        # Attention concentration is a cue, not calibrated contact correctness.
+        confidence = point_logits.detach().float().softmax(-1).amax(-1, keepdim=True).to(relative.dtype)
+        geometry = torch.cat([relative, confidence], dim=-1)
+        geometry = torch.where(torch.isfinite(geometry).all(-1, keepdim=True), geometry, torch.zeros_like(geometry))
+        if not self.contact_conditioning_enabled:
+            geometry = torch.zeros_like(geometry)
+        state = torch.cat([tcp / self.contact_geometry_scale_m,
+                           gripper_state.detach().reshape(tcp.shape[0], 1) / .04], dim=-1)
+        state = torch.where(torch.isfinite(state), state, torch.zeros_like(state))
+        features = torch.cat([geometry, state], dim=-1)
+        return self.early_contact_encoder(features), geometry
 
     def _condition_on_gripper(
         self, fused: torch.Tensor, gripper_state: Optional[torch.Tensor]
@@ -349,7 +412,16 @@ class Part2ActionModel(nn.Module):
             text_tok, text_mask = self.text(instructions)
             text_tok, text_mask = text_tok.to(rgb.device), text_mask.to(rgb.device)
 
-        raw_visual_tok = self._encode_visual(rgb)
+        early_contact = self.contact_conditioning_stage == "early_temporal"
+        visual_history = None
+        if early_contact:
+            visual_history = self._encode_visual(rgb, return_history=True)
+            if visual_history.ndim != 4 or visual_history.shape[1] != self.n_obs_steps:
+                raise ValueError("early_temporal requires the configured RGB frame history")
+            # Localize contact before temporal action features are constructed.
+            raw_visual_tok = visual_history[:, -1]
+        else:
+            raw_visual_tok = self._encode_visual(rgb)
         phase_visual_tok = raw_visual_tok
         gate_logits = None
         legacy_gated_visual_tok = None
@@ -437,6 +509,31 @@ class Part2ActionModel(nn.Module):
                         gt_part_mask, raw_visual_tok.shape[1], oracle_gate_logit_scale
                     ).to(device=raw_visual_tok.device, dtype=gate_logits.dtype)
                     grounded_visual_tok, _ = self.apply_part_gate(raw_visual_tok, oracle_logits)
+        contact_out = {}
+        if early_contact:
+            assert point_tokens is not None and agentview_pcd is not None
+            assert conditioning_skill is not None
+            contact_xyz, contact_token, contact_point_logits = self.contact_attention(
+                point_tokens, agentview_pcd, grounded_visual_tok,
+                conditioning_skill, tcp_pose,
+                world_xyz=camera_to_world_torch(agentview_pcd),
+            )
+            contact_out.update(
+                contact_xyz=contact_xyz,
+                contact_token=contact_token,
+                contact_point_logits=contact_point_logits,
+            )
+        if early_contact:
+            context, geometry = self._early_contact_context(
+                contact_out["contact_xyz"], contact_out["contact_point_logits"],
+                tcp_pose, gripper_state)
+            contact_out["contact_conditioning_features"] = geometry
+            contact_out["early_contact_context"] = context
+            action_visual = self.temporal(visual_history, context_token=context)
+            if gate_logits is not None:
+                action_visual, _ = self.apply_part_gate(action_visual, gate_logits)
+            grounded_visual_tok = action_visual
+
         visual_tok = grounded_visual_tok
         if pcd_embed is not None:
             visual_tok = visual_tok + pcd_embed[:, None, :].to(visual_tok.dtype)
@@ -452,7 +549,7 @@ class Part2ActionModel(nn.Module):
             fused = self.fusion(visual_tok, text_tok, text_mask)
         action_fused = self._condition_on_gripper(fused, gripper_state)
 
-        out = {"fused": fused, "gate_mode": gate_mode, **hierarchy_out}
+        out = {"fused": fused, "gate_mode": gate_mode, **hierarchy_out, **contact_out}
         if self.use_action_deltas:
             out["action_representation"] = "tcp_xyz_delta"
         if self.use_contact_relative_actions:
@@ -468,7 +565,7 @@ class Part2ActionModel(nn.Module):
             out["heatmap_logits"] = self.heatmap_head(fused).squeeze(1)
         if "contact" in self.active_heads:
             out["contact_xy"] = self.contact_head(fused)
-        if self.use_contact_action_token:
+        if self.use_contact_action_token and not early_contact:
             assert point_tokens is not None and agentview_pcd is not None
             assert conditioning_skill is not None
             contact_xyz, contact_token, contact_point_logits = self.contact_attention(
@@ -476,17 +573,14 @@ class Part2ActionModel(nn.Module):
                 conditioning_skill, tcp_pose,
                 world_xyz=camera_to_world_torch(agentview_pcd),
             )
-            out.update(
-                contact_xyz=contact_xyz,
-                contact_token=contact_token,
-                contact_point_logits=contact_point_logits,
-            )
-        elif self.use_contact_xyz:
+            out.update(contact_xyz=contact_xyz, contact_token=contact_token,
+                       contact_point_logits=contact_point_logits)
+        if self.use_contact_xyz and not self.use_contact_action_token:
             out["contact_xyz"] = self.contact_xyz_head(fused)
         if "approach" in self.active_heads:
             out["approach_dir"] = self.approach_head(fused)
         if "action" in self.active_heads:
-            if self.use_unified_contact_conditioning:
+            if self.use_unified_contact_conditioning and not early_contact:
                 if tcp_pose is None:
                     raise ValueError("unified contact conditioning requires tcp_pose")
                 action_fused, geometry_features = self.contact_geometry_conditioner(
@@ -494,6 +588,8 @@ class Part2ActionModel(nn.Module):
                     enabled=self.contact_conditioning_enabled,
                 )
                 out["contact_conditioning_features"] = geometry_features
+                if self.contact_geometry_conditioner.mode == "normalized_global":
+                    out["contact_conditioning_weight"] = self.contact_geometry_conditioner.contact_weight
             if self.split_action_heads:
                 out.update(
                     self.action_head(

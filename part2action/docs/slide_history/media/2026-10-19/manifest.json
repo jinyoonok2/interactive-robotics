@@ -1,0 +1,230 @@
+{
+  "meeting_date": "2026-10-19",
+  "assets": [],
+  "slide_mapping": {
+    "1": [
+      "slide01_diffusion_improves_control_table.png"
+    ],
+    "3": [
+      "slide03_next_index_targets_table.png"
+    ],
+    "4": [
+      "slide04_transformer_diffusion_table.png"
+    ],
+    "5": [
+      "slide05_faster_comparisons_table.png"
+    ],
+    "6": [
+      "slide06_current_runs_and_next_steps_table.png"
+    ]
+  },
+  "generators": {
+    "tables": "part2action/docs/slide_history/scripts/export_slide_tables.py"
+  },
+  "table_images": [
+    {
+      "slides": [
+        1
+      ],
+      "file": "slide01_diffusion_improves_control_table.png",
+      "title": "Slide 1 \u2014 Diffusion improves control",
+      "kind": "table_png",
+      "markdown_cells": [
+        [
+          "Model",
+          "Successful rollouts",
+          "Success rate"
+        ],
+        [
+          "Historical direct MLP control",
+          "3/447",
+          "0.7%"
+        ],
+        [
+          "Diffusion control",
+          "33/447",
+          "7.4%"
+        ],
+        [
+          "Diffusion with late contact",
+          "22/447",
+          "4.9%"
+        ],
+        [
+          "Diffusion with early contact",
+          "40/447",
+          "8.9%"
+        ]
+      ],
+      "dimensions": [
+        2600,
+        704
+      ],
+      "bytes": 67836,
+      "sha256": "867a0f768a493b98e38385c170c2b321873abf3a1d62a02b11427f4b25840837"
+    },
+    {
+      "slides": [
+        3
+      ],
+      "file": "slide03_next_index_targets_table.png",
+      "title": "Slide 3 \u2014 Timing and sampling",
+      "kind": "table_png",
+      "markdown_cells": [
+        [
+          "Training stride",
+          "Action targets",
+          "Successes",
+          "Rate"
+        ],
+        [
+          "2",
+          "Same-index (earlier reference)",
+          "33/447",
+          "7.4%"
+        ],
+        [
+          "1",
+          "Same-index",
+          "10/447",
+          "2.2%"
+        ],
+        [
+          "1",
+          "Next-index",
+          "16/447",
+          "3.6%"
+        ]
+      ],
+      "dimensions": [
+        2600,
+        576
+      ],
+      "bytes": 53191,
+      "sha256": "bb342487808722db5ab28eeadf15af949445a94e9f3a05cd25a7b1b38a49883b"
+    },
+    {
+      "slides": [
+        4
+      ],
+      "file": "slide04_transformer_diffusion_table.png",
+      "title": "Slide 4 \u2014 Transformer diffusion",
+      "kind": "table_png",
+      "markdown_cells": [
+        [
+          "Component",
+          "Previous diffusion baseline",
+          "New Transformer diffusion"
+        ],
+        [
+          "Noise prediction",
+          "Small MLP",
+          "Action-token self-attention"
+        ],
+        [
+          "Action-head parameters",
+          "489,016",
+          "1,323,783"
+        ],
+        [
+          "Explicit contact input",
+          "Disabled",
+          "Disabled"
+        ],
+        [
+          "Diffusion process",
+          "100-step cosine DDPM",
+          "Same"
+        ]
+      ],
+      "dimensions": [
+        2600,
+        772
+      ],
+      "bytes": 79108,
+      "sha256": "109474041e54b8324ef530f6ea9c7007625d3a97a49ea715e3e5f619f14c06d7"
+    },
+    {
+      "slides": [
+        5
+      ],
+      "file": "slide05_faster_comparisons_table.png",
+      "title": "Slide 5 \u2014 Faster comparisons",
+      "kind": "table_png",
+      "markdown_cells": [
+        [
+          "Shared setting",
+          "Current screening protocol"
+        ],
+        [
+          "Training budget",
+          "10 epochs from scratch"
+        ],
+        [
+          "Observation history",
+          "Two frames"
+        ],
+        [
+          "Action targets",
+          "Next-index, offset 1"
+        ],
+        [
+          "Sample stride",
+          "1"
+        ],
+        [
+          "Training seed / batch size",
+          "42 / 16"
+        ],
+        [
+          "Data",
+          "All 4,053 valid training demos across four objects"
+        ],
+        [
+          "Evaluation",
+          "149 test1 scenarios \u00d7 seeds 42, 43, 44"
+        ]
+      ],
+      "dimensions": [
+        2600,
+        1088
+      ],
+      "bytes": 100318,
+      "sha256": "2fb799e02b77195312a20f898355f6b625e4e78dce98d8b459d6b02172cc67d8"
+    },
+    {
+      "slides": [
+        6
+      ],
+      "file": "slide06_current_runs_and_next_steps_table.png",
+      "title": "Slide 6 \u2014 Current runs and next steps",
+      "kind": "table_png",
+      "markdown_cells": [
+        [
+          "Stage",
+          "Previous diffusion baseline",
+          "Transformer diffusion"
+        ],
+        [
+          "Fresh 10-epoch training",
+          "6724877, running near epoch 3/10",
+          "6724878, running near epoch 3/10"
+        ],
+        [
+          "Automatic evaluation",
+          "6724879, waiting for training",
+          "6724880, waiting for training"
+        ]
+      ],
+      "dimensions": [
+        2600,
+        516
+      ],
+      "bytes": 57163,
+      "sha256": "b90e04313fac40be2ccb82863db28899de5ccb4e7d17ff1232c074b7751a7d7a"
+    }
+  ],
+  "supporting_files": [
+    "tables.json"
+  ]
+}

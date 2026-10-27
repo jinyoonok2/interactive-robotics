@@ -1,0 +1,188 @@
+[
+  {
+    "slide": 1,
+    "title": "Diffusion improves control",
+    "rows": [
+      [
+        "Model",
+        "Successful rollouts",
+        "Success rate"
+      ],
+      [
+        "Historical direct MLP control",
+        "3/447",
+        "0.7%"
+      ],
+      [
+        "Diffusion control",
+        "33/447",
+        "7.4%"
+      ],
+      [
+        "Diffusion with late contact",
+        "22/447",
+        "4.9%"
+      ],
+      [
+        "Diffusion with early contact",
+        "40/447",
+        "8.9%"
+      ]
+    ],
+    "column_fractions": [
+      0.4,
+      0.3,
+      0.3
+    ],
+    "file": "slide01_diffusion_improves_control_table.png",
+    "markdown_source": "| Model | Successful rollouts | Success rate |\n| --- | ---: | ---: |\n| Historical direct MLP control | 3/447 | 0.7% |\n| Diffusion control | 33/447 | 7.4% |\n| Diffusion with late contact | 22/447 | 4.9% |\n| Diffusion with early contact | 40/447 | 8.9% |"
+  },
+  {
+    "slide": 3,
+    "title": "Timing and sampling",
+    "rows": [
+      [
+        "Training stride",
+        "Action targets",
+        "Successes",
+        "Rate"
+      ],
+      [
+        "2",
+        "Same-index (earlier reference)",
+        "33/447",
+        "7.4%"
+      ],
+      [
+        "1",
+        "Same-index",
+        "10/447",
+        "2.2%"
+      ],
+      [
+        "1",
+        "Next-index",
+        "16/447",
+        "3.6%"
+      ]
+    ],
+    "column_fractions": [
+      0.2,
+      0.46,
+      0.17,
+      0.17
+    ],
+    "file": "slide03_next_index_targets_table.png",
+    "markdown_source": "| Training stride | Action targets | Successes | Rate |\n| --- | --- | ---: | ---: |\n| 2 | Same-index (earlier reference) | 33/447 | 7.4% |\n| 1 | Same-index | 10/447 | 2.2% |\n| 1 | Next-index | 16/447 | 3.6% |"
+  },
+  {
+    "slide": 4,
+    "title": "Transformer diffusion",
+    "rows": [
+      [
+        "Component",
+        "Previous diffusion baseline",
+        "New Transformer diffusion"
+      ],
+      [
+        "Noise prediction",
+        "Small MLP",
+        "Action-token self-attention"
+      ],
+      [
+        "Action-head parameters",
+        "489,016",
+        "1,323,783"
+      ],
+      [
+        "Explicit contact input",
+        "Disabled",
+        "Disabled"
+      ],
+      [
+        "Diffusion process",
+        "100-step cosine DDPM",
+        "Same"
+      ]
+    ],
+    "column_fractions": [
+      0.4,
+      0.3,
+      0.3
+    ],
+    "file": "slide04_transformer_diffusion_table.png",
+    "markdown_source": "| Component | Previous diffusion baseline | New Transformer diffusion |\n| --- | --- | --- |\n| Noise prediction | Small MLP | Action-token self-attention |\n| Action-head parameters | 489,016 | 1,323,783 |\n| Explicit contact input | Disabled | Disabled |\n| Diffusion process | 100-step cosine DDPM | Same |"
+  },
+  {
+    "slide": 5,
+    "title": "Faster comparisons",
+    "rows": [
+      [
+        "Shared setting",
+        "Current screening protocol"
+      ],
+      [
+        "Training budget",
+        "10 epochs from scratch"
+      ],
+      [
+        "Observation history",
+        "Two frames"
+      ],
+      [
+        "Action targets",
+        "Next-index, offset 1"
+      ],
+      [
+        "Sample stride",
+        "1"
+      ],
+      [
+        "Training seed / batch size",
+        "42 / 16"
+      ],
+      [
+        "Data",
+        "All 4,053 valid training demos across four objects"
+      ],
+      [
+        "Evaluation",
+        "149 test1 scenarios \u00d7 seeds 42, 43, 44"
+      ]
+    ],
+    "column_fractions": [
+      0.4,
+      0.6
+    ],
+    "file": "slide05_faster_comparisons_table.png",
+    "markdown_source": "| Shared setting | Current screening protocol |\n| --- | --- |\n| Training budget | 10 epochs from scratch |\n| Observation history | Two frames |\n| Action targets | Next-index, offset 1 |\n| Sample stride | 1 |\n| Training seed / batch size | 42 / 16 |\n| Data | All 4,053 valid training demos across four objects |\n| Evaluation | 149 test1 scenarios \u00d7 seeds 42, 43, 44 |"
+  },
+  {
+    "slide": 6,
+    "title": "Current runs and next steps",
+    "rows": [
+      [
+        "Stage",
+        "Previous diffusion baseline",
+        "Transformer diffusion"
+      ],
+      [
+        "Fresh 10-epoch training",
+        "6724877, running near epoch 3/10",
+        "6724878, running near epoch 3/10"
+      ],
+      [
+        "Automatic evaluation",
+        "6724879, waiting for training",
+        "6724880, waiting for training"
+      ]
+    ],
+    "column_fractions": [
+      0.28,
+      0.36,
+      0.36
+    ],
+    "file": "slide06_current_runs_and_next_steps_table.png",
+    "markdown_source": "| Stage | Previous diffusion baseline | Transformer diffusion |\n| --- | --- | --- |\n| Fresh 10-epoch training | 6724877, running near epoch 3/10 | 6724878, running near epoch 3/10 |\n| Automatic evaluation | 6724879, waiting for training | 6724880, waiting for training |"
+  }
+]

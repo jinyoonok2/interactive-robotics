@@ -50,6 +50,7 @@ def build_eval_loader(cfg: dict) -> DataLoader:
     ds = PartInstructDataset(
         hdf5_paths=eval_paths,
         action_chunk=data_cfg.get("action_chunk", 8),
+        action_target_offset=data_cfg.get("action_target_offset", 0),
         sample_stride=max(1, data_cfg.get("sample_stride", 1) * 2),
         max_demos_per_file=data_cfg.get("max_demos_per_file"),
         n_obs_steps=data_cfg.get("n_obs_steps", 1),
@@ -369,6 +370,14 @@ def main() -> None:
         text_device=cfg["model"].get("text_device", "cpu"),
         action_head_type=cfg["model"].get("action_head_type", "mlp"),
         diffusion_steps=int(cfg["model"].get("diffusion_steps", 50)),
+        diffusion_denoiser_type=str(cfg["model"].get("diffusion_denoiser_type", "mlp")),
+        diffusion_transformer_layers=int(cfg["model"].get("diffusion_transformer_layers", 2)),
+        diffusion_transformer_heads=int(cfg["model"].get("diffusion_transformer_heads", 4)),
+        diffusion_transformer_dropout=float(cfg["model"].get("diffusion_transformer_dropout", 0.0)),
+        diffusion_schedule=cfg["model"].get("diffusion_schedule", "linear"),
+        diffusion_action_scale=cfg["model"].get("diffusion_action_scale"),
+        diffusion_action_offset=cfg["model"].get("diffusion_action_offset"),
+        diffusion_clip_sample=cfg["model"].get("diffusion_clip_sample"),
         temporal_encoder_type=cfg["model"].get("temporal_encoder_type", "none"),
         n_obs_steps=int(cfg["data"].get("n_obs_steps", 1)),
         temporal_layers=int(cfg["model"].get("temporal_layers", 1)),
@@ -397,7 +406,10 @@ def main() -> None:
         ),
         use_unified_contact_conditioning=bool(cfg["model"].get("use_unified_contact_conditioning", False)),
         contact_conditioning_enabled=bool(cfg["model"].get("contact_conditioning_enabled", True)),
+        contact_conditioning_stage=cfg["model"].get("contact_conditioning_stage", "late"),
         contact_geometry_scale_m=float(cfg["model"].get("contact_geometry_scale_m", 0.1)),
+        contact_conditioning_mode=cfg["model"].get("contact_conditioning_mode", "additive"),
+        contact_conditioning_initial_weight=float(cfg["model"].get("contact_conditioning_initial_weight", 0.01)),
         use_near_contact_actions=bool(
             cfg["model"].get("use_near_contact_actions", False)
         ),

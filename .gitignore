@@ -88,3 +88,4 @@ part2action/storage
 /results/*
 !/results/README.md
 /part2action/docs/CONTACT_LABEL_AUDIT.md
+/part2action/docs/archive/**/CONTACT_LABEL_AUDIT.md

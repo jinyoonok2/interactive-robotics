@@ -19,6 +19,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from .diffusion_transformer import ActionTokenDenoiser
 
 from data.geometry import (
     camera_to_world_torch,
@@ -473,12 +474,36 @@ class DiffusionActionHead(nn.Module):
         num_steps: int = 50,
         beta_start: float = 1.0e-4,
         beta_end: float = 2.0e-2,
+        schedule: str = "linear",
+        action_scale: Optional[list[float]] = None,
+        action_offset: Optional[list[float]] = None,
+        clip_sample: Optional[float] = None,
+        denoiser_type: str = "mlp",
+        transformer_layers: int = 2,
+        transformer_heads: int = 4,
+        transformer_dropout: float = 0.0,
     ) -> None:
         super().__init__()
         self.chunk = int(chunk)
         self.action_dim = int(action_dim)
         self.num_steps = int(num_steps)
         self.action_flat_dim = self.chunk * self.action_dim
+        self.clip_sample = clip_sample
+        self.denoiser_type = str(denoiser_type).lower()
+        if self.denoiser_type not in {"mlp", "transformer"}:
+            raise ValueError("diffusion denoiser_type must be mlp or transformer")
+        if clip_sample is not None and (not math.isfinite(clip_sample) or clip_sample <= 0):
+            raise ValueError("diffusion clip_sample must be finite and positive")
+        if self.num_steps < 2:
+            raise ValueError("diffusion requires at least two steps")
+        scale = torch.tensor(action_scale if action_scale is not None else [1.] * self.action_dim)
+        offset = torch.tensor(action_offset if action_offset is not None else [0.] * self.action_dim)
+        if scale.shape != (self.action_dim,) or offset.shape != (self.action_dim,):
+            raise ValueError("diffusion normalization must match action_dim")
+        if not torch.isfinite(scale).all() or not torch.isfinite(offset).all() or (scale <= 0).any():
+            raise ValueError("diffusion normalization requires finite offsets and positive scales")
+        self.register_buffer("action_scale", scale.float())
+        self.register_buffer("action_offset", offset.float())
 
         self.cond = nn.Sequential(
             nn.Linear(in_dim, hidden),
@@ -497,13 +522,35 @@ class DiffusionActionHead(nn.Module):
             nn.GELU(),
             nn.Linear(hidden, self.action_flat_dim),
         )
+        if self.denoiser_type == "transformer":
+            # Keep the CPU initialization stream identical for shared modules
+            # built after this head (e.g. measured-opening encoder). The new
+            # denoiser has fresh weights, without perturbing their initial ones.
+            with torch.random.fork_rng(devices=[]):
+                self.net = ActionTokenDenoiser(action_dim, chunk, hidden,
+                                              transformer_layers, transformer_heads,
+                                              transformer_dropout)
 
-        betas = torch.linspace(beta_start, beta_end, self.num_steps)
+        if schedule == "linear":
+            betas = torch.linspace(beta_start, beta_end, self.num_steps)
+        elif schedule == "cosine":
+            time = torch.linspace(0, 1, self.num_steps + 1, dtype=torch.float64)
+            cumulative = torch.cos((time + 0.008) / 1.008 * math.pi / 2).square()
+            cumulative = cumulative / cumulative[0]
+            betas = (1 - cumulative[1:] / cumulative[:-1]).clamp(max=0.999).float()
+        else:
+            raise ValueError("diffusion schedule must be linear or cosine")
         alphas = 1.0 - betas
         alpha_bars = torch.cumprod(alphas, dim=0)
         self.register_buffer("betas", betas)
         self.register_buffer("alphas", alphas)
         self.register_buffer("alpha_bars", alpha_bars)
+
+    def normalize(self, action: torch.Tensor) -> torch.Tensor:
+        return (action.float() - self.action_offset) / self.action_scale
+
+    def denormalize(self, action: torch.Tensor) -> torch.Tensor:
+        return action * self.action_scale + self.action_offset
 
     def _time_embedding(self, t: torch.Tensor, dim: int) -> torch.Tensor:
         half = dim // 2
@@ -520,6 +567,8 @@ class DiffusionActionHead(nn.Module):
         pooled = fused.mean(dim=1)
         cond = self.cond(pooled)
         t_emb = self.time(self._time_embedding(t, cond.shape[-1]).to(cond.dtype))
+        if self.denoiser_type == "transformer":
+            return self.net(noisy_action.to(cond.dtype), cond, t_emb)
         x = noisy_action.reshape(noisy_action.shape[0], -1)
         pred = self.net(torch.cat([x, cond, t_emb], dim=-1))
         return pred.reshape(-1, self.chunk, self.action_dim)
@@ -528,6 +577,7 @@ class DiffusionActionHead(nn.Module):
         if target_action is None:
             return {"action_chunk": self.sample(fused)}
 
+        target_action = self.normalize(target_action)
         bsz = target_action.shape[0]
         t = torch.randint(0, self.num_steps, (bsz,), device=target_action.device)
         noise = torch.randn_like(target_action)
@@ -544,7 +594,8 @@ class DiffusionActionHead(nn.Module):
     @torch.no_grad()
     def sample(self, fused: torch.Tensor) -> torch.Tensor:
         bsz = fused.shape[0]
-        x = torch.randn(bsz, self.chunk, self.action_dim, device=fused.device, dtype=fused.dtype)
+        # Keep the reverse-process arithmetic in float32 even under AMP.
+        x = torch.randn(bsz, self.chunk, self.action_dim, device=fused.device, dtype=torch.float32)
         for step in reversed(range(self.num_steps)):
             t = torch.full((bsz,), step, device=fused.device, dtype=torch.long)
             pred_noise = self._denoise(fused, x, t)
@@ -552,11 +603,18 @@ class DiffusionActionHead(nn.Module):
             alpha = self.alphas[step].to(x.dtype)
             alpha_bar = self.alpha_bars[step].to(x.dtype)
             mean = (x - beta / (1.0 - alpha_bar).sqrt() * pred_noise) / alpha.sqrt()
+            previous_alpha_bar = self.alpha_bars[step - 1] if step > 0 else x.new_tensor(1.)
+            if self.clip_sample is not None:
+                clean = ((x - (1 - alpha_bar).sqrt() * pred_noise) / alpha_bar.sqrt()).clamp(
+                    -self.clip_sample, self.clip_sample)
+                mean = (previous_alpha_bar.sqrt() * beta / (1 - alpha_bar) * clean
+                        + alpha.sqrt() * (1 - previous_alpha_bar) / (1 - alpha_bar) * x)
             if step > 0:
-                x = mean + beta.sqrt() * torch.randn_like(x)
+                posterior_variance = beta * (1 - previous_alpha_bar) / (1 - alpha_bar)
+                x = mean + posterior_variance.sqrt() * torch.randn_like(x)
             else:
                 x = mean
-        return x
+        return self.denormalize(x)
 
 
 class GroundedHybridActionHead(nn.Module):
@@ -624,17 +682,28 @@ class GroundedHybridActionHead(nn.Module):
 
 
 class ContactGeometryConditioner(nn.Module):
-    """Add detached predicted world contact relative to TCP to action features.
+    """Condition action features on detached predicted world contact relative to TCP.
 
     Disabled conditioning feeds zeros through the same projection for a matched
     control. Nonfinite contact/TCP geometry likewise contributes zero inputs.
+    Normalized-global mode retains the learned zero-input bias and weights only
+    the normalized contact-dependent signal; additive mode preserves old models.
     """
-    def __init__(self, hidden_dim: int, scale_m: float = 0.1):
+    def __init__(self, hidden_dim: int, scale_m: float = 0.1,
+                 mode: str = "additive", initial_weight: float = 0.01):
         super().__init__()
         if scale_m <= 0:
             raise ValueError('contact_geometry_scale_m must be positive')
         self.scale_m = float(scale_m)
+        if mode not in {"additive", "normalized_global"}:
+            raise ValueError("Unknown contact conditioning mode")
+        self.mode = mode
         self.projection = nn.Sequential(nn.Linear(3, hidden_dim), nn.GELU(), nn.Linear(hidden_dim, hidden_dim))
+        if mode == "normalized_global":
+            if not math.isfinite(initial_weight):
+                raise ValueError("Contact weight must be finite")
+            self.contact_weight = nn.Parameter(torch.tensor(float(initial_weight)))
+            self.contact_norm = nn.LayerNorm(hidden_dim, elementwise_affine=False)
 
     def forward(self, features, contact_xyz, tcp_pose, enabled=True):
         from data.geometry import tcp_position_torch
@@ -644,6 +713,11 @@ class ContactGeometryConditioner(nn.Module):
         if not enabled:
             relative = torch.zeros_like(relative)
         projected = self.projection(relative)
+        if self.mode == "normalized_global":
+            # Retain the control checkpoint's learned zero-input bias exactly.
+            # Only the contact-dependent signal is normalized and weighted.
+            bias = self.projection(torch.zeros_like(relative))
+            projected = bias + self.contact_weight * self.contact_norm(projected - bias)
         if features.ndim == 3:
             projected = projected[:, None, :]
         return features + projected, relative

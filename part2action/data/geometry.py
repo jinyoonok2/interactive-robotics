@@ -4,6 +4,15 @@ from __future__ import annotations
 import numpy as np
 import torch
 
+
+def bound_gripper_command(action: np.ndarray) -> np.ndarray:
+    """Copy a world action and bound Panda's per-finger position to 0–0.04 m."""
+    bounded = np.asarray(action, dtype=np.float32).copy()
+    if bounded.shape != (7,) or not np.isfinite(bounded).all():
+        raise ValueError("PartGym requires a finite seven-dimensional action")
+    bounded[6] = np.clip(bounded[6], 0.0, 0.04)
+    return bounded
+
 # Inverse of PyBullet's fixed agent-view matrix from PartGym config.yaml:
 # target=[-0.25, 0.05, 0.5], distance=0.8, yaw=-90, pitch=-20.
 _AGENTVIEW_TO_WORLD = np.array(

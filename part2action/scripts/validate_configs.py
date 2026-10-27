@@ -14,7 +14,46 @@ def validate(path: Path, check_files: bool = False) -> list[str]:
     cfg = yaml.safe_load(path.read_text())
     errors = []
     data, model, losses = cfg.get("data", {}), cfg.get("model", {}), cfg.get("losses", {})
+    offset = data.get("action_target_offset", 0)
+    if type(offset) is not int or offset not in (0, 1):
+        errors.append("data.action_target_offset must be integer 0 (legacy) or 1 (next action)")
     frozen = set(cfg.get("train", {}).get("freeze_prefixes", []))
+    if cfg.get("train", {}).get("require_untrained_initialization") and not cfg.get("train", {}).get("init_checkpoint"):
+        errors.append("require_untrained_initialization needs a shared untrained init_checkpoint")
+    action_type = model.get("action_head_type", "mlp")
+    denoiser = model.get("diffusion_denoiser_type", "mlp")
+    if denoiser not in {"mlp", "transformer"}:
+        errors.append("diffusion_denoiser_type must be mlp or transformer")
+    if denoiser == "transformer":
+        if action_type != "diffusion" or model.get("split_action_heads"):
+            errors.append("Transformer denoiser requires a monolithic diffusion head")
+        layers = int(model.get("diffusion_transformer_layers", 2))
+        heads = int(model.get("diffusion_transformer_heads", 4))
+        # DiffusionActionHead uses hidden width 256 in the model factory.
+        if layers < 1 or heads < 1 or 256 % max(heads, 1):
+            errors.append("Transformer needs positive layers/heads with heads dividing 256")
+        if not 0 <= float(model.get("diffusion_transformer_dropout", 0)) < 1:
+            errors.append("diffusion_transformer_dropout must be in [0,1)")
+    if action_type not in {"mlp", "diffusion"}:
+        errors.append("action_head_type must be mlp or diffusion")
+    if action_type == "diffusion":
+        import math
+        if int(model.get("diffusion_steps", 50)) < 2:
+            errors.append("diffusion_steps must be at least 2")
+        if model.get("diffusion_schedule", "linear") not in {"linear", "cosine"}:
+            errors.append("diffusion_schedule must be linear or cosine")
+        for key in ("diffusion_action_scale", "diffusion_action_offset"):
+            values = model.get(key)
+            if values is not None and (len(values) != 7 or not all(math.isfinite(float(v)) for v in values)):
+                errors.append(f"{key} must contain seven finite values")
+        scales = model.get("diffusion_action_scale")
+        if scales is not None and any(float(v) <= 0 for v in scales):
+            errors.append("diffusion_action_scale must be positive")
+        clip = model.get("diffusion_clip_sample")
+        if clip is not None and (not math.isfinite(float(clip)) or float(clip) <= 0):
+            errors.append("diffusion_clip_sample must be finite and positive")
+        if model.get("split_action_heads") and any(key in model for key in ("diffusion_schedule", "diffusion_action_scale", "diffusion_action_offset", "diffusion_clip_sample")):
+            errors.append("configured diffusion normalization/schedule requires monolithic actions")
     if not model.get("use_hierarchy"):
         errors.append("model.use_hierarchy must be true")
     if not data.get("use_hierarchy"):
@@ -113,11 +152,25 @@ def validate(path: Path, check_files: bool = False) -> list[str]:
             errors.append("contact-relative actions currently require split_action_heads=false")
         if float(model.get("contact_relative_max_translation", 0)) <= 0:
             errors.append("contact_relative_max_translation must be positive")
+    stage = model.get("contact_conditioning_stage", "late")
+    if stage not in {"late", "early_temporal"}:
+        errors.append("Unknown contact_conditioning_stage")
+    if stage == "early_temporal":
+        if not model.get("use_unified_contact_conditioning"):
+            errors.append("early_temporal requires use_unified_contact_conditioning")
+        if int(data.get("n_obs_steps", 1)) < 2 or model.get("temporal_encoder_type") not in {"transformer", "patch_transformer"}:
+            errors.append("early_temporal requires multi-frame transformer input")
+        if not model.get("use_gripper_state"):
+            errors.append("early_temporal requires use_gripper_state")
+        if cfg.get("train", {}).get("init_checkpoint"):
+            errors.append("early_temporal requires fresh initialization, not an existing late-fusion checkpoint")
     if model.get("use_unified_contact_conditioning"):
+        if model.get("contact_conditioning_mode", "additive") not in {"additive", "normalized_global"}:
+            errors.append("Unknown contact_conditioning_mode")
         if not model.get("use_contact_action_token") or not data.get("use_tcp_pose"):
             errors.append("unified conditioning requires contact action token and data.use_tcp_pose")
-        if model.get("action_head_type", "mlp") != "mlp" or model.get("split_action_heads"):
-            errors.append("unified conditioning requires monolithic MLP action head")
+        if model.get("split_action_heads"):
+            errors.append("unified conditioning requires monolithic action head")
         if any(model.get(flag) for flag in ["use_near_contact_actions", "use_contact_relative_actions", "use_contact_residual", "use_action_deltas"]):
             errors.append("unified conditioning is incompatible with contact switching/residuals/deltas")
         if float(model.get("contact_geometry_scale_m", 0.1)) <= 0:
@@ -157,6 +210,11 @@ def validate(path: Path, check_files: bool = False) -> list[str]:
         if model.get("split_action_heads"):
             errors.append("use_action_deltas currently requires split_action_heads=false")
     if check_files:
+        checkpoint = cfg.get("train", {}).get("init_checkpoint")
+        if checkpoint:
+            candidate = Path(checkpoint) if Path(checkpoint).is_absolute() else ROOT / checkpoint
+            if not candidate.is_file():
+                errors.append(f"missing initialization checkpoint: {candidate}")
         for item in data.get("train_hdf5", []):
             candidate = Path(item) if Path(item).is_absolute() else ROOT / item
             if not candidate.resolve().exists():

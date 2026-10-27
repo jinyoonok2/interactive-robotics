@@ -18,6 +18,7 @@ import argparse
 import json
 import os
 import sys
+import time
 from collections import deque
 from pathlib import Path
 from typing import Any
@@ -27,13 +28,14 @@ import torch
 from omegaconf import OmegaConf
 
 from _common import ROOT, ensure_dir, load_yaml, resolve_paths, select_device, set_seed
-from data.geometry import tcp_deltas_to_absolute_actions
+from data.geometry import bound_gripper_command, tcp_deltas_to_absolute_actions
 from diagnostics.partgym_reach import (
     measure_point_part_prediction,
     measure_policy_target_alignment,
     measure_tcp_to_target_part,
 )
 from diagnostics.partgym_skill_oracle import PartGymSkillOracle
+from diagnostics.evaluation_scenarios import load_scenarios, pin_scenario, rollout_plan, success_statistics, DEFAULT_EVALUATION_SEEDS
 from diagnostics.phase_controller import should_advance_phase
 from models.part2action_model import Part2ActionModel
 
@@ -76,6 +78,14 @@ def _load_model(cfg: dict[str, Any], ckpt_path: Path, device: torch.device) -> P
         text_device=cfg["model"].get("text_device", "cpu"),
         action_head_type=cfg["model"].get("action_head_type", "mlp"),
         diffusion_steps=int(cfg["model"].get("diffusion_steps", 50)),
+        diffusion_denoiser_type=str(cfg["model"].get("diffusion_denoiser_type", "mlp")),
+        diffusion_transformer_layers=int(cfg["model"].get("diffusion_transformer_layers", 2)),
+        diffusion_transformer_heads=int(cfg["model"].get("diffusion_transformer_heads", 4)),
+        diffusion_transformer_dropout=float(cfg["model"].get("diffusion_transformer_dropout", 0.0)),
+        diffusion_schedule=cfg["model"].get("diffusion_schedule", "linear"),
+        diffusion_action_scale=cfg["model"].get("diffusion_action_scale"),
+        diffusion_action_offset=cfg["model"].get("diffusion_action_offset"),
+        diffusion_clip_sample=cfg["model"].get("diffusion_clip_sample"),
         temporal_encoder_type=cfg["model"].get("temporal_encoder_type", "none"),
         n_obs_steps=int(cfg["data"].get("n_obs_steps", 1)),
         temporal_layers=int(cfg["model"].get("temporal_layers", 1)),
@@ -104,7 +114,10 @@ def _load_model(cfg: dict[str, Any], ckpt_path: Path, device: torch.device) -> P
         ),
         use_unified_contact_conditioning=bool(cfg["model"].get("use_unified_contact_conditioning", False)),
         contact_conditioning_enabled=bool(cfg["model"].get("contact_conditioning_enabled", True)),
+        contact_conditioning_stage=cfg["model"].get("contact_conditioning_stage", "late"),
         contact_geometry_scale_m=float(cfg["model"].get("contact_geometry_scale_m", 0.1)),
+        contact_conditioning_mode=cfg["model"].get("contact_conditioning_mode", "additive"),
+        contact_conditioning_initial_weight=float(cfg["model"].get("contact_conditioning_initial_weight", 0.01)),
         use_near_contact_actions=bool(
             cfg["model"].get("use_near_contact_actions", False)
         ),
@@ -179,6 +192,8 @@ def _rollout_diagnostics(
     current_phase: torch.Tensor | None,
 ) -> dict[str, Any]:
     diagnostic: dict[str, Any] = {"inference_step": int(inference_step)}
+    if "gripper_state" in obs:
+        diagnostic["measured_finger_position_m"] = float(np.asarray(obs["gripper_state"]).reshape(-1)[0])
     tcp_pose = np.asarray(obs.get("tcp_pose", []), dtype=np.float32).reshape(-1)
     if tcp_pose.size >= 7:
         diagnostic["tcp_xyz"] = tcp_pose[4:7].astype(float).tolist()
@@ -220,6 +235,11 @@ def _rollout_diagnostics(
         diagnostic["residual_action0"] = _as_float_list(residual[0])
     if "action_chunk" in out:
         diagnostic["action0"] = _as_float_list(out["action_chunk"][0, 0])
+        diagnostic["raw_gripper_command_m"] = diagnostic["action0"][6]
+        diagnostic["executed_gripper_command_m"] = float(
+            bound_gripper_command(np.asarray(diagnostic["action0"]))[6])
+    if "contact_conditioning_weight" in out:
+        diagnostic["contact_conditioning_weight"] = float(out["contact_conditioning_weight"].detach())
     return diagnostic
 
 
@@ -343,10 +363,13 @@ def rollout_one(
     gif_every_n: int,
     diagnostics: bool,
     predicate_diagnostics: bool,
+    contact_diagnostics: bool,
     diagnostic_every: int,
     termination_mode: str,
     min_phase_cycles: int,
     out_dir: Path,
+    collision_diagnostics: bool = False,
+    selected_episode: dict | None = None,
 ) -> dict[str, Any]:
     if termination_mode not in TERMINATION_MODES:
         raise ValueError(f"unsupported termination_mode={termination_mode}")
@@ -362,7 +385,16 @@ def rollout_one(
         task_type=task_type,
         track_samples=False,
     )
+    if selected_episode is not None:
+        pin_scenario(env, selected_episode, episode_seed)
     obs = env.reset()
+    if selected_episode is not None and str(env.ep_id) != str(selected_episode["ep_id"]):
+        env.close()
+        raise RuntimeError("PartGym reset did not select the requested scenario")
+    collision_logger = None
+    if collision_diagnostics:
+        from diagnostics.physics_collision import PhysicsCollisionLogger
+        collision_logger = PhysicsCollisionLogger(env)
     instruction = env.task_instruction
     n_obs_steps = int(model_cfg["data"].get("n_obs_steps", 1))
     history: deque[np.ndarray] = deque(maxlen=max(1, n_obs_steps))
@@ -373,7 +405,9 @@ def rollout_one(
     contact_trace: list[list[float]] = []
     gate_confidence_trace: list[float] = []
     gripper_command_trace: list[float] = []
+    raw_gripper_command_trace: list[float] = []
     diagnostic_trace: list[dict[str, Any]] = []
+    inference_latency_ms: list[float] = []
     phase_event_trace: list[dict[str, Any]] = []
     initial_point_part_diagnostic = None
     info: dict[str, Any] = {}
@@ -401,8 +435,14 @@ def rollout_one(
                     force_current_phase=True,
                 )
                 model_instruction = None
+            if device.type == "cuda":
+                torch.cuda.synchronize(device)
+            inference_start = time.perf_counter()
             with torch.no_grad():
                 out = model(rgb, model_instruction, **kwargs)
+            if device.type == "cuda":
+                torch.cuda.synchronize(device)
+            inference_latency_ms.append((time.perf_counter() - inference_start) * 1000)
             if cached_slots is None:
                 cached_slots = out["plan_slots"].detach()
                 cached_valid = out["slot_valid_logits"].detach()
@@ -427,6 +467,9 @@ def rollout_one(
                     out=out,
                     current_phase=current_phase,
                 )
+                diagnostic["policy_forward_ms"] = inference_latency_ms[-1]
+                if hasattr(model, "contact_intervention_diagnostic"):
+                    diagnostic["contact_intervention"] = model.contact_intervention_diagnostic
                 diagnostic_trace.append(diagnostic)
                 if inference_step % max(1, diagnostic_every) == 0:
                     _print_rollout_diagnostic(diagnostic)
@@ -442,15 +485,18 @@ def rollout_one(
                     raise RuntimeError("use_action_deltas requires tcp_pose observations")
                 chunk = tcp_deltas_to_absolute_actions(chunk, kwargs["tcp_pose"])
             policy_alignment = None
+            initial_part_alignment = None
             if (
-                predicate_diagnostics
+                (predicate_diagnostics or contact_diagnostics)
                 and "contact_xyz" in out
                 and "tcp_pose" in obs
             ):
                 policy_alignment = measure_policy_target_alignment(
                     env,
                     obs["tcp_pose"],
-                    phase_idx,
+                    # At reset, score the first ground-truth task skill even if
+                    # the learned phase selector chose a different slot.
+                    0 if contact_diagnostics and inference_step == 0 else phase_idx,
                     predicted_contact_xyz=(
                         out["contact_xyz"][0].detach().cpu().float().numpy()
                     ),
@@ -458,11 +504,22 @@ def rollout_one(
                         chunk[0, 0, :3].detach().cpu().float().numpy()
                     ),
                 )
+                if contact_diagnostics:
+                    initial_part_alignment = policy_alignment if policy_alignment.get("skill_index") == 0 else measure_policy_target_alignment(
+                        env, obs["tcp_pose"], 0,
+                        predicted_contact_xyz=out["contact_xyz"][0].detach().cpu().float().numpy(),
+                        action_target_xyz=chunk[0, 0, :3].detach().cpu().float().numpy(),
+                    )
             chunk = chunk[0].detach().cpu().float().numpy()
             for action in chunk[:execute_steps]:
-                obs, reward, done, info = env.step(action.astype(np.float32))
-                action_trace.append(action.astype(float).tolist())
-                gripper_command_trace.append(float(action[6]))
+                raw_gripper_command_trace.append(float(action[6]))
+                executed_action = bound_gripper_command(action)
+                if collision_logger is not None:
+                    collision_logger.action_index = len(action_trace)
+                    collision_logger.command = executed_action.astype(float).tolist()
+                obs, reward, done, info = env.step(executed_action)
+                action_trace.append(executed_action.astype(float).tolist())
+                gripper_command_trace.append(float(executed_action[6]))
                 history.append(np.asarray(obs["agentview_rgb"], dtype=np.uint8))
                 if done:
                     break
@@ -526,6 +583,8 @@ def rollout_one(
                 event["reach_diagnostic"] = reach_diagnostic
             if policy_alignment is not None:
                 event["policy_target_alignment"] = policy_alignment
+            if initial_part_alignment is not None:
+                event["initial_target_part_alignment"] = initial_part_alignment
             phase_event_trace.append(event)
             if advance:
                 current_phase = current_phase + 1
@@ -535,7 +594,7 @@ def rollout_one(
     finally:
         if record and env.render_sequence_buffer:
             env.dump_buffers()
-            trial_name = f"{obj_class}_{task_type}_{split}_trial{trial_index:02d}_seed{episode_seed}"
+            trial_name = f"{obj_class}_{task_type}_{split}_episode{env.ep_id}_trial{trial_index:02d}_seed{episode_seed}"
             video_path = out_dir / "videos" / trial_name / "rollout.mp4"
             env.save_renders(str(video_path), video_only=True)
             try:
@@ -547,12 +606,15 @@ def rollout_one(
                 )
             except Exception as exc:  # pragma: no cover - optional media path
                 print(f"[rollout] gif conversion failed: {exc}")
+        if collision_logger is not None:
+            collision_logger.close()
         env.close()
 
     return {
         "obj_class": obj_class,
         "task_type": task_type,
         "split": split,
+        "requested_episode_id": str(selected_episode["ep_id"]) if selected_episode else None,
         "trial_index": trial_index,
         "seed": episode_seed,
         "instruction": instruction,
@@ -560,16 +622,24 @@ def rollout_one(
         "completion_rate": float(info.get("Completion Rate", 0.0)) if info else 0.0,
         "steps": int(info.get("Steps", len(action_trace))) if info else len(action_trace),
         "num_actions": len(action_trace),
+        "policy_forward_latency_ms": inference_latency_ms,
+        "policy_forward_mean_ms": float(np.mean(inference_latency_ms)) if inference_latency_ms else None,
+        "policy_forward_steady_mean_ms": float(np.mean(inference_latency_ms[1:])) if len(inference_latency_ms) > 1 else None,
         "termination_mode": termination_mode,
         "predicate_diagnostics": bool(predicate_diagnostics),
+        "contact_diagnostics": bool(contact_diagnostics),
         "predicted_contact_xyz": contact_trace,
         "gate_max_confidence": gate_confidence_trace,
         "gripper_commands": gripper_command_trace,
+        "raw_gripper_commands": raw_gripper_command_trace,
+        "gripper_command_bounds_m": [0.0, 0.04],
+        "gripper_clipped_count": sum(v < 0 or v > 0.04 for v in raw_gripper_command_trace),
         "actions": action_trace,
         "phase_trace": phase_trace,
         "phase_events": phase_event_trace,
         "initial_point_part_diagnostic": initial_point_part_diagnostic,
         "diagnostics": diagnostic_trace if diagnostics else [],
+        "physics_collision_trace": collision_logger.rows if collision_logger is not None else [],
         "rollout_video": str(video_path) if video_path else None,
         "rollout_gif": str(gif_path) if gif_path else None,
         "info": {k: v for k, v in info.items() if k not in {"Action"}},
@@ -578,6 +648,10 @@ def rollout_one(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--contact-strength", type=float, default=None,
+                        help="Evaluation-only relative contact input multiplier [0,1]; logs same-observation 0/0.25/1 action and feature comparisons.")
+    parser.add_argument("--collision-diagnostics", action="store_true",
+                        help="Read-only contact forces, robot links, object/TCP poses and both finger joints at every physics substep.")
     parser.add_argument("--model-key", choices=sorted(MODEL_DEFAULTS), default="hierarchical")
     parser.add_argument("--config", type=Path, default=None)
     parser.add_argument("--ckpt", type=Path, default=None)
@@ -587,18 +661,10 @@ def main() -> None:
     parser.add_argument("--split", default="test1")
     parser.add_argument("--obj-classes", nargs="+", default=None)
     parser.add_argument("--task-types", nargs="+", default=None)
-    parser.add_argument(
-        "--num-episodes",
-        type=int,
-        default=2,
-        help="Maximum number of unique object/task combinations (legacy name).",
-    )
-    parser.add_argument(
-        "--trials-per-task",
-        type=int,
-        default=1,
-        help="Number of independently seeded rollouts for each object/task combination.",
-    )
+    parser.add_argument("--num-episodes", type=int, default=None,
+                        help="Optional scenario limit for a smoke test; default evaluates every scenario.")
+    parser.add_argument("--expected-episodes", type=int, default=None,
+                        help="Fail before rollout if the selected scenario count differs.")
     parser.add_argument("--max-steps", type=int, default=80)
     parser.add_argument("--execute-steps", type=int, default=1)
     parser.add_argument("--device", default="cuda")
@@ -618,6 +684,10 @@ def main() -> None:
         help="Print one diagnostic line every N inference steps (all steps are saved).",
     )
     parser.add_argument(
+        "--contact-diagnostics", action="store_true",
+        help="Log contact/action/TCP distance to ground-truth target parts without predicate evaluation or changing policy inputs. At reset use ground-truth skill 0.",
+    )
+    parser.add_argument(
         "--predicate-diagnostics",
         action="store_true",
         help=(
@@ -634,13 +704,16 @@ def main() -> None:
     )
     parser.add_argument("--min-phase-cycles", type=int, default=None)
     parser.add_argument("--out-dir", type=Path, default=ROOT.parent / "results" / "part2action" / "evaluations" / "manual_partgym_rollouts")
-    parser.add_argument("--seed", type=int, default=42)
+    seeds_group = parser.add_mutually_exclusive_group()
+    seeds_group.add_argument("--seed", type=int, default=None, help="Single evaluation seed for an explicit smoke test.")
+    seeds_group.add_argument("--eval-seeds", type=int, nargs="+", default=None,
+                             help="Fixed seeds for every scenario; default: 42 43 44.")
     args = parser.parse_args()
+    evaluation_seeds = args.eval_seeds or ([args.seed] if args.seed is not None else list(DEFAULT_EVALUATION_SEEDS))
+    rollout_plan([], evaluation_seeds)  # Validate seeds before loading models.
 
     if args.diagnostic_every < 1:
         parser.error("--diagnostic-every must be at least 1")
-    if args.trials_per_task < 1:
-        parser.error("--trials-per-task must be at least 1")
 
     defaults = MODEL_DEFAULTS[args.model_key]
     config_path = (args.config or defaults["config"]).expanduser().resolve()
@@ -653,7 +726,7 @@ def main() -> None:
     )
     data_root = (args.data_root.expanduser().resolve() if args.data_root else partinstruct_root / "data")
 
-    set_seed(args.seed)
+    set_seed(evaluation_seeds[0])
     device = select_device(args.device)
     partgym_cfg = OmegaConf.load(partgym_config)
     partgym_cfg.data_root = str(data_root)
@@ -684,52 +757,55 @@ def main() -> None:
         )
 
     model = _load_model(model_cfg, ckpt_path, device)
+    if args.contact_strength is not None:
+        from diagnostics.contact_intervention import install_contact_intervention
+        install_contact_intervention(model, args.contact_strength)
     env_cls = _load_partgym_env(partinstruct_root)
 
     out_dir = ensure_dir(args.out_dir / args.model_key)
-    episodes = _load_episode_keys(
-        meta_path,
-        args.split,
-        args.num_episodes,
-        obj_classes=args.obj_classes,
-        task_types=args.task_types,
-    )
+    episodes = load_scenarios(meta_path, args.split, args.obj_classes,
+                              args.task_types, args.num_episodes)
+    if args.expected_episodes is not None and len(episodes) != args.expected_episodes:
+        raise ValueError(f"Expected {args.expected_episodes} scenarios, found {len(episodes)}")
+    (out_dir / "evaluation_scenarios.json").write_text(json.dumps(
+        {"split": args.split, "evaluation_seeds": evaluation_seeds, "trials_per_scenario": len(evaluation_seeds),
+         "scenarios": episodes}, indent=2) + "\n")
     results = []
-    combination_index = 0
-    for obj_class, task_type in episodes:
-        for trial_index in range(args.trials_per_task):
-            episode_seed = int(args.seed + combination_index * 100 + trial_index)
-            result = rollout_one(
-                env_cls=env_cls,
-                model=model,
-                model_cfg=model_cfg,
-                partgym_cfg=partgym_cfg,
-                config_path=partgym_config,
-                obj_class=obj_class,
-                task_type=task_type,
-                split=args.split,
-                trial_index=trial_index,
-                episode_seed=episode_seed,
-                device=device,
-                max_steps=args.max_steps,
-                execute_steps=args.execute_steps,
-                record=args.record,
-                gif_fps=args.gif_fps,
-                gif_width=args.gif_width,
-                gif_every_n=args.gif_every_n,
-                diagnostics=args.diagnostics,
-                predicate_diagnostics=args.predicate_diagnostics,
-                diagnostic_every=args.diagnostic_every,
-                termination_mode=termination_mode,
-                min_phase_cycles=min_phase_cycles,
-                out_dir=out_dir,
-            )
-            results.append(result)
-            print(
-                f"[rollout] {obj_class}/{task_type} trial={trial_index} seed={episode_seed}: "
-                f"success={result['success']} completion={result['completion_rate']:.3f}"
-            )
-        combination_index += 1
+    for scenario, trial_index, episode_seed in rollout_plan(episodes, evaluation_seeds):
+        obj_class, task_type = scenario["obj_class"], scenario["task_type"]
+        result = rollout_one(
+            selected_episode=scenario["episode"],
+            env_cls=env_cls,
+            model=model,
+            model_cfg=model_cfg,
+            partgym_cfg=partgym_cfg,
+            config_path=partgym_config,
+            obj_class=obj_class,
+            task_type=task_type,
+            split=args.split,
+            trial_index=trial_index,
+            episode_seed=episode_seed,
+            device=device,
+            max_steps=args.max_steps,
+            execute_steps=args.execute_steps,
+            record=args.record,
+            gif_fps=args.gif_fps,
+            gif_width=args.gif_width,
+            gif_every_n=args.gif_every_n,
+            diagnostics=args.diagnostics,
+            predicate_diagnostics=args.predicate_diagnostics,
+            contact_diagnostics=args.contact_diagnostics,
+            diagnostic_every=args.diagnostic_every,
+            termination_mode=termination_mode,
+            min_phase_cycles=min_phase_cycles,
+            out_dir=out_dir,
+            collision_diagnostics=args.collision_diagnostics,
+        )
+        results.append(result)
+        print(
+            f"[rollout] {obj_class}/{task_type} trial={trial_index} seed={episode_seed}: "
+            f"success={result['success']} completion={result['completion_rate']:.3f}"
+        )
 
     per_task: dict[str, list[dict[str, Any]]] = {}
     for result in results:
@@ -739,13 +815,25 @@ def main() -> None:
     summary = {
         "model_key": args.model_key,
         "point_cloud_sampling_device": os.environ.get("PARTGYM_FPS_DEVICE", "cpu"),
+        "policy_inference_device": str(device),
+        "gpu_name": torch.cuda.get_device_name(device) if device.type == "cuda" else None,
+        "latency_scope": "Synchronized policy forward only; excludes observation conversion, simulator stepping, diagnostics, and video export. First cycle per trial includes planning.",
         "config": str(config_path),
         "ckpt": str(ckpt_path),
         "split": args.split,
         "termination_mode": termination_mode,
         "predicate_diagnostics": bool(args.predicate_diagnostics),
+        "contact_diagnostics": bool(args.contact_diagnostics),
+        "contact_intervention_strength": args.contact_strength,
+        "collision_diagnostics": bool(args.collision_diagnostics),
+        "gripper_command_bounds_m": [0.0, 0.04],
         "min_phase_cycles": min_phase_cycles,
         "use_skill_gate": bool(model_cfg.get("model", {}).get("use_skill_gate", False)),
+        "evaluation_protocol": "all_scenarios_fixed_seeds",
+        "evaluation_seeds": evaluation_seeds,
+        "num_unique_scenarios": len(episodes),
+        "trials_per_scenario": len(evaluation_seeds),
+        **success_statistics(results),
         "num_episodes": len(results),
         "success_rate": float(np.mean([r["success"] for r in results])) if results else 0.0,
         "mean_completion_rate": float(np.mean([r["completion_rate"] for r in results])) if results else 0.0,

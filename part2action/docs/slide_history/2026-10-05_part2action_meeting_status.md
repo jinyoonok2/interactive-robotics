@@ -125,6 +125,6 @@ Evaluate success by object and skill, contact localization, motion errors, and l
 Expand dataset coverage and test a stronger action decoder after the initial comparison.
 
 Sources of local evidence: [research plan](../RESEARCH_PLAN.md),
-[contact audit](../CONTACT_LABEL_AUDIT.md),
+[contact audit](../archive/2026-10-22/CONTACT_LABEL_AUDIT.md),
 [DP3 visualization provenance](../../../results/partinstruct/visualizations/dp3_success/manifest.json),
 [download manifest](../../../results/data/full_dataset_download/manifest.json).

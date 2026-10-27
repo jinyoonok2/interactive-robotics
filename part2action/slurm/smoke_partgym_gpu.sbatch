@@ -39,7 +39,7 @@ for RUN in world_geometry_30epoch_no_residual_6645296 world_geometry_30epoch_nea
     "$PYTHON" part2action/scripts/rollout_partgym.py \
       --partinstruct-root "$ROOT/PartInstruct" --data-root /p/part2action/data/PartInstruct \
       --model-key hierarchical --config "$RUN_DIR/config_source.yaml" --ckpt "$RUN_DIR/last.pt" \
-      --obj-classes bottle --task-types 1 --num-episodes 1 --trials-per-task 1 \
+      --obj-classes bottle --task-types 1 --num-episodes 1 \
       --max-steps 5 --execute-steps 1 --device cuda --termination-mode legacy \
       --diagnostics --diagnostic-every 1 --out-dir "$OUT/$RUN" \
       > "$OUT/${RUN}.log" 2>&1

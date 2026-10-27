@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import shutil
 import time
 from pathlib import Path
@@ -26,6 +27,7 @@ DEFAULT_CONFIG = ROOT / "configs" / "architecture_update" / "hierarchical_world_
 def build_dataset(data: dict) -> PartInstructDataset:
     return PartInstructDataset(
         hdf5_paths=data["train_hdf5"], action_chunk=data.get("action_chunk", 8),
+        action_target_offset=data.get("action_target_offset", 0),
         sample_stride=data.get("sample_stride", 1),
         max_demos_per_file=data.get("max_demos_per_file"),
         n_obs_steps=data.get("n_obs_steps", 1), use_pcd=data.get("use_pcd", False),
@@ -59,6 +61,14 @@ def build_model(cfg: dict) -> Part2ActionModel:
         text_device=m.get("text_device", "cpu"),
         action_head_type=m.get("action_head_type", "mlp"),
         diffusion_steps=int(m.get("diffusion_steps", 50)),
+        diffusion_denoiser_type=str(m.get("diffusion_denoiser_type", "mlp")),
+        diffusion_transformer_layers=int(m.get("diffusion_transformer_layers", 2)),
+        diffusion_transformer_heads=int(m.get("diffusion_transformer_heads", 4)),
+        diffusion_transformer_dropout=float(m.get("diffusion_transformer_dropout", 0.0)),
+        diffusion_schedule=m.get("diffusion_schedule", "linear"),
+        diffusion_action_scale=m.get("diffusion_action_scale"),
+        diffusion_action_offset=m.get("diffusion_action_offset"),
+        diffusion_clip_sample=m.get("diffusion_clip_sample"),
         temporal_encoder_type=m.get("temporal_encoder_type", "none"),
         n_obs_steps=int(d.get("n_obs_steps", 1)),
         temporal_layers=int(m.get("temporal_layers", 1)),
@@ -85,7 +95,10 @@ def build_model(cfg: dict) -> Part2ActionModel:
         ),
         use_unified_contact_conditioning=bool(m.get("use_unified_contact_conditioning", False)),
         contact_conditioning_enabled=bool(m.get("contact_conditioning_enabled", True)),
+        contact_conditioning_stage=m.get("contact_conditioning_stage", "late"),
         contact_geometry_scale_m=float(m.get("contact_geometry_scale_m", 0.1)),
+        contact_conditioning_mode=m.get("contact_conditioning_mode", "additive"),
+        contact_conditioning_initial_weight=float(m.get("contact_conditioning_initial_weight", 0.01)),
         use_near_contact_actions=bool(m.get("use_near_contact_actions", False)),
         near_contact_distance=float(m.get("near_contact_distance", 0.03)),
         near_contact_max_translation=float(m.get("near_contact_max_translation", 0.03)),
@@ -157,6 +170,25 @@ def trainable_state_dict(model):
         for key, value in model.state_dict().items()
         if not key.startswith(excluded)
     }
+
+
+def policy_state_digest(state):
+    """Fingerprint policy tensors, including shape/dtype, independent of device."""
+    digest = hashlib.sha256()
+    for name, tensor in sorted(state.items()):
+        tensor = tensor.detach().cpu().contiguous()
+        digest.update(f"{name}\n{tensor.dtype}\n{list(tensor.shape)}\n".encode())
+        digest.update(tensor.reshape(-1).view(torch.uint8).numpy().tobytes())
+    return digest.hexdigest()
+
+
+def verify_untrained_initialization(initial):
+    if initial.get("epoch") != -1 or initial.get("initialization_kind") != "fresh_random_policy":
+        raise ValueError("This from-scratch experiment requires a freshly initialized, untrained policy")
+    expected = initial.get("policy_state_sha256")
+    if not expected or policy_state_digest(initial["model"]) != expected:
+        raise ValueError("Untrained initialization fingerprint is missing or incorrect")
+    return expected
 
 
 def gate_loss(logits, mask, weights):
@@ -389,6 +421,8 @@ def compute_losses(
             (out["termination_logits"] >= 0) == batch["phase_termination"].bool()
         ).float().mean().detach()
     parts["total"] = total.detach()
+    if "contact_conditioning_weight" in out:
+        parts["contact_conditioning_weight"] = out["contact_conditioning_weight"].detach()
     return total, parts
 
 
@@ -455,9 +489,27 @@ def main():
         print(f"[train] resume {args.resume}; ignoring train.init_checkpoint")
     if init_from and not Path(init_from).is_absolute():
         init_from = str((ROOT / init_from).resolve())
+    if cfg["train"].get("require_untrained_initialization") and not init_from and not args.resume:
+        raise ValueError("From-scratch timing requires the shared untrained initialization")
     if init_from:
         initial = torch.load(init_from, map_location=device, weights_only=False)
+        expected_initial_state = None
+        if cfg["train"].get("require_untrained_initialization", False):
+            expected_initial_state = verify_untrained_initialization(initial)
         missing, unexpected = model.load_state_dict(initial["model"], strict=False)
+        if cfg["model"].get("contact_conditioning_mode") == "normalized_global":
+            allowed = {"contact_geometry_conditioner.contact_weight"}
+            incompatible = [k for k in missing if not k.startswith(("visual.model.", "text.model.")) and k not in allowed]
+            if incompatible or unexpected:
+                raise ValueError(f"Incompatible normalized-contact initialization: missing={incompatible}, unexpected={unexpected}")
+        if expected_initial_state is not None:
+            actual_initial_state = policy_state_digest(trainable_state_dict(model))
+            if actual_initial_state != expected_initial_state:
+                raise ValueError("Loaded policy weights differ from the shared untrained initialization")
+            save_json(out_dir / "initialization_verification.json", {
+                "source": init_from, "kind": "fresh_random_policy", "epoch": -1,
+                "policy_state_sha256": actual_initial_state, "verified_before_optimization": True,
+            })
         print(
             f"[train] initialized from {init_from}; "
             f"missing={len(missing)} unexpected={len(unexpected)}"
@@ -469,7 +521,8 @@ def main():
     if frozen:
         print(f"[train] froze {len(frozen)} parameter tensors")
     active = set(cfg["heads"])
-    print(f"[train] device={device} dataset={len(ds)} batches={len(dl)}")
+    print(f"[train] device={device} dataset={len(ds)} batches={len(dl)} "
+          f"action_target_offset={ds.action_target_offset} sample_stride={cfg['data'].get('sample_stride', 1)}")
 
     if args.dry_run:
         batch = next(iter(dl))
@@ -502,6 +555,9 @@ def main():
     history, start_epoch = [], 0
     if args.resume:
         state = torch.load(args.resume, map_location=device, weights_only=False)
+        saved_offset = state.get("cfg", {}).get("data", {}).get("action_target_offset", 0)
+        if saved_offset != ds.action_target_offset:
+            raise ValueError("Resume action_target_offset differs from the checkpoint; use --init-from for a new alignment experiment")
         model.load_state_dict(state["model"], strict=False)
         history = list(state.get("history", []))
         start_epoch = int(state.get("epoch", -1)) + 1

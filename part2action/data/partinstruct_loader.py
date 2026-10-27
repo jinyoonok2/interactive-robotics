@@ -4,7 +4,7 @@ The PartInstruct HuggingFace dataset stores one HDF5 file per object category
 (e.g. scissors.hdf5, pliers.hdf5). Schema (verified from upstream config):
 
     data/demo_{i}/
-        actions                (T, 7)   pos(3) + axis_angle(3) + gripper(1)
+        actions                (T, 7)   world pos(3) + Euler XYZ(3) + finger opening(1)
         skill_instructions     (T,)     bytes utf-8 per timestep
         obs/agentview_rgb      (T, H, W, 3)  uint8        H=W=300
         obs/agentview_part_mask(T, H, W, 1)  uint8 binary part mask
@@ -18,6 +18,12 @@ The PartInstruct HuggingFace dataset stores one HDF5 file per object category
 This adapter yields per-step samples used by the heatmap and part-action
 tracks. It does NOT depend on the upstream PartInstruct python package or its diffusion_policy fork;
 we only need h5py + numpy.
+
+Released observations are post-action at the audited approach transitions.
+action_target_offset=1 pairs recorded observation t with the next command,
+t+1, while offset0 preserves historical training labels. Observation history,
+part/contact and hierarchy supervision remain anchored to t; only action and
+action-derived gripper targets advance. Chunks may span skill boundaries.
 """
 from __future__ import annotations
 
@@ -83,12 +89,16 @@ class PartInstructDataset(Dataset):
         pcd_key: str = "agentview_pcd",
         part_pcd_key: str = "agentview_part_pcd",
         tcp_pose_key: str = "tcp_pose",
+        action_target_offset: int = 0,
     ) -> None:
         super().__init__()
         if not hdf5_paths:
             raise ValueError("PartInstructDataset requires at least one HDF5 path")
         self.hdf5_paths = [str(Path(p).expanduser().resolve()) for p in hdf5_paths]
         self.action_chunk = int(action_chunk)
+        if type(action_target_offset) is not int or action_target_offset not in (0, 1):
+            raise ValueError("action_target_offset must be integer 0 (legacy) or 1 (next action)")
+        self.action_target_offset = action_target_offset
         self.rgb_key = rgb_key
         self.mask_key = mask_key
         self.gripper_key = gripper_key
@@ -170,6 +180,9 @@ class PartInstructDataset(Dataset):
                 if n_steps < self.action_chunk + 1:
                     continue
                 last_valid = n_steps - self.action_chunk
+                # Preserve the historical sample set at offset0. Its final
+                # available sample already leaves one action unused, so the
+                # identical sample set also fits a complete offset1 chunk.
                 for t in range(0, last_valid, max(1, int(sample_stride))):
                     self._samples.append(
                         SampleSpec(file_path=path, demo_key=dk, t=t, n_steps=n_steps)
@@ -282,14 +295,17 @@ class PartInstructDataset(Dataset):
             else None
         )
 
-        actions_full = np.asarray(demo["actions"][spec.t : spec.t + self.action_chunk])
+        action_start = spec.t + self.action_target_offset
+        actions_full = np.asarray(demo["actions"][action_start : action_start + self.action_chunk])
+        if self.action_target_offset == 1 and actions_full.shape[0] != self.action_chunk:
+            raise RuntimeError("Next-action sample lacks a complete future action chunk")
         if actions_full.shape[0] < self.action_chunk:
             pad = self.action_chunk - actions_full.shape[0]
             actions_full = np.concatenate([actions_full, np.tile(actions_full[-1:], (pad, 1))], axis=0)
 
         full_actions_demo = np.asarray(demo["actions"][:])
         previous_gripper_command = (
-            float(full_actions_demo[spec.t - 1, 6]) if spec.t > 0 else float(actions_full[0, 6])
+            float(full_actions_demo[action_start - 1, 6]) if action_start > 0 else float(actions_full[0, 6])
         )
         gripper_closed, gripper_weights = derive_gripper_targets(
             actions_full,
@@ -369,6 +385,9 @@ class PartInstructDataset(Dataset):
                 "file": os.path.basename(spec.file_path),
                 "demo": spec.demo_key,
                 "t": int(spec.t),
+                "action_start_t": int(action_start),
+                "action_last_t": int(action_start + self.action_chunk - 1),
+                "action_target_offset": self.action_target_offset,
                 "contact_t": int(contact_t),
                 "contact_label_mode": self.contact_label_mode,
             },

@@ -1,0 +1,781 @@
+{
+  "gif": "part2action_bottle_neck.gif",
+  "description": "Franka Panda approaching a bottle neck and closing its gripper in PartGym.",
+  "suggested_caption": "Part2Action \u2014 language-guided, part-aware manipulation in PartGym. Scene shown: PartInstruct expert demonstration.",
+  "suggested_alt": "A Franka Panda approaches and grasps a bottle neck. Cyan marks the derived contact target, yellow marks the recorded TCP and recent path, and green highlights the dataset target part.",
+  "source_kind": "PartInstruct expert demonstration, not a learned Part2Action policy evaluation",
+  "dataset": "SCAI-JHU/PartInstruct",
+  "source_hdf5": "/p/part2action/data/PartInstruct/demos/bottle.hdf5",
+  "demo": "demo_0",
+  "episode_id": "80113",
+  "instruction": "Grasp the bottle at its neck",
+  "source_frames": [
+    15,
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31,
+    33,
+    35,
+    37,
+    39,
+    41,
+    43,
+    45,
+    47,
+    49,
+    51,
+    53,
+    55,
+    57,
+    59,
+    61,
+    63,
+    65,
+    67,
+    69,
+    71,
+    73,
+    75,
+    77,
+    79,
+    81,
+    83,
+    85,
+    87,
+    88
+  ],
+  "source_rgb_resolution": [
+    300,
+    300
+  ],
+  "crop_xyxy": [
+    0,
+    55,
+    300,
+    255
+  ],
+  "output_resolution": [
+    600,
+    400
+  ],
+  "resizing": "2x Lanczos enlargement of the recorded frames; no additional scene detail generated",
+  "frame_duration_ms": [
+    300,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    100,
+    1000
+  ],
+  "nominal_source_fps_assumption": 20,
+  "timing_note": "Every second recorded frame is shown at 10 fps; native recording intervals are not independently established.",
+  "duration_seconds": 4.9,
+  "loop": "infinite",
+  "bytes": 907228,
+  "sha256": "df25aab5e8006a5e596f4e9427352afa6b43b6ce0f9551f25cfafb738532b9b7",
+  "attribution": "Simulation assets and expert demonstration: PartInstruct (SCAI-JHU), https://github.com/SCAI-JHU/PartInstruct",
+  "selection": "Start at source frame 15 and stop at the grasp segment end (88); subsequent move skills do not provide contact labels.",
+  "decoded_frames": 38,
+  "overlay": {
+    "contact_color": "#00ddff",
+    "tcp_color": "#ffe25c",
+    "part_color": "#41dc64",
+    "contact_kind": "Derived skill-specific demonstration label; not a learned model prediction",
+    "contact_method": "gripper_close_in_segment",
+    "contact_event_frame": 76,
+    "grasp_segment": [
+      0,
+      88
+    ],
+    "projection": "Same fixed-camera projection and world geometry as the contact audit",
+    "scope": "Only the initial grasp segment; no target extrapolation into later skills",
+    "tcp_trail": "Recorded measured TCP positions over the preceding 12 source frames",
+    "part_mask": "Recorded agentview_part_mask, tinted green",
+    "frames": [
+      {
+        "source_frame": 15,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          177.93885456888566,
+          229.0292736944259
+        ]
+      },
+      {
+        "source_frame": 17,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          187.91176219531798,
+          234.81265553456313
+        ]
+      },
+      {
+        "source_frame": 19,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          197.5525935659478,
+          239.73669676164968
+        ]
+      },
+      {
+        "source_frame": 21,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          206.7054138525202,
+          243.93059643816594
+        ]
+      },
+      {
+        "source_frame": 23,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          215.27545257602367,
+          247.50873139273108
+        ]
+      },
+      {
+        "source_frame": 25,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          223.21402321869286,
+          250.57005911975466
+        ]
+      },
+      {
+        "source_frame": 27,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          230.50592383956328,
+          253.19868525387483
+        ]
+      },
+      {
+        "source_frame": 29,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          240.0215637330301,
+          256.39680066966787
+        ]
+      },
+      {
+        "source_frame": 31,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02474033832550049,
+          -0.0014073029160499573,
+          0.20374518632888794
+        ],
+        "contact_output_xy_px": [
+          323.9999985106103,
+          284.0000030074353
+        ],
+        "tcp_output_xy_px": [
+          251.0250063304237,
+          259.8355253661456
+        ]
+      },
+      {
+        "source_frame": 33,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02474033832550049,
+          -0.0014073029160499573,
+          0.20374518632888794
+        ],
+        "contact_output_xy_px": [
+          323.9999985106103,
+          284.0000030074353
+        ],
+        "tcp_output_xy_px": [
+          259.9211129266239,
+          262.47591977391954
+        ]
+      },
+      {
+        "source_frame": 35,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02474033832550049,
+          -0.0014073029160499573,
+          0.20374518632888794
+        ],
+        "contact_output_xy_px": [
+          323.9999985106103,
+          284.0000030074353
+        ],
+        "tcp_output_xy_px": [
+          267.04522476506236,
+          264.5418266997233
+        ]
+      },
+      {
+        "source_frame": 37,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02445131540298462,
+          -0.001268737018108368,
+          0.21331071853637695
+        ],
+        "contact_output_xy_px": [
+          323.99999984588965,
+          280.00000029403094
+        ],
+        "tcp_output_xy_px": [
+          272.7127834544538,
+          266.18533950766556
+        ]
+      },
+      {
+        "source_frame": 39,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          277.2001760681157,
+          267.5112256253354
+        ]
+      },
+      {
+        "source_frame": 41,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          280.74043923753607,
+          268.5929374610099
+        ]
+      },
+      {
+        "source_frame": 43,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          283.5256598510895,
+          269.4831631253031
+        ]
+      },
+      {
+        "source_frame": 45,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02445131540298462,
+          -0.001268737018108368,
+          0.21331071853637695
+        ],
+        "contact_output_xy_px": [
+          323.99999984588965,
+          280.00000029403094
+        ],
+        "tcp_output_xy_px": [
+          285.71166421903575,
+          270.22071080247093
+        ]
+      },
+      {
+        "source_frame": 47,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024178147315979004,
+          -0.0011301711201667786,
+          0.2228327989578247
+        ],
+        "contact_output_xy_px": [
+          323.99999943979054,
+          276.0000210160235
+        ],
+        "tcp_output_xy_px": [
+          287.4238158351524,
+          270.8348870446012
+        ]
+      },
+      {
+        "source_frame": 49,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          288.76231134265663,
+          271.34820509985985
+        ]
+      },
+      {
+        "source_frame": 51,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          294.2144515873934,
+          272.7833314973746
+        ]
+      },
+      {
+        "source_frame": 53,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          298.72751176341694,
+          273.93476593120187
+        ]
+      },
+      {
+        "source_frame": 55,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024154305458068848,
+          -0.001361113041639328,
+          0.20827919244766235
+        ],
+        "contact_output_xy_px": [
+          323.99999781991255,
+          281.9999913528726
+        ],
+        "tcp_output_xy_px": [
+          302.31041680401415,
+          274.834288482424
+        ]
+      },
+      {
+        "source_frame": 57,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024178147315979004,
+          -0.0011301711201667786,
+          0.2228327989578247
+        ],
+        "contact_output_xy_px": [
+          323.99999943979054,
+          276.0000210160235
+        ],
+        "tcp_output_xy_px": [
+          305.148002208215,
+          275.5418355273041
+        ]
+      },
+      {
+        "source_frame": 59,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          307.39135715481444,
+          276.1016039924883
+        ]
+      },
+      {
+        "source_frame": 61,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.018918871879577637,
+          0.002453245222568512,
+          0.19050157070159912
+        ],
+        "contact_output_xy_px": [
+          321.99999907955805,
+          287.9999926091452
+        ],
+        "tcp_output_xy_px": [
+          309.1625870923192,
+          276.54663659116545
+        ]
+      },
+      {
+        "source_frame": 63,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          310.5596440388634,
+          276.9019406946424
+        ]
+      },
+      {
+        "source_frame": 65,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          311.660694679249,
+          277.18658402087794
+        ]
+      },
+      {
+        "source_frame": 67,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          312.52789808611783,
+          277.4153063325306
+        ]
+      },
+      {
+        "source_frame": 69,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          313.2105495085908,
+          277.5995462236003
+        ]
+      },
+      {
+        "source_frame": 71,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02537405490875244,
+          -0.0009916089475154877,
+          0.22831851243972778
+        ],
+        "contact_output_xy_px": [
+          323.9999981933457,
+          273.99999630676086
+        ],
+        "tcp_output_xy_px": [
+          313.74767608491766,
+          277.7483005804677
+        ]
+      },
+      {
+        "source_frame": 73,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          314.17012965731567,
+          277.86864746547474
+        ]
+      },
+      {
+        "source_frame": 75,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          314.5022664023732,
+          277.96616932876185
+        ]
+      },
+      {
+        "source_frame": 77,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.0247536301612854,
+          -0.0011763609945774078,
+          0.21832776069641113
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          278.00000499294003
+        ],
+        "tcp_output_xy_px": [
+          314.51441984028463,
+          277.96979032218115
+        ]
+      },
+      {
+        "source_frame": 79,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02537405490875244,
+          -0.0009916089475154877,
+          0.22831851243972778
+        ],
+        "contact_output_xy_px": [
+          323.9999981933457,
+          273.99999630676086
+        ],
+        "tcp_output_xy_px": [
+          314.5143957256379,
+          277.9697972120802
+        ]
+      },
+      {
+        "source_frame": 81,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.021271109580993652,
+          0.00249558687210083,
+          0.18696266412734985
+        ],
+        "contact_output_xy_px": [
+          321.99999877711645,
+          290.00000918438604
+        ],
+        "tcp_output_xy_px": [
+          314.5143731506314,
+          277.9698065436477
+        ]
+      },
+      {
+        "source_frame": 83,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.024178147315979004,
+          -0.0011301711201667786,
+          0.2228327989578247
+        ],
+        "contact_output_xy_px": [
+          323.99999943979054,
+          276.0000210160235
+        ],
+        "tcp_output_xy_px": [
+          314.5143542034069,
+          277.96981343354753
+        ]
+      },
+      {
+        "source_frame": 85,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02329498529434204,
+          -0.0011763609945774078,
+          0.22233527898788452
+        ],
+        "contact_output_xy_px": [
+          323.99999929703023,
+          275.9999894737698
+        ],
+        "tcp_output_xy_px": [
+          314.51433697865747,
+          277.96981343354753
+        ]
+      },
+      {
+        "source_frame": 87,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.020645856857299805,
+          -0.0013149231672286987,
+          0.2208426594734192
+        ],
+        "contact_output_xy_px": [
+          324.00000053600735,
+          276.0000181823481
+        ],
+        "tcp_output_xy_px": [
+          314.5136716152415,
+          277.9713608756246
+        ]
+      },
+      {
+        "source_frame": 88,
+        "contact_valid": true,
+        "contact_world_xyz_m": [
+          -0.02006763219833374,
+          -0.001268737018108368,
+          0.22535490989685059
+        ],
+        "contact_output_xy_px": [
+          323.99999984588965,
+          274.0000081800623
+        ],
+        "tcp_output_xy_px": [
+          314.51573787290624,
+          277.969904936485
+        ]
+      }
+    ]
+  },
+  "exporter": "part2action/docs/slide_history/scripts/export_project_gif.py"
+}

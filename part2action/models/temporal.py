@@ -14,7 +14,9 @@ import torch.nn as nn
 class IdentityTemporalEncoder(nn.Module):
     """No temporal modeling; returns the last frame's patch tokens."""
 
-    def forward(self, tokens: torch.Tensor) -> torch.Tensor:
+    def forward(self, tokens: torch.Tensor, context_token: torch.Tensor | None = None) -> torch.Tensor:
+        if context_token is not None:
+            raise ValueError("Context tokens require the transformer temporal encoder")
         if tokens.ndim == 3:
             return tokens
         if tokens.ndim != 4:
@@ -56,8 +58,10 @@ class TemporalPatchTransformer(nn.Module):
         self.encoder = nn.TransformerEncoder(layer, num_layers=num_layers)
         self.norm = nn.LayerNorm(embed_dim)
 
-    def forward(self, tokens: torch.Tensor) -> torch.Tensor:
+    def forward(self, tokens: torch.Tensor, context_token: torch.Tensor | None = None) -> torch.Tensor:
         if tokens.ndim == 3:
+            if context_token is not None:
+                raise ValueError("Temporal context requires a frame history (B,T,N,D)")
             return tokens
         if tokens.ndim != 4:
             raise RuntimeError(f"Expected (B,N,D) or (B,T,N,D), got {tuple(tokens.shape)}")
@@ -68,8 +72,14 @@ class TemporalPatchTransformer(nn.Module):
 
         x = tokens.permute(0, 2, 1, 3).reshape(bsz * n_patches, steps, dim)
         x = x + self.pos[:, :steps].to(dtype=x.dtype)
+        if context_token is not None:
+            if context_token.shape != (bsz, dim):
+                raise ValueError("Expected temporal context token (B,D)")
+            context = context_token[:, None, None, :].expand(bsz, n_patches, 1, dim)
+            x = torch.cat([x, context.reshape(bsz * n_patches, 1, dim)], dim=1)
         x = self.encoder(x)
-        x = self.norm(x[:, -1])
+        # Read the latest visual frame, which can attend to the contact token.
+        x = self.norm(x[:, steps - 1])
         return x.reshape(bsz, n_patches, dim)
 
 

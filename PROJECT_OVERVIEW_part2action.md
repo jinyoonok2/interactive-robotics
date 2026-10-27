@@ -218,4 +218,4 @@ dataset coverage and diffusion or flow-matching action decoders.
 
 - [Repository README](README.md) provides project navigation.
 - [Part2Action README](part2action/README.md) describes model interfaces and variants.
-- [Project environment guide](part2action/docs/PROJECT_ENVIRONMENT.md) records current experiment status and execution details.
+- [Research plan](part2action/docs/RESEARCH_PLAN.md) records current decisions and experiments; [setup](part2action/docs/SETUP.md) holds execution details.
