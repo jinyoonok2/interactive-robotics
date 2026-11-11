@@ -18,7 +18,7 @@ STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
 PYTHON="${PYTHON:-/p/part2action/envs/part2action_train/bin/python}"
 VARIANT="${VARIANT:-next_action}"
 case "$VARIANT" in same_index|next_action) ;; *) echo "VARIANT must be same_index or next_action" >&2; exit 2;; esac
-CONFIG="${CONFIG:-part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_timing_${VARIANT}.yaml}"
+CONFIG="${CONFIG:-part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_10epoch_timing_${VARIANT}.yaml}"
 RUN_NAME="world_geometry_10epoch_timing_${VARIANT}_${SLURM_JOB_ID:-manual}"
 OUT_DIR="$STORAGE_ROOT/runs/$RUN_NAME"
 RESUME="${RESUME:-}"

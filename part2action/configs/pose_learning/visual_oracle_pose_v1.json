@@ -1,0 +1,9 @@
+{
+  "experiment": "original_visual_Transformer_oracle_grasp_pose_v1",
+  "data_root": "/p/part2action/data/PartInstruct",
+  "baseline_config": "part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml",
+  "init_checkpoint": "/p/part2action/results/part2action/runs/world_geometry_10epoch_diffusion_next_action_transformer_6724878/last.pt",
+  "objects": ["bottle", "mug", "pliers", "scissors"],
+  "train": {"epochs": 2, "seed": 42, "lr": 0.0001},
+  "evaluation": {"seeds": [42, 43, 44], "max_steps": 120, "shards": 4}
+}

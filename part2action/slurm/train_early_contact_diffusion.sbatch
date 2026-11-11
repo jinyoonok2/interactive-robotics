@@ -17,7 +17,7 @@ STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
 PYTHON="${PYTHON:-/p/part2action/envs/part2action_train/bin/python}"
 VARIANT="${VARIANT:-control}"
 case "$VARIANT" in control|contact) ;; *) echo "VARIANT must be control or contact" >&2; exit 2;; esac
-CONFIG="${CONFIG:-part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_diffusion_early_${VARIANT}.yaml}"
+CONFIG="${CONFIG:-part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_diffusion_early_${VARIANT}.yaml}"
 OUT_DIR="$STORAGE_ROOT/runs/world_geometry_30epoch_diffusion_early_${VARIANT}_${SLURM_JOB_ID:-manual}"
 export PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1

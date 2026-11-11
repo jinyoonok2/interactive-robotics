@@ -16,7 +16,7 @@ def main():
     assert torch.cuda.is_available()
     results = {}
     for variant in ["control","contact"]:
-        source = ROOT/'configs/architecture_update'/f'hierarchical_world_geometry_10epoch_normalized_global_{variant}.yaml'
+        source = ROOT/'docs/archive/2026-11-11_config_history'/f'hierarchical_world_geometry_10epoch_normalized_global_{variant}.yaml'
         cfg = resolve_paths(load_yaml(source), ROOT); set_seed(42)
         cfg['data'].update(max_demos_per_file=1,batch_size=2,num_workers=0)
         dataset = build_dataset(cfg['data'])

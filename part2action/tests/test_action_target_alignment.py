@@ -130,7 +130,7 @@ class ActionAlignmentTests(unittest.TestCase):
 
     def test_timing_configs_match_except_target_alignment(self):
         from validate_configs import validate
-        folder = ROOT/'configs/architecture_update'
+        folder = ROOT/'docs/archive/2026-11-11_config_history'
         paths = [folder/f'hierarchical_world_geometry_10epoch_timing_{v}.yaml'
                  for v in ('same_index', 'next_action')]
         configs = [yaml.safe_load(p.read_text()) for p in paths]

@@ -1,0 +1,174 @@
+[
+  {
+    "member": "part2action/configs/pose_learning/point_ablation_v1.json",
+    "sha256": "5f83a5d04f3b7cf2b8cfd1a57dec5a23b2994c8eaca0cc6e0850b378f9784f51"
+  },
+  {
+    "member": "part2action/configs/pose_learning/visible_geometry_v1.json",
+    "sha256": "c42607e07b374da0d5367c8bd3125916661e6a297ec6107fdb745c00bd326961"
+  },
+  {
+    "member": "part2action/configs/pose_learning/visible_geometry_v2.json",
+    "sha256": "8c098c15ca365a34baa1533ba20a990d766777ee930415f86b6854da1be1ef45"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/manifest.json",
+    "sha256": "7dffbca266c5168f0b38fbc139b8f98195413a829cfefa5e8070d5cd01f38c1d"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/report_figure.tex",
+    "sha256": "ff75a6ce25cb90335c516336fd58481443f0fad3f771238a3ca159a166f59366"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/visual_policy_vs_pose_guided_pilot.mmd",
+    "sha256": "fca89e3ce70da2ea7ad93805066aacf3d4fc32ef6aec8d0c7d3366d4520fba98"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/visual_policy_vs_pose_guided_pilot.pdf",
+    "sha256": "6425bf414280ad187cf61b99d4149905f79618423872a5ec5f761f2e36db5ee2"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/visual_policy_vs_pose_guided_pilot.png",
+    "sha256": "c35957c4a7b1f60354e7f08eafa241e4309188f94c21d7170260b57fd6a403ba"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_architecture_comparison/visual_policy_vs_pose_guided_pilot.svg",
+    "sha256": "bb10826617dbcc71ad30490f1365f0817c4291a13d7b994361ab4d8c455943e2"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/manifest.json",
+    "sha256": "7681e32cd7187b033b3b2e1d11458bc3b12ec58a56d1ad6f045515ba5acad41d"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/report_figure.tex",
+    "sha256": "c0a39005317abab1ac4fd74389abf7df7161baf7db14da8089cbe1b28942ce86"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/visual_baseline_plus_pose.mmd",
+    "sha256": "825ce6d65bdd09eeec5a8b69742cd0f5ad4a16bf4c9430b256b5c1295b7bee3e"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/visual_baseline_plus_pose.pdf",
+    "sha256": "3009054574ae4412fcc6532128b17fded877ac584272a68d4e074eaa3433e5ae"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/visual_baseline_plus_pose.png",
+    "sha256": "31130137ec83cbceadc0201955f49b4dd052619cfbd3d6c7bc789291554f0e5f"
+  },
+  {
+    "member": "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison/visual_baseline_plus_pose.svg",
+    "sha256": "fc006d3448161d700694c5febe2e7cc8b0cae177f7c380eff47da0ddb6f18223"
+  },
+  {
+    "member": "part2action/scripts/audit_learned_pose_actor.py",
+    "sha256": "478fdf3b372934086c32e76a1242d3bfe8162534bb43dd40bab97d97125a0a29"
+  },
+  {
+    "member": "part2action/scripts/check_background_experiment.py",
+    "sha256": "0098b6836bdba5b2e68819f12010029fd09b4c18f8e005568f40634a1a05f547"
+  },
+  {
+    "member": "part2action/scripts/draw_architecture_comparison.py",
+    "sha256": "fedc5a508949ebe32a73f3c70f2732353d00c56f55da2f6afc6e6f0162c76838"
+  },
+  {
+    "member": "part2action/scripts/draw_matched_visual_pose_comparison.py",
+    "sha256": "83d1709880044e46da3bf7a62b7ff33016e5796920892a648af466ab77ba774b"
+  },
+  {
+    "member": "part2action/scripts/run_learned_pose_actor.py",
+    "sha256": "7a2ea0ef4a67b11c3be0b2d893f3d0e4a269b3c2f65dd16729317543706323ec"
+  },
+  {
+    "member": "part2action/scripts/run_point_to_pose.py",
+    "sha256": "1edd3d80533ba64bb786c54ac40fad3b1f0207174294ef2e081854bc85bdae28"
+  },
+  {
+    "member": "part2action/scripts/run_pose_geometry_ablation.py",
+    "sha256": "63aeef4d6367bfd6c257063f13f9337cad8c0c9e1e41405337829beef0fb1222"
+  },
+  {
+    "member": "part2action/scripts/run_pose_geometry_seed_replication.py",
+    "sha256": "617785a84d7f982de4d1260a43327161dd91f62ac7015606da157655ab6a4a5d"
+  },
+  {
+    "member": "part2action/scripts/run_pose_guided_approach.py",
+    "sha256": "f3a7705f5dcaa75bb160d56cadb74b14381df6963fe52ddf2499b18e6ac84b53"
+  },
+  {
+    "member": "part2action/scripts/run_pose_point_ablation.py",
+    "sha256": "4bceb19b08ef8132a921bf81f9772b596ea7fdc92c293f23ba1a336155b97f6e"
+  },
+  {
+    "member": "part2action/scripts/run_sparse_visible_pose_geometry.py",
+    "sha256": "047335c3e33ba6b40838c7ed977f7955e3d9f9d27c6ec8e6de2b74267c9e0193"
+  },
+  {
+    "member": "part2action/scripts/run_visible_pose_geometry.py",
+    "sha256": "056b80ed9999f6810bc17a8e81bc7cab9214de2c7f26a31225b9c919d9d21403"
+  },
+  {
+    "member": "part2action/slurm/learned_pose_actor.sbatch",
+    "sha256": "5530a3e46649abf6f150ec44f887011237bec08014cec2794525d2a95fe8ebd0"
+  },
+  {
+    "member": "part2action/slurm/point_to_pose.sbatch",
+    "sha256": "005ec8ca94fcfa70a684feb071e59d68d2d21ad7f8d764537d927b762389287b"
+  },
+  {
+    "member": "part2action/slurm/pose_geometry_ablation.sbatch",
+    "sha256": "0e2d27e6a6884b396b7d425efca963d415b890ea8b7caabd0df64592822c27f5"
+  },
+  {
+    "member": "part2action/slurm/pose_geometry_seed_replication.sbatch",
+    "sha256": "2aa18d7b13fe6c5f28614097929e351e31aff01f3b5fd6b57fa118ec2737f390"
+  },
+  {
+    "member": "part2action/slurm/pose_guided_approach.sbatch",
+    "sha256": "be190cbdde162b743d4af76a8e5a4fac3e4cc1da5790791f5b8a8a193984ba14"
+  },
+  {
+    "member": "part2action/slurm/pose_point_ablation.sbatch",
+    "sha256": "5b6a161b9392133c436d24579a9816a8046463f241cd59f3dd2e4675f238dccb"
+  },
+  {
+    "member": "part2action/slurm/sparse_visible_pose_geometry.sbatch",
+    "sha256": "020b411a659967ed091974354607cebc72f3f7a66385d6b6fbf0f5a075ec4c8d"
+  },
+  {
+    "member": "part2action/slurm/visible_pose_geometry.sbatch",
+    "sha256": "9d15be6c23b0f20687943156373a251287d9ebee8b8023db553ee46776b9193c"
+  },
+  {
+    "member": "part2action/tests/test_common_pose_samples.py.txt",
+    "sha256": "3f9ad95e764bc52cd1f8d97e2bf5117a38631af626b919a922843e6060d9de0c"
+  },
+  {
+    "member": "part2action/tests/test_interaction_pose_head.py.txt",
+    "sha256": "3f0fcdf98e9a067288f184c43f42091e00d2a92361e34c270c3c87ea474686a8"
+  },
+  {
+    "member": "part2action/tests/test_pose_geometry_ablation.py.txt",
+    "sha256": "2038a0713d09d66213eb483ddd81a5e4827d6444c2e38638852fec0cb9e0fd82"
+  },
+  {
+    "member": "part2action/tests/test_pose_geometry_seed_replication.py.txt",
+    "sha256": "4d7638e9180d99db77fd5a8a8d98fd6b556e2947d42dba304021190193d31419"
+  },
+  {
+    "member": "part2action/tests/test_pose_guided_actor.py.txt",
+    "sha256": "39c0ea412a95f0be6b6e4f9896284205a8597cc742c11caa97b0b6b8935cbc7d"
+  },
+  {
+    "member": "part2action/tests/test_pose_guided_approach.py.txt",
+    "sha256": "e31f16905da9f8e0595079c57243431801d5fa5bec5aa10f45ac2805d4643fb2"
+  },
+  {
+    "member": "part2action/tests/test_pose_point_reporting.py.txt",
+    "sha256": "a99caa4d02b8bc6f62c08a60e663e10b5b84c265484e788ccfd9fb7eac877e4f"
+  },
+  {
+    "member": "part2action/tests/test_visible_pose_geometry.py.txt",
+    "sha256": "62a04904da50eaccbb011f942716e0b2408ea19fc3c5f7bfbb41c9cd6303bc84"
+  }
+]

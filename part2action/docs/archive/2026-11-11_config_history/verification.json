@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "active_regular_recipes": 3,
+  "compatibility_symlinks": 1,
+  "historical_recipes_moved": 18,
+  "historical_config_regressions_passed": 17,
+  "frozen_job_sources_verified": 59,
+  "archive_integrity": "passed",
+  "maintained_document_links": "passed",
+  "known_secret_pattern_scan": "passed",
+  "model_source_and_queued_jobs_changed": false
+}

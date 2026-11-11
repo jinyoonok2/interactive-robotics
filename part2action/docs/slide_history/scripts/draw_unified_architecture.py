@@ -14,7 +14,7 @@ import yaml
 from media_bundle import write_bundle
 
 ROOT = Path(__file__).resolve().parents[4]
-CONFIG = ROOT/'part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_normalized_global_contact.yaml'
+CONFIG = ROOT/'part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_10epoch_normalized_global_contact.yaml'
 
 
 def main():

@@ -5,6 +5,12 @@ PartInstruct outputs. Browse results here even when their physical files live
 under `/p/part2action`. A linked run can be running, partial, or
 finished: check its logs and scheduler status before interpreting it.
 
+Current pose work retains the visual Transformer in two paths: the queued
+[matched GT-pose study](diagnostics/visual_oracle_pose_20261110_01/README.md) and the
+[implemented shared grounding/pose architecture](../part2action/models/grounded_visual_pose_policy_v1.py).
+The latter passed one real-data GPU smoke step; it has no completed training run. Eight separate non-visual pose/controller
+result roots were deleted at the user's request; [cleanup receipt](../part2action/docs/cleanup_20261111_nonvisual_pose.json).
+
 Current work uses diffusion action heads. Completed MLP experiments are retained
 in the [MLP archive](part2action/archive/mlp/README.md).
 

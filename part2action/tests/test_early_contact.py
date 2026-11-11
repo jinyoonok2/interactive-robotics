@@ -115,7 +115,7 @@ def test_temporal_context_attends_before_readout():
 
 def test_early_configs_match_and_propagate_to_training_factory():
     from scripts.train import build_model
-    root = Path(__file__).resolve().parents[1] / 'configs/architecture_update'
+    root = Path(__file__).resolve().parents[1] / 'docs/archive/2026-11-11_config_history'
     configs = []
     for variant in ['control', 'contact']:
         path = root / f'hierarchical_world_geometry_30epoch_diffusion_early_{variant}.yaml'

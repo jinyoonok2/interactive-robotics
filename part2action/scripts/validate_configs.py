@@ -7,7 +7,7 @@ from pathlib import Path
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT = ROOT / "configs" / "architecture_update" / "hierarchical_world_geometry_30epoch_no_residual.yaml"
+DEFAULT = ROOT / "configs" / "architecture_update" / "hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml"
 
 
 def validate(path: Path, check_files: bool = False) -> list[str]:

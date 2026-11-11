@@ -1,0 +1,50 @@
+{
+  "status": "implemented_stage1_training_setup_no_performance_claim",
+  "created_utc": "2026-11-11T04:41:12.337899+00:00",
+  "generator": "part2action/scripts/draw_visual_gt_pose_finetuning.py",
+  "generator_sha256": "853305e66b7a54bf0086aceb7f26923495064ac48cdb6dfa7910e5ce2f8e6f26",
+  "source_sha256": {
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/part2action/models/pose_conditioning_v1.py": "a31d2aecc39e812d058b6f0b570ea34d224fea5653bfc89bd5e6a09630883eff",
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/part2action/models/visual_pose_policy_v1.py": "b05f5854009a0ab6dd7d4430f7ff7786fc84b029ece8fdb19273d3fdfee8a305",
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/part2action/scripts/train_visual_pose_v1.py": "08e795c7994444d563bd216fdd0fbdff30991841d530751c23c1e4bfcffb584b",
+    "/p/part2action/results/diagnostics/visual_oracle_pose_20261110_01/control.yaml": "23e01254fe7d5efd3e14053e0ad5a88b5b30e796490760e45f761bf36ba7f062",
+    "/p/part2action/results/diagnostics/visual_oracle_pose_20261110_01/oracle_pose.yaml": "6f4ad4b3e68ef87cadb143bd5685ed0a8ab8e03636b2b884041b77a3df72d586"
+  },
+  "training": {
+    "shared_pretrained_checkpoint": "/p/part2action/results/part2action/runs/world_geometry_10epoch_diffusion_next_action_transformer_6724878/last.pt",
+    "additional_epochs": 2,
+    "frozen_prefixes": [
+      "visual",
+      "text"
+    ],
+    "new_pose_module": "new weights, zero-initialized final projection",
+    "pose_estimator_present": false
+  },
+  "files": {
+    "report_figure.tex": {
+      "bytes": 1402,
+      "sha256": "be0425ff7d3d1a33f2b2e08bcb761e8970f8c0a8100928c0dc35da6042df976b"
+    },
+    "visual_gt_pose_finetuning.mmd": {
+      "bytes": 2431,
+      "sha256": "27370b8a0d1497e6d829e0eee12427c89ae9a09d4cbb6fdea17c36182cb5426b"
+    },
+    "visual_gt_pose_finetuning.pdf": {
+      "bytes": 32567,
+      "sha256": "12fa6c6256fdf8d21cf05fe054a4e9f2c39c47258029b688f43ef7abfc82dde5"
+    },
+    "visual_gt_pose_finetuning.png": {
+      "bytes": 986026,
+      "sha256": "f6093f5d008e3d16bb4a1f29cf99d03df5d297d195c5eb480872e0f7987e2462"
+    },
+    "visual_gt_pose_finetuning.svg": {
+      "bytes": 35275,
+      "sha256": "f83ae598e40ac9c284c671e798e0f6f9473460542ca611881549fd433ee3c0d7"
+    }
+  },
+  "layout_checks": "passed",
+  "png_dimensions": [
+    4800,
+    4008
+  ]
+}

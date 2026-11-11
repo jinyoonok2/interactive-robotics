@@ -19,7 +19,7 @@ ROOT_DIR="${SLURM_SUBMIT_DIR:-/u/xna8aw/workspace/research_projects/interactive-
 PART_DIR="$ROOT_DIR/part2action"
 WORKSPACE_ROOT="${WORKSPACE_ROOT:-/u/xna8aw/workspace}"
 STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
-CONFIG="part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_near_contact.yaml"
+CONFIG="part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_near_contact.yaml"
 RUN_NAME="world_geometry_30epoch_near_contact_${SLURM_JOB_ID:-manual}"
 OUT_DIR="$STORAGE_ROOT/runs/$RUN_NAME"
 # Set RESUME to a last.pt to continue that run. Empty starts from scratch.

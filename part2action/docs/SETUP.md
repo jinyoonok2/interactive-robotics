@@ -1,6 +1,6 @@
 # Part2Action setup and run commands
 
-Updated October 22, 2026. This is the operational guide for the existing UVA CS
+Updated November 11, 2026. This is the operational guide for the existing UVA CS
 installation. Decisions, results and active job IDs: [RESEARCH_PLAN](RESEARCH_PLAN.md).
 Dataset schema, labels and split counts: [DATASET](DATASET.md).
 [Archived documentation](archive/2026-10-22/README.md) is historical, not a launch plan.
@@ -37,7 +37,16 @@ export PYTHONNOUSERSITE=1
 ```
 
 GPU training and inference run inside Slurm allocations, never on portal/login
-nodes. Optional environment activation:
+nodes.
+
+User preference, November 5: run authorized long data-collection, training and
+simulation work as background Slurm jobs. Save source/config snapshots, job IDs,
+checkpoints and an automatic report; return after checking submission/startup
+instead of keeping the chat waiting for all results. Use dependency chains and
+failure-aware reporting so results can be checked later. A submitted job is not
+a completed experiment.
+
+Optional environment activation:
 
 ```bash
 export PATH="/u/xna8aw/workspace/.bin:$PATH"
@@ -71,23 +80,79 @@ DP3 generated caches require suffix `+dataset.cache_suffix=dp3s`, separate from 
 
 ## Train
 
-Current defaults: fresh 10 epochs, two consecutive frames, next-index targets,
-stride 1, training seed 42, batch 16, LR 1e-4. The current contact experiment uses
-a Transformer diffusion denoiser and changes only explicit contact conditioning.
-Contact auxiliary prediction remains active in the ON and OFF models.
+### Shared visual grounding and predicted pose — November 11
+
+The original visual GT-pose study below remains queued independently. The new
+architecture is implemented in `models/grounded_visual_pose_policy_v1.py`; the
+training recipe is `configs/pose_learning/grounded_visual_pose_v1.yaml`.
+It fine-tunes the original visual Transformer, with newly initialized pose
+modules and frozen DINO/T5. Dedicated non-visual study launchers and results have
+been retired; see [the cleanup receipt](cleanup_20261111_nonvisual_pose.json).
+
+CPU checks use the existing training environment:
+
+```bash
+PYTHONPATH=part2action:part2action/scripts:part2action/tests \
+PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 OMP_NUM_THREADS=2 \
+/p/part2action/envs/part2action_train/bin/python - <<'PYTEST'
+import runpy
+for name, check in runpy.run_path('part2action/tests/test_grounded_visual_pose_v1.py').items():
+    if name.startswith('test_'):
+        check()
+        print('PASS', name)
+PYTEST
+```
+
+The Slurm entry accepts `DRY_RUN=1` for one real-data optimization step and a
+sampled diffusion action chunk. Set `TASK_OUTPUT` to a fresh physical directory
+under `/p/part2action/results/`, register it using `register_result.py`, and use
+`slurm/grounded_visual_pose_v1.sbatch`. Full training is deliberately not launched
+before the currently authorized GT-stage comparison has been examined.
+
+```bash
+sbatch --partition=gpu --constraint="a40|a100_40gb|a100_80gb|h100_94gb" \
+  --output=/p/part2action/logs/part2action/slurm/grounded_pose_%j.out \
+  --error=/p/part2action/logs/part2action/slurm/grounded_pose_%j.err \
+  --export=ALL,DRY_RUN=1,TASK_OUTPUT=/p/part2action/results/diagnostics/NEW_GROUNDED_POSE_PREFLIGHT \
+  part2action/slurm/grounded_visual_pose_v1.sbatch
+```
+
+The implementation smoke test **6865392 completed successfully** with the actual
+pretrained encoders. Its frozen source plan, logs and receipts are under
+[grounded_visual_pose_20261111_01](../../results/diagnostics/grounded_visual_pose_20261111_01/README.md).
+It completed one optimization step and observation-only diffusion sampling; its
+checkpoint is a smoke artifact, not a completed training run. Full new-model
+training is not submitted. The independent GT-stage GPU preflight also passed;
+training 6864652 awaits GPU priority and evaluation 6864664 awaits that training.
+
+After a trained checkpoint exists, the observation-only rollout adapter is
+`scripts/evaluate_grounded_visual_pose_v1.py --config CONFIG --ckpt CHECKPOINT
+--out-dir FRESH_PER_SHARD_DIRECTORY`. Defaults cover all 149 four-object Test1
+scenarios at seeds 42/43/44, with the original learned phase/termination loop.
+`--num-episodes` explicitly selects a debugging subset; `--shards/--shard-index`
+partition the full population. Run visual inference inside a Slurm GPU allocation
+using `partgym_rollout`. Runtime errors remain unknown, not policy failures.
+
+### Original visual baseline training
+
+Historical baseline recipe: fresh 10 epochs, two consecutive frames, next-index
+targets, stride 1, seed 42, batch 16 and LR 1e-4. The completed original visual
+checkpoint initializes the current pose study. These commands describe that
+baseline recipe, not a request to launch another training run.
 
 ```bash
 /p/part2action/envs/part2action_train/bin/python \
   part2action/scripts/validate_configs.py \
-  part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer_contact.yaml \
+  part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml \
   --check-files
 ```
 
 `part2action/slurm/train_diffusion_screening.sbatch` accepts `VARIANT=transformer`
 (or the previous diffusion `baseline`) and an absolute `CONFIG` snapshot. It
 performs real-data GPU AMP/sampling preflight in a separate process, then starts
-fresh training with no trained-policy/optimizer continuation. Active jobs already
-exist: consult the research plan before submitting anything again.
+fresh training with no trained-policy/optimizer continuation. The pose study
+already has its own queue; consult the research plan before submitting anything
+again.
 
 For a newly authorized experiment only, after creating a reviewed config snapshot:
 
@@ -102,6 +167,12 @@ job. Historical MLP, near-contact, continuation and early-fusion launchers are
 not the current recipe. Do not silently change other settings with a tested flag.
 
 ## Evaluate
+
+Use the versioned pose adapters for the two pose architectures: the current
+GT-stage jobs use `evaluate_visual_oracle_pose_v2.py`, and predicted-pose
+checkpoints use `evaluate_grounded_visual_pose_v1.py` in `partgym_rollout`.
+The generic baseline launch commands below load original visual-policy
+checkpoints; they do not construct the added pose modules.
 
 Part2Action standard: fixed 149 four-object test1 scenarios x seeds 42/43/44 =447
 rollouts per model, max 120 actions, execute one, legacy termination, gripper
@@ -177,6 +248,14 @@ shift runs share trial/step-specific DDPM noise; reuse that identity control for
 comparisons. These are frozen-policy interventions with distribution-shift limits,
 not new training or physically verified contact measurements.
 
+### Historical replay and evaluator tools
+
+Replay/tolerance/evaluator launchers and their dedicated report/training commands
+are retired from the active tree. Do not submit their old commands. Checksummed
+source is available in the [scope-cleanup archive](archive/2026-11-11_scope_cleanup/README.md).
+The native-reference generator and its imported legacy helper remain because
+the queued GT-pose evaluation depends on them.
+
 ## Released DP-S and DP3-S
 
 Use downloaded author-released weights for the reproduction/reference objective;
@@ -228,3 +307,46 @@ their intended position with an explicit "Use this image" download link. Reuse
 remain in the dated `tables.json`. Keep code under `slide_history/scripts/` and
 do not recreate the removed `slide_history/figures/` folder. Reports also provide
 PNG tables and their underlying CSV/JSON rather than requiring video inspection.
+
+
+Historical replay reports/probes are retained in the
+[retired source archive](archive/2026-11-11_scope_cleanup/README.md). Their old
+commands are not active launch instructions.
+
+## Original visual policy with oracle grasp-pose input — November 10
+
+This first stage retains RGB, scene PCD, language, measured state, learned
+hierarchy and the Transformer diffusion action head. GT pose changes only the
+new feature-conditioning path. A separately fine-tuned control receives no pose
+signal. The learned estimator is a later stage. The submitted screen has two
+fine-tuning epochs per arm from the same original visual control checkpoint.
+
+Verified November 11: GPU preflight **6864650** passed in both arms. Matched
+training **6864652** is pending GPU priority; evaluation **6864664** waits for
+training. Reference collection produced 333 successful references and six
+unavailable records out of 339 grasp starts. There are no policy rollouts yet.
+The report/statistics jobs are already queued; do not submit duplicates.
+
+The installed run is
+`results/diagnostics/visual_oracle_pose_20261110_01`, linked to
+`/p/part2action/results/diagnostics/visual_oracle_pose_20261110_01`.
+Open its `README.md`, `submissions.json`, `label_audit.json`, `preflight.json`,
+`simulation_reset_preflight.json` and eventual paired results. Policy actions
+run from reset through the full task. Native experts execute only in separate
+reference scenes; failed references remain explicit coverage gaps.
+
+New experiments use a fresh output directory, not the already submitted one:
+
+```bash
+export PYTHONPATH=part2action:part2action/scripts
+/p/part2action/envs/part2action_train/bin/python \
+  part2action/scripts/run_visual_oracle_pose_v1.py --mode prepare \
+  --out-dir /p/part2action/results/diagnostics/CHOOSE_NEW_NAME
+```
+
+The submitted run preserves its original V1 source snapshot and records the
+versioned evaluation correction in `evaluation_revision.json`; use the recorded
+jobs and `evaluate_visual_oracle_pose_v2.py` for that run. The V1 submitter is
+historical; do not submit it again or edit its frozen sources. Reuse unchanged
+models/training/data for a new versioned submission, with a validated evaluation
+entry point. Scheduler commands require the usual cluster access.

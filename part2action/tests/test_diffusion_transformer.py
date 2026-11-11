@@ -63,7 +63,7 @@ def test_transformer_training_sampling_checkpoint_and_action_interaction():
 
 
 def test_transformer_configuration_changes_only_decoder():
-    base = Path(__file__).resolve().parents[1] / 'configs/architecture_update'
+    base = Path(__file__).resolve().parents[1] / 'docs/archive/2026-11-11_config_history'
     path = base / 'hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml'
     assert validate(path, check_files=True) == []
     old, new = [yaml.safe_load(p.read_text()) for p in [
@@ -89,7 +89,7 @@ def test_model_factories_pass_transformer_options():
     import runpy
     stubs = runpy.run_path(str(Path(__file__).with_name('test_early_contact.py')))
     cfg = yaml.safe_load((Path(__file__).resolve().parents[1] /
-        'configs/architecture_update/hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml').read_text())
+        'docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml').read_text())
     cfg['model']['text_device'] = 'cpu'
     with patch.object(architecture, 'FrozenDINOv2', stubs['Vision']), patch.object(architecture, 'FrozenT5', stubs['Text']):
         torch.manual_seed(42)
@@ -113,7 +113,7 @@ def test_model_factories_pass_transformer_options():
 
 
 def test_ten_epoch_next_action_pair_is_matched_from_scratch():
-    base = Path(__file__).resolve().parents[1] / 'configs/architecture_update'
+    base = Path(__file__).resolve().parents[1] / 'docs/archive/2026-11-11_config_history'
     configs = []
     for variant, kind in [('baseline', 'mlp'), ('transformer', 'transformer')]:
         path = base / f'hierarchical_world_geometry_10epoch_diffusion_next_action_{variant}.yaml'

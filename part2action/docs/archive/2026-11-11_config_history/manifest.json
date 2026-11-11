@@ -1,0 +1,101 @@
+{
+  "archived_configs": [
+    {
+      "name": "hierarchical_world_geometry_10epoch_diffusion_next_action_baseline.yaml",
+      "sha256": "98795c319c4200c92b32754e14b3aac6162dca769045d4f13cc4b63df3a74c13",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml",
+      "sha256": "45bba5da024005380d78a8f46c6e4fdf1edc6ed69335eee636aca2ac1de52f4d",
+      "action": "historical reference copy of retained active baseline"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_diffusion_next_action_transformer_contact.yaml",
+      "sha256": "eb5cf0713f7a860676a2df905da1e7ad4b0b98b3d6deadecd9ee3bdcf983be22",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_diffusion_next_action_transformer_stride2.yaml",
+      "sha256": "8a8d48b7bc3c1671f63e1b2c87902c6a2dd45bc062ff2608d524763352729bc0",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_normalized_global_contact.yaml",
+      "sha256": "6b33dd66ed5287d0c0e9f7ffc36ee4bbfb8da78f686744c33fb2821bc363cc68",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_normalized_global_control.yaml",
+      "sha256": "67bf30fa875d4dfa60229a6726dfd5ee8f1b020707556feaa3a07d5a79b28b5e",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_timing_next_action.yaml",
+      "sha256": "f29a80a4c29f8870bdb6aae6c1a2527339d5a38bce8e09bf55dd8dd31d420364",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_10epoch_timing_same_index.yaml",
+      "sha256": "7f0094dc892d55502a0d5fc08fa2a6e28d0e190be886702e3cad5a25fb7e8b37",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_diffusion_early_contact.yaml",
+      "sha256": "272109dc2ea29b61524e7d1a908340b7079200611ba0dd60432179a7355c030d",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_diffusion_early_control.yaml",
+      "sha256": "81ff3d281abed8ffcb37eb3ca66c5a630fe6f1559bb73ef2ec11038f20164049",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_diffusion_timing_next_action.yaml",
+      "sha256": "acce3e3a0bb99f2da243ea5cc67fc0bd70e1dbe0eddd07b542ff2982e810530a",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_diffusion_timing_same_index.yaml",
+      "sha256": "3c8d5be27c763fe772b32151f0663c385b05b095d6bea925be4fdac76ba6cc0e",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml",
+      "sha256": "666813938ec9c325054fa89dd277f49cab1c2674fc7e943322d8fb1da9887f5d",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_near_contact.yaml",
+      "sha256": "40cf6b8502c3b9a2cce4379494b03d887a2add273e4d6d91b0c2b16d5184f4b9",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_no_residual.yaml",
+      "sha256": "61c8c16926d4ffd2ec0a43942d1c762312cf5d1dc6db251eebbf4883ca589d61",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_unified_contact.yaml",
+      "sha256": "9afa3c7819bdcb2461be3ed009b22385c615d3bae44f11d39d3098038acf3792",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_unified_control.yaml",
+      "sha256": "e4dfa3da72082850e9cbc2fc836ded213cde4d9be30016cf4e9105bf8c3bf83a",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_unified_diffusion_contact.yaml",
+      "sha256": "0f0bab0cb9ecc5945c9a0d91ec8c37bd5e074cab60924e3fa9a058a528c66fc2",
+      "action": "moved out of active configs"
+    },
+    {
+      "name": "hierarchical_world_geometry_30epoch_unified_diffusion_control.yaml",
+      "sha256": "24ce102eb5fe963d6f82958faab52835e4213f1102d6643ec5ba87ca2af720cd",
+      "action": "moved out of active configs"
+    }
+  ],
+  "active_baseline": "part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml",
+  "compatibility_alias": "part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_no_residual.yaml"
+}

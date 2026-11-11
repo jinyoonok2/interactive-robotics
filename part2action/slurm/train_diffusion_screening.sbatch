@@ -13,9 +13,13 @@ set -euo pipefail
 ROOT_DIR="${SLURM_SUBMIT_DIR:-/u/xna8aw/workspace/research_projects/interactive-robotics}"
 PYTHON="${PYTHON:-/p/part2action/envs/part2action_train/bin/python}"
 STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
-VARIANT="${VARIANT:-baseline}"
+VARIANT="${VARIANT:-transformer}"
 case "$VARIANT" in baseline|transformer) ;; *) echo "Invalid decoder variant" >&2; exit 2;; esac
-CONFIG="${CONFIG:-part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_${VARIANT}.yaml}"
+DEFAULT_CONFIG="part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_${VARIANT}.yaml"
+if [[ ! -f "$DEFAULT_CONFIG" ]]; then
+  DEFAULT_CONFIG="part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_10epoch_diffusion_next_action_${VARIANT}.yaml"
+fi
+CONFIG="${CONFIG:-$DEFAULT_CONFIG}"
 OUT_DIR="$STORAGE_ROOT/runs/world_geometry_10epoch_diffusion_next_action_${VARIANT}_${SLURM_JOB_ID:-manual}"
 export PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1 OMP_NUM_THREADS=4
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1

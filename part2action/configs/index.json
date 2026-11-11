@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "active": [
+    {
+      "role": "original_visual_baseline",
+      "path": "architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml",
+      "model_class": "Part2ActionModel",
+      "entrypoint": "scripts/train.py"
+    },
+    {
+      "role": "matched_visual_gt_pose_study",
+      "path": "pose_learning/visual_oracle_pose_v1.json",
+      "model_class": "VisualPosePolicyV1",
+      "entrypoint": "scripts/run_visual_oracle_pose_v1.py",
+      "submitted_evaluation_entrypoint": "scripts/evaluate_visual_oracle_pose_v2.py"
+    },
+    {
+      "role": "shared_grounding_predicted_pose",
+      "path": "pose_learning/grounded_visual_pose_v1.yaml",
+      "model_class": "GroundedVisualPosePolicyV1",
+      "entrypoint": "scripts/train_grounded_visual_pose_v1.py"
+    }
+  ],
+  "compatibility_aliases": [
+    {
+      "path": "architecture_update/hierarchical_world_geometry_30epoch_no_residual.yaml",
+      "target": "../docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_no_residual.yaml",
+      "reason": "Preserve defaults referenced by frozen rollout/trainer sources."
+    }
+  ],
+  "historical_configs": "../docs/archive/2026-11-11_config_history"
+}

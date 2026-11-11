@@ -13,7 +13,7 @@ set -euo pipefail
 ROOT_DIR="${SLURM_SUBMIT_DIR:-/u/xna8aw/workspace/research_projects/interactive-robotics}"
 PYTHON="${PYTHON:-/p/part2action/envs/part2action_train/bin/python}"
 STORAGE_ROOT="${STORAGE_ROOT:-/p/part2action/results/part2action}"
-CONFIG="${CONFIG:-part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml}"
+CONFIG="${CONFIG:-part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_diffusion_transformer_control.yaml}"
 OUT_DIR="$STORAGE_ROOT/runs/world_geometry_30epoch_diffusion_transformer_control_${SLURM_JOB_ID:-manual}"
 export PYTHONUNBUFFERED=1 PYTHONNOUSERSITE=1 OMP_NUM_THREADS=4
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1

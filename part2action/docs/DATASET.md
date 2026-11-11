@@ -1,6 +1,6 @@
 # PartInstruct dataset and evaluation splits
 
-Updated October 22, 2026; release counts audited October 12, 2026. This is the reference for dataset contents, split
+Updated November 11, 2026; release counts audited October 12, 2026. This is the reference for dataset contents, split
 meanings, counts, and the scope of our experiments. Server locations and verification are below; environment usage is in
 [SETUP.md](SETUP.md#existing-installation-and-storage);
 download and evaluation commands remain in [SETUP.md](SETUP.md).
@@ -11,6 +11,26 @@ PartInstruct supplies expert demonstrations for part-level robot manipulation
 and test scenarios executed in the PartGym simulator. Instructions identify
 parts of everyday objects, such as grasping a bottle at its neck or touching a
 mug handle. A scenario may require several basic skills in sequence.
+
+### Labels for the shared visual pose architecture — November 11
+
+`data/grounded_grasp_pose_v1.py` extends the original released-data loader.
+Normal inputs remain RGB history, observed full-scene PCD, task and measured
+TCP/opening. Target-part masks, aligned point membership, contact proxies and
+future measured grasp TCP pose are supervision only. No GT part cloud, event
+clock or future pose is supplied to the new model at inference.
+
+The pose label uses the same measured pre-closure target as the GT study below,
+but supervises pose regression only for observation indices before the first
+closure in grasp-start demonstrations. All subsequent and non-grasp frames stay
+in the dataset for action training; their pose-applicability label is zero.
+The model predicts applicability from observations, rather than receiving that
+label as a feature. A single demonstrated pose is not the only physically valid
+grasp. Training/test separation and original action-time alignment are retained.
+
+The old non-visual common-sample and geometry-head result roots were removed at
+the user's request. Their dedicated adapters are not active training recipes;
+source provenance remains in the [retirement record](archive/2026-11-11_nonvisual_pose/README.md).
 
 There are two different kinds of entries:
 
@@ -24,6 +44,13 @@ scenario. Expert videos in review GIFs can therefore come from task-matched
 training demonstrations, with their different source episode and scene clearly
 identified. A scenario is also not an object category: one category contains
 many instances, instructions, part choices, and initial states.
+
+### Historical replay collection
+
+Earlier replay/tolerance data collection is deferred. Its launchers are no longer
+active recipes; [historical source](archive/2026-11-11_scope_cleanup/README.md)
+is retained separately. The current GT-pose study obtains native-expert references
+in separate simulator scenes and preserves the original released demonstrations.
 
 ## Release structure and annotation types
 
@@ -52,7 +79,7 @@ skill/gripper timing, rather than measured physical finger-contact annotations.
 Our policy uses predicted part/contact information at deployment; ground-truth
 part masks or target-part clouds do not enter its action inputs. Released DP-S/DP3-S evaluations use privileged target-part observations and
 oracle skill progression; their native sampled protocol is described in
-[RESEARCH_PLAN.md](RESEARCH_PLAN.md#evaluation-diagnostics-and-comparison-boundaries).
+[RESEARCH_PLAN.md](RESEARCH_PLAN.md#evaluation-and-claims).
 
 ## How the authors define the splits
 
@@ -226,3 +253,31 @@ The audit below was computed from these installed files on October12,2026.
 | --- | --- |
 | `episodes_meta_train.json` | `3f12de437b88d0cf9df23500eb5fe533c8d658b04c312f03944ee2d4d12e4c55` |
 | `episodes_meta_test.json` | `5e6902643430c35903c9156629b5ff7b7e173850c5db5abe73e678520dc4d436` |
+
+## Oracle target pose for the original visual policy — November 10
+
+The versioned adapter `data/oracle_grasp_pose_v1.py` retains the original visual
+training samples and adds an explicit privileged target for the first grasp.
+For a closure at command index `j`, the label is measured `obs/tcp_pose[j-1]`,
+because released observations are post-action. It is not the commanded action
+or the measured pose after closure. TCP pose is quaternion **xyzw followed by
+world XYZ in meters**. The fixed first-grasp pose is supplied for every frame in
+the episode, without a phase label or closure/skill-end index as model input.
+
+The full-data audit found 4,053 demos and 502,431 frames: 2,478 demos begin with
+grasp and have a valid measured target; 1,575 begin with another skill and remain
+in the dataset with invalid pose targets. Neither arm drops those samples.
+Normal visual and action fields are unchanged. The disabled-control arm ignores
+the supplied target completely; the GT arm intentionally consumes it as an
+oracle input. It is not a deployed predicted-pose result.
+
+Test1 uses the same 149 scenarios and three seeds per arm. Of the 447 planned
+rollouts, 339 begin with grasp. A separate native expert execution provides a
+reference only when its grasp succeeds and has one unambiguous pre-closure pose.
+Physical reset agreement is checked before policy execution. Missing or failed
+references are coverage gaps, not task failures or substitute GT values.
+Verified November 11: all 339 planned grasp-reference records exist; 333 are
+completed and six are unavailable. These are reference-collection outcomes, not
+evaluated policy successes or failures. The fine-tuning/evaluation queue has not
+yet produced policy rollout results.
+See the [run audit](../../results/diagnostics/visual_oracle_pose_20261110_01/label_audit.json).

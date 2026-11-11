@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "checks": [
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_rotation_is_so3_even_for_degenerate_predictions",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_zero_conditioner_reuses_baseline_actions_and_removes_unused_heads",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_inference_has_no_pose_or_contact_label_inputs",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_pose_and_action_use_rgb_and_observed_scene_geometry",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_action_gradients_reach_pose_estimator_and_grounding_without_detach",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_invalid_pose_labels_are_ignored_while_action_training_continues",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_supervised_pose_trains_new_head_before_zero_projection_opens",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_pose_labels_stop_at_closure_without_removing_later_action_samples",
+    "part2action/tests/test_grounded_visual_pose_v1.py:test_two_frame_hierarchy_plan_cache_and_bfloat16_backward",
+    "part2action/tests/test_visual_pose_v1.py:test_relative_pose_frame_invariance_and_invalid_data_boundary",
+    "part2action/tests/test_visual_pose_v1.py:test_gt_label_is_measured_preclose_not_command_or_postclose",
+    "part2action/tests/test_visual_pose_v1.py:test_disabled_matches_original_checkpoint_and_noise_exactly",
+    "part2action/tests/test_visual_pose_v1.py:test_same_action_decoder_preserves_vision_and_learns_pose_conditioning",
+    "part2action/tests/test_visual_pose_v1.py:test_zero_projection_cannot_replace_actions_with_goal",
+    "part2action/tests/test_visual_pose_v1.py:test_reporting_keeps_missing_trials_unknown_and_uses_same_pairs"
+  ],
+  "number_of_checks": 15,
+  "encoder_scope": "CPU network tests replace frozen DINO/T5 with tiny deterministic encoders; full pretrained backbones require Slurm GPU smoke test.",
+  "real_hdf5_loader_check": {
+    "scope": "one released training demo from each of four categories",
+    "indexed_frames": 428,
+    "rgb_shape": [
+      2,
+      3,
+      300,
+      300
+    ],
+    "scene_shape": [
+      1024,
+      3
+    ],
+    "part_label_shape": [
+      1024
+    ],
+    "pose_label_shape": [
+      7
+    ]
+  },
+  "source_sha256": {
+    "part2action/models/grounded_visual_pose_policy_v1.py": "aeb4522ff91b1493346cac72cd82d18b27f141db0234f8593e46e36398b9c635",
+    "part2action/models/grounded_pose_head_v1.py": "054999535e665728d19acefcdb2e596a507a6046f3dfc97ddfa214a5be33f293",
+    "part2action/data/grounded_grasp_pose_v1.py": "7028e18cdb7b84f009dcabd76bce49c3b39b15d36f185a3d7e6b351ae16142cd",
+    "part2action/scripts/train_grounded_visual_pose_v1.py": "8ede21121c5272ae13224aeb41092eacb4efa817fe79dceb9894bf48c5e0ef73",
+    "part2action/scripts/evaluate_grounded_visual_pose_v1.py": "71237886ecf9853ac66d8d74b1fe1cfbd71d00d0abd5dbd47ef9aea9adadd450",
+    "part2action/tests/test_grounded_visual_pose_v1.py": "082b08b631c39f5fddadaedca6238084a6cce611f7fec107e9e275621173695b"
+  }
+}

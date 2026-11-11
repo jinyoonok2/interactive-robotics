@@ -52,49 +52,59 @@ training; bounding does not add a separate gripper loss or change checkpoints.
 - Point-cloud features and contact attention predict a world-frame contact point.
 - A diffusion action head predicts the chunk with a two-layer/four-head
   Transformer denoiser and pooled observation/skill context. A separate temporal
-  Transformer processes two consecutive observation frames. Earlier MLP action
-  heads remain available as historical references.
+  Transformer processes two consecutive observation frames. The original action decoder
+  is retained in both pose paths.
 
-The unified variants retain the hierarchy, part gate, and auxiliary contact
-head. “Unified” refers to using the action policy throughout the motion without
-switching XYZ commands at a contact-distance threshold.
+The original visual checkpoint and its configuration remain available for
+initialization and comparison. Earlier architecture descriptions are historical;
+the two supported pose paths below define current work.
 
-## Historical architecture variants
+## Supported pose architectures
 
-The table below describes earlier methods, not the active experiment queue.
-Current control/contact models both use Transformer diffusion, stride 1,
-next-index targets, two frames and contact auxiliary supervision. Only explicit
-contact conditioning changes. See the research plan for scores and job records.
+The [config index](configs/README.md) identifies the three current recipes:
+the original visual baseline and the two pose paths. Older recipes are archived;
+one compatibility symlink preserves frozen-tooling defaults. Configs select
+settings, Python defines the computation, and checkpoints store learned weights.
 
-| Variant | Observation history | How predicted contact coordinates affect actions |
+Two paths retain the original RGB/scene/state/language Transformer diffusion
+policy. Neither uses a separate small action controller.
+
+| Path | Implementation | Status |
 | --- | --- | --- |
-| Baseline | One frame | Auxiliary supervision; coordinates do not directly enter the action head or replace XYZ |
-| Near-contact | Two frames | Within 3 cm, replace XYZ with predicted contact plus a bounded 3 cm offset; otherwise use MLP XYZ |
-| Unified control | Two frames | Same conditioning projection as unified contact, supplied with zeros; no XYZ switching |
-| Unified contact | Two frames | Feed predicted contact relative to the TCP into action features throughout motion; no XYZ switching |
+| Original visual policy + supplied GT grasp pose | `models/visual_pose_policy_v1.py`, `scripts/run_visual_oracle_pose_v1.py` | GPU checks passed; fine-tuning pending GPU priority; evaluation queued behind it |
+| Shared visual grounding + predicted grasp pose | `models/grounded_visual_pose_policy_v1.py`, `scripts/train_grounded_visual_pose_v1.py` | Implemented; 15 CPU/regression checks and GPU smoke 6865392 passed; full training not submitted |
 
-Unified contact projects the detached vector
-`(predicted_contact_world - TCP_world) / 0.1` into action features. It uses
-predictions during both training and deployment. Ground-truth contact targets
-remain auxiliary supervision. Contact confidence is not an implemented input.
-The old bounded contact-relative action offset and residual are disabled in the
-unified pair.
+The [GT-stage diagram](docs/figures/2026-11-10_visual_gt_pose_finetuning/visual_gt_pose_finetuning.pdf)
+shows its matched control. The [current two-path diagram](docs/figures/2026-11-11_grounded_visual_pose/visual_pose_architectures.pdf)
+compares supplied versus predicted pose conditioning.
 
-The near-contact training gate uses demonstration contact labels; rollout gating
-uses predictions. The unified control/contact pair is the matched comparison for
-explicit geometry conditioning. The original baseline also differs in temporal
-history, so comparisons against it involve more than that single change.
+In the new path, shared skill-conditioned grounding weights pool local observed
+geometry. A geometry/skill query attends to visual tokens; those features plus
+measured TCP/opening predict target TCP position, orientation and applicability.
+The differentiable pose-conditioning MLP feeds the original action decoder.
+Global visual, scene, history and skill context continue directly to that decoder.
+Contact XYZ and part labels supervise grounding; there is no independent contact
+coordinate-to-action input. Unused heatmap/approach/contact-token heads are
+omitted in this version. The original checkpoint's learned constant bias is
+preserved for initialization equivalence.
 
-Configs are under [configs/architecture_update/](configs/architecture_update/),
-with names ending in `no_residual`, `near_contact`, `unified_control`, and
-`unified_contact`. Model construction uses config flags; keep matched experiments
-consistent outside the module being tested.
+DINO/T5 remain frozen. Existing trainable policy layers fine-tune; the new pose
+head starts with newly initialized weights. Pose labels are valid during the
+first-grasp approach only, while all demonstration frames still train actions.
+Runtime uses predictions from observations and inferred skills. No GT pose,
+GT part cloud, reference clock or replay commands enter that deployment path.
 
-Matched unified diffusion control/contact configs are also available. They keep
-the same observation and geometry-conditioning interfaces, with a normalized
-100-step cosine DDPM decoder in place of the MLP. Training commands are in
-[setup](docs/SETUP.md#train); current run records are in
-[the research plan](docs/RESEARCH_PLAN.md).
+[Recipe](configs/pose_learning/grounded_visual_pose_v1.yaml),
+[setup](docs/SETUP.md#shared-visual-grounding-and-predicted-pose--november-11),
+[research plan](docs/RESEARCH_PLAN.md),
+[active GT run](../results/diagnostics/visual_oracle_pose_20261110_01/README.md),
+[new architecture preflight](../results/diagnostics/grounded_visual_pose_20261111_01/README.md).
+
+At the user's request, the non-visual pose/controller pipeline is retired and its
+eight result roots, including trained models and rollout metrics, were deleted.
+Dedicated source/config/test/figure files remain only in a source archive;
+unused modules fingerprinted by the queued GT experiment remain unchanged to
+preserve that run's integrity. [Cleanup receipt](docs/cleanup_20261111_nonvisual_pose.json).
 
 ## Dataset and evaluation
 
@@ -110,7 +120,9 @@ evaluation seed42,43,44 (447 rollouts per model), with explicit scenario selecti
 Report per-seed success and its mean and sample standard deviation. It uses a 120-step limit,
 legacy learned termination, and one action executed per policy cycle.
 Point-cloud sampling uses deterministic PyTorch3D CPU FPS; policy inference uses
-GPU. Detailed progress and job IDs belong in the research plan.
+GPU. Detailed progress and job IDs belong in the research plan. The current GT-pose
+study has zero policy rollouts so far; 333/339 native grasp references are
+available, and the remaining six are coverage gaps.
 
 Released PartInstruct DP-S/DP3-S weights are downloaded and their native
 GT-part/oracle-skill evaluations completed. Those 176 sampled trials per model

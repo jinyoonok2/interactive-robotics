@@ -1,0 +1,22 @@
+flowchart TB
+  subgraph A["A. Current GT-pose experiment — queued"]
+    AO["RGB history + scene PCD + task + measured TCP/opening"] --> AE["Shared encoders, temporal features, hierarchy and fusion"]
+    AE --> AG["Original global visual/scene/skill context"]
+    AT["Supplied GT first-grasp TCP pose"] --> AC["Relative pose + validity → pose-conditioning MLP"]
+    AO -->|"Measured TCP"| AC
+    AG --> AF["Feature addition"]
+    AC --> AF
+    AF --> AA["Original Transformer diffusion head → 8 × 7 actions"]
+  end
+  subgraph B["B. Shared visual grounding + predicted pose — implemented, untrained"]
+    BO["Same RGB history + scene PCD + task + measured TCP/opening"] --> BE["Shared frozen DINO/T5 + trainable scene/history/hierarchy"]
+    BE --> BG["Original global visual/scene/skill context"]
+    BE --> BR["Skill-conditioned soft part grounding"]
+    BR --> BP["Weighted local geometry + visual attention + robot state → target TCP pose + applicability"]
+    BP --> BC["Differentiable relative-pose conditioning MLP"]
+    BG --> BF["Feature addition"]
+    BC --> BF
+    BF --> BA["Same Transformer diffusion head → 8 × 7 actions"]
+    BL["TRAINING ONLY: part/contact labels + pre-closure grasp pose"] -.-> BR
+    BL -.-> BP
+  end

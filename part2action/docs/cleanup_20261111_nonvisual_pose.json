@@ -1,0 +1,87 @@
+{
+  "authorization": "User requested removal of the non-visual architecture and its results on 2026-11-11.",
+  "status": "completed",
+  "completed_unix": 1794376732.955645,
+  "removed_results": [
+    {
+      "path": "/p/part2action/results/diagnostics/learned_pose_actor_20261105_01",
+      "files": 318,
+      "bytes": 29883825
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/point_to_pose_20261105_01",
+      "files": 531,
+      "bytes": 42239789
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_geometry_ablation_20261107_01",
+      "files": 1364,
+      "bytes": 146983992
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_geometry_seed_replication_20261108_01",
+      "files": 1632,
+      "bytes": 191541225
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_guided_approach_20261105_01",
+      "files": 141,
+      "bytes": 12654232
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_point_ablation_20261108_01",
+      "files": 1513,
+      "bytes": 179255190
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_visible_geometry_20261110_01",
+      "files": 517,
+      "bytes": 14168864
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_visible_geometry_20261110_02",
+      "files": 878,
+      "bytes": 86330789
+    }
+  ],
+  "preserved_current_run": "visual_oracle_pose_20261110_01",
+  "current_source_fingerprints_verified": 48,
+  "scope": "Only the eight explicitly named retired non-visual experiment result roots; historical source/config/diagram files preserved.",
+  "retired_from_active_source": [
+    "part2action/scripts/run_pose_guided_approach.py",
+    "part2action/slurm/pose_guided_approach.sbatch",
+    "part2action/scripts/run_learned_pose_actor.py",
+    "part2action/slurm/learned_pose_actor.sbatch",
+    "part2action/scripts/run_point_to_pose.py",
+    "part2action/slurm/point_to_pose.sbatch",
+    "part2action/scripts/run_pose_geometry_ablation.py",
+    "part2action/slurm/pose_geometry_ablation.sbatch",
+    "part2action/scripts/run_pose_geometry_seed_replication.py",
+    "part2action/slurm/pose_geometry_seed_replication.sbatch",
+    "part2action/scripts/run_pose_point_ablation.py",
+    "part2action/slurm/pose_point_ablation.sbatch",
+    "part2action/scripts/run_visible_pose_geometry.py",
+    "part2action/slurm/visible_pose_geometry.sbatch",
+    "part2action/scripts/run_sparse_visible_pose_geometry.py",
+    "part2action/slurm/sparse_visible_pose_geometry.sbatch",
+    "part2action/scripts/audit_learned_pose_actor.py",
+    "part2action/scripts/draw_architecture_comparison.py",
+    "part2action/scripts/draw_matched_visual_pose_comparison.py",
+    "part2action/configs/pose_learning/point_ablation_v1.json",
+    "part2action/configs/pose_learning/visible_geometry_v1.json",
+    "part2action/configs/pose_learning/visible_geometry_v2.json",
+    "part2action/tests/test_common_pose_samples.py",
+    "part2action/tests/test_visible_pose_geometry.py",
+    "part2action/tests/test_pose_geometry_seed_replication.py",
+    "part2action/tests/test_pose_guided_approach.py",
+    "part2action/tests/test_interaction_pose_head.py",
+    "part2action/tests/test_pose_geometry_ablation.py",
+    "part2action/tests/test_pose_guided_actor.py",
+    "part2action/tests/test_pose_point_reporting.py",
+    "part2action/docs/figures/2026-11-10_architecture_comparison",
+    "part2action/docs/figures/2026-11-10_matched_visual_pose_comparison",
+    "part2action/scripts/check_background_experiment.py"
+  ],
+  "source_archive": "part2action/docs/archive/2026-11-11_nonvisual_pose",
+  "archived_tests_note": "Archived test files use .py.txt to avoid collection by active test runners."
+}

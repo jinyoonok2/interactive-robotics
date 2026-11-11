@@ -19,7 +19,7 @@ def main():
     args.out_dir.mkdir(parents=True, exist_ok=True)
     results = {}
     variants = [(args.config.stem, args.config)] if args.config else [
-        (variant, ROOT / "configs" / "architecture_update" / f"hierarchical_world_geometry_30epoch_unified_diffusion_{variant}.yaml")
+        (variant, ROOT / "docs" / "archive" / "2026-11-11_config_history" / f"hierarchical_world_geometry_30epoch_unified_diffusion_{variant}.yaml")
         for variant in ["control", "contact"]]
     for variant, source in variants:
         cfg = resolve_paths(load_yaml(source), ROOT)

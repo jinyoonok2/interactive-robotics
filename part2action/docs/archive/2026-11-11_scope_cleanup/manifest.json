@@ -1,0 +1,189 @@
+{
+  "verified_at": "2026-11-11T11:55:42-05:00",
+  "authorization": "User requested research-plan refresh and removal of unnecessary files/code on November 11, 2026.",
+  "retired_active_files": [
+    {
+      "original_path": "part2action/scripts/build_interaction_replay_audit.py",
+      "archive_member": "part2action/scripts/build_interaction_replay_audit.py",
+      "sha256": "9be6a919093cc95e687207eb154d8a3555f1dc1d6a35d8f5e23ed8ca055dfe1b"
+    },
+    {
+      "original_path": "part2action/scripts/build_robustness_training_report.py",
+      "archive_member": "part2action/scripts/build_robustness_training_report.py",
+      "sha256": "2c0b0ad008adebc8a81d67620fe6f379b1b32c3e5cf0bd80794d3a85b97318c1"
+    },
+    {
+      "original_path": "part2action/scripts/collect_full_trajectory_baselines.py",
+      "archive_member": "part2action/scripts/collect_full_trajectory_baselines.py",
+      "sha256": "883584e49581fc3e4eb399cf0952253a70f011f23289ceacf73cc46c034e425e"
+    },
+    {
+      "original_path": "part2action/scripts/generate_alternative_expert.py",
+      "archive_member": "part2action/scripts/generate_alternative_expert.py",
+      "sha256": "d2d162d539538c2bd1b90b200e95bac4c1336172318de8b12b429fa0638739f8"
+    },
+    {
+      "original_path": "part2action/scripts/generate_native_context_audit.py",
+      "archive_member": "part2action/scripts/generate_native_context_audit.py",
+      "sha256": "f37e9be787d94edc85b7773e9820537c45cca10eeee60edd0c49f4423629b50c"
+    },
+    {
+      "original_path": "part2action/scripts/probe_interaction_replay.py",
+      "archive_member": "part2action/scripts/probe_interaction_replay.py",
+      "sha256": "d2357f33e1d75fbcc648bdccd58388b6673bcb118637f89d956131c99b39c1d7"
+    },
+    {
+      "original_path": "part2action/scripts/probe_lift_factorial.py",
+      "archive_member": "part2action/scripts/probe_lift_factorial.py",
+      "sha256": "b2410bd9d0f17affbb7af55065bfa2083a9508fb0314007e4194b0e43f699ddc"
+    },
+    {
+      "original_path": "part2action/scripts/probe_lift_handoff.py",
+      "archive_member": "part2action/scripts/probe_lift_handoff.py",
+      "sha256": "38c500621cf259f7553eb16402f389352fb443976492675b44e8796692bff923"
+    },
+    {
+      "original_path": "part2action/scripts/replay_full_dataset_trajectory.py",
+      "archive_member": "part2action/scripts/replay_full_dataset_trajectory.py",
+      "sha256": "4ae8eafcca891c990b904c4f49944e3d41eb6762d614de36351e644415007167"
+    },
+    {
+      "original_path": "part2action/scripts/run_interaction_tolerance_sweep.py",
+      "archive_member": "part2action/scripts/run_interaction_tolerance_sweep.py",
+      "sha256": "e22e5fb369882b610f38d96ead0b930d6fab9c7e06bc7936dd6e951469dc7229"
+    },
+    {
+      "original_path": "part2action/scripts/run_logged_reference_study.py",
+      "archive_member": "part2action/scripts/run_logged_reference_study.py",
+      "sha256": "0e35732305061bb1a7203fea548bc155aedec7278601321c38ecc1a81a615be1"
+    },
+    {
+      "original_path": "part2action/scripts/train_interaction_pilot.py",
+      "archive_member": "part2action/scripts/train_interaction_pilot.py",
+      "sha256": "12c70dd70e41969e40f1a7afed97f15b1bb844a00237e35a463dc4c767319953"
+    },
+    {
+      "original_path": "part2action/scripts/validate_interaction_records.py",
+      "archive_member": "part2action/scripts/validate_interaction_records.py",
+      "sha256": "4d1281ee000778911700390379f974162bcb31d20b0b0ade6bf51b441c6dd33e"
+    },
+    {
+      "original_path": "part2action/slurm/audit_native_context.sbatch",
+      "archive_member": "part2action/slurm/audit_native_context.sbatch",
+      "sha256": "e577347db7e0446822eec0f898ae68889345eaae31dfaa1607639f8eb8e8912e"
+    },
+    {
+      "original_path": "part2action/slurm/check_interaction_records.sbatch",
+      "archive_member": "part2action/slurm/check_interaction_records.sbatch",
+      "sha256": "28251ceb54d077cb7e9ebb9e3e1391aa474c3af0ef3264e085cef0dbc5eb500a"
+    },
+    {
+      "original_path": "part2action/slurm/collect_full_trajectory_baselines.sbatch",
+      "archive_member": "part2action/slurm/collect_full_trajectory_baselines.sbatch",
+      "sha256": "4b7a044349573779cf796bd2858192700c0db6794f1857c5bec6677f0a7bdb96"
+    },
+    {
+      "original_path": "part2action/slurm/generate_alternative_expert.sbatch",
+      "archive_member": "part2action/slurm/generate_alternative_expert.sbatch",
+      "sha256": "89bdffe6321eedb55a1b4cf69a35a22923d0e5c46ddcac994fb21c83bf5ade29"
+    },
+    {
+      "original_path": "part2action/slurm/generate_logged_references.sbatch",
+      "archive_member": "part2action/slurm/generate_logged_references.sbatch",
+      "sha256": "042e68f3fef7b6219ee2ede99f13155ee49c8c18d75fdc6ff41bb22652c94837"
+    },
+    {
+      "original_path": "part2action/slurm/interaction_tolerance_pilot.sbatch",
+      "archive_member": "part2action/slurm/interaction_tolerance_pilot.sbatch",
+      "sha256": "a6356763d63d29fe8209f26a8ed14e68dbe59e483f01cb074cc3df6a6a63d545"
+    },
+    {
+      "original_path": "part2action/slurm/interaction_tolerance_sweep.sbatch",
+      "archive_member": "part2action/slurm/interaction_tolerance_sweep.sbatch",
+      "sha256": "5186f15c53052fe089e9aba4c7700890eb6ed5bfcf9bafcd01404ce2b423f2cd"
+    },
+    {
+      "original_path": "part2action/slurm/probe_interaction_replay.sbatch",
+      "archive_member": "part2action/slurm/probe_interaction_replay.sbatch",
+      "sha256": "bdf155425849ba11bd0e761dfc0ace110f024703e775a3be12adb2d51a66fbfb"
+    },
+    {
+      "original_path": "part2action/slurm/probe_lift_handoff.sbatch",
+      "archive_member": "part2action/slurm/probe_lift_handoff.sbatch",
+      "sha256": "2a30af315b8fd7036ab70fe2f54a353278f317bd6d45111357304726d2419f44"
+    },
+    {
+      "original_path": "part2action/slurm/replay_full_dataset_trajectory.sbatch",
+      "archive_member": "part2action/slurm/replay_full_dataset_trajectory.sbatch",
+      "sha256": "8643aa3794a166c03c16e9d0e257df79ebe20dadfed54f42dd56d598391aca1c"
+    },
+    {
+      "original_path": "part2action/slurm/report_robustness_training.sbatch",
+      "archive_member": "part2action/slurm/report_robustness_training.sbatch",
+      "sha256": "7d5f4a86122ff032cfba67994758a6b29fdce3c95ca0bbd71ba25e141c6446d9"
+    },
+    {
+      "original_path": "part2action/slurm/train_interaction_pilot.sbatch",
+      "archive_member": "part2action/slurm/train_interaction_pilot.sbatch",
+      "sha256": "c41ef902c3e90a9ccdba1f41aab297601adfe6f08f84855a688af9cd2c741abf"
+    },
+    {
+      "original_path": "part2action/tests/test_interaction_tolerance_sweep.py",
+      "archive_member": "part2action/tests/test_interaction_tolerance_sweep.py",
+      "sha256": "bac258325b2ee2b9024a18dd9333046eb1faa7dc5698788e7604946aebaad5ee"
+    },
+    {
+      "original_path": "part2action/tests/test_interaction_training.py",
+      "archive_member": "part2action/tests/test_interaction_training.py",
+      "sha256": "6827db2ee63fb9504826b0f3f6f72b407ed677b829f6ebbe18e9539f967c7ab0"
+    }
+  ],
+  "archived_source_bundle": "part2action/docs/archive/2026-11-11_scope_cleanup/retired_tools.zip",
+  "packed_prior_source_archive": {
+    "path": "part2action/docs/archive/2026-11-11_nonvisual_pose/source.zip",
+    "verified_members": 43
+  },
+  "deleted_generated_caches": {
+    "directories": [
+      "part2action/diagnostics/__pycache__",
+      "part2action/models/__pycache__",
+      "part2action/scripts/__pycache__",
+      "part2action/scripts/official_partinstruct/__pycache__",
+      "part2action/tests/__pycache__",
+      "part2action/data/__pycache__",
+      "part2action/docs/slide_history/scripts/__pycache__"
+    ],
+    "files": 89,
+    "bytes": 600807
+  },
+  "frozen_sources_verified": 59,
+  "retained_transitive_legacy_helpers": [
+    "part2action/scripts/run_interaction_tolerance_pilot.py"
+  ],
+  "notes": [
+    "No queued jobs use retired launchers; static local import closure has no incoming callers to retired scripts.",
+    "Original visual policy, both visual pose paths, queued jobs, raw data, current results, baseline checkpoints and slide history were preserved.",
+    "Legacy model/data modules remain because the current GT submission fingerprints them; run_interaction_tolerance_pilot.py remains imported by generate_logged_references.py."
+  ],
+  "validation": {
+    "frozen_source_and_input_hashes": "passed",
+    "archive_member_sha256": "passed",
+    "remaining_python_syntax": "passed",
+    "maintained_document_links": "passed",
+    "git_diff_check": "passed",
+    "active_entry_point_imports": {
+      "training_environment": "passed: GT trainer/runner/evaluation dispatch/statistics, native-reference generator and imported legacy helper, predicted-pose trainer",
+      "simulator_environment": "passed: GT-pose evaluation adapter, predicted-pose evaluation adapter, native-reference generator",
+      "environment_note": "Simulator adapters use partgym_rollout, which supplies OmegaConf; training checks use part2action_train."
+    },
+    "retired_module_import_check": "passed: remaining Python files do not import retired modules"
+  },
+  "maintained_documents": [
+    "README.md",
+    "part2action/README.md",
+    "part2action/docs/RESEARCH_PLAN.md",
+    "part2action/docs/SETUP.md",
+    "part2action/docs/DATASET.md",
+    "results/README.md"
+  ]
+}

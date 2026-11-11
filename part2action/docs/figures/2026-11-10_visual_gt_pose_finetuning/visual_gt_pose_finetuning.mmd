@@ -1,0 +1,53 @@
+flowchart LR
+  INIT["SAME previously trained visual-policy checkpoint<br/>Two further fine-tuning epochs per arm"]
+  subgraph A["(a) Matched control: pose guidance OFF"]
+    direction TB
+    A0["RGB history + task text"]
+    AS["Scene PCD + current TCP pose + opening"]
+    A1["FROZEN: DINOv2 + Flan-T5"]
+    A2["FINE-TUNE: scene encoder, visual part gate,<br/>temporal encoder, skill hierarchy and fusion"]
+    AH["Original policy context h_t"]
+    AZ["Same pose-module structure: disabled<br/>Zero feature contribution"]
+    AF["Action features = h_t + 0"]
+    A3["FINE-TUNE: original Transformer diffusion action head"]
+    A4["8 x 7 command chunk<br/>Execute first command; observe again"]
+    A0 --> A1 --> A2
+    AS --> A2 --> AH --> AF --> A3 --> A4
+    AZ --> AF
+    A4 --> A0
+    A4 --> AS
+  end
+  subgraph B["(b) GT pose guidance ON"]
+    direction TB
+    B0["SAME RGB history + task text"]
+    BS["SAME scene PCD + current TCP pose + opening"]
+    B1["FROZEN: DINOv2 + Flan-T5"]
+    B2["FINE-TUNE: same scene encoder, visual part gate,<br/>temporal encoder, skill hierarchy and fusion"]
+    BH["Original policy context h_t"]
+    GT["Supplied GT target grasp pose<br/>Fixed target position + orientation"]
+    P["TRAIN NEW pose-conditioning MLP<br/>TCP-relative pose + validity<br/>10 to 256 to 256"]
+    BF["Action features = h_t + pose embedding"]
+    B3["FINE-TUNE: same Transformer diffusion action head"]
+    B4["8 x 7 command chunk<br/>Execute first command; observe again"]
+    B0 --> B1 --> B2
+    BS --> B2 --> BH --> BF --> B3 --> B4
+    BS -->|"Current TCP pose"| P
+    GT --> P --> BF
+    B4 --> B0
+    B4 --> BS
+  end
+  INIT -.-> A2
+  INIT -.-> B2
+  classDef frozen fill:#f0f2f5,stroke:#7b8794,color:#19334e;
+  classDef finetune fill:#eaf2fc,stroke:#285da8,color:#19334e;
+  classDef added fill:#e5f5f0,stroke:#18766d,color:#19334e;
+  classDef oracle fill:#fff4df,stroke:#a76018,color:#73400e;
+  class A1,B1,AZ frozen;
+  class A2,A3,B2,B3 finetune;
+  class P added;
+  class GT oracle;
+%% This first stage supplies GT pose; no learned pose estimator is present.
+%% The new module's final projection is zero initialized: both arms start at the original policy.
+%% New pose weights and existing trainable policy weights learn from the action loss.
+%% GT target stays fixed; robot-relative pose features refresh as the robot moves.
+%% No GT phase clock, recorded prefix/tail, or separate small action controller.

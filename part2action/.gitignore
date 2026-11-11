@@ -9,3 +9,7 @@ __pycache__/
 *.mp4
 *.gif
 .DS_Store
+
+# Small, checksummed source archives required by the maintained cleanup records
+!docs/archive/2026-11-11_nonvisual_pose/source.zip
+!docs/archive/2026-11-11_scope_cleanup/retired_tools.zip

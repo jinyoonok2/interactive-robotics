@@ -1,0 +1,2 @@
+# Matplotlib SVG path data intentionally contains spaces before line breaks.
+part2action/docs/figures/**/*.svg whitespace=-blank-at-eol linguist-generated=true

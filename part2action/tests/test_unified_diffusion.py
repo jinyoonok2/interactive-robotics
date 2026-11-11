@@ -106,7 +106,7 @@ def test_diffusion_configs_are_matched_and_reject_invalid_scales():
     import yaml
     from scripts.validate_configs import validate
 
-    root = Path(__file__).resolve().parents[1] / "configs" / "architecture_update"
+    root = Path(__file__).resolve().parents[1] / "docs" / "archive" / "2026-11-11_config_history"
     control_path = root / "hierarchical_world_geometry_30epoch_unified_diffusion_control.yaml"
     contact_path = root / "hierarchical_world_geometry_30epoch_unified_diffusion_contact.yaml"
     assert validate(control_path, check_files=True) == []

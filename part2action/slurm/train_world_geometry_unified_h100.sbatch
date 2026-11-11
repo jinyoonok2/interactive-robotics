@@ -25,7 +25,7 @@ DECODER="${DECODER:-mlp}"
 case "$DECODER" in mlp|diffusion) ;; *) echo "DECODER must be mlp or diffusion" >&2; exit 2;; esac
 DECODER_SUFFIX=""
 if [[ "$DECODER" == "diffusion" ]]; then DECODER_SUFFIX="_diffusion"; fi
-CONFIG="part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_unified${DECODER_SUFFIX}_${VARIANT}.yaml"
+CONFIG="part2action/docs/archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_unified${DECODER_SUFFIX}_${VARIANT}.yaml"
 RUN_NAME="world_geometry_30epoch_unified${DECODER_SUFFIX}_${VARIANT}_${SLURM_JOB_ID:-manual}"
 OUT_DIR="$STORAGE_ROOT/runs/$RUN_NAME"
 # Set RESUME to a last.pt to continue that run. Empty starts from scratch.

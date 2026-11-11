@@ -1,0 +1,16 @@
+{
+  "source_sha256": {
+    "part2action/scripts/draw_grounded_visual_pose_v1.py": "ce186488368bdad2a43eb0544d4ef9c8a6182b115c086a663d709a4b0bef46a5",
+    "part2action/models/grounded_visual_pose_policy_v1.py": "aeb4522ff91b1493346cac72cd82d18b27f141db0234f8593e46e36398b9c635",
+    "part2action/models/grounded_pose_head_v1.py": "054999535e665728d19acefcdb2e596a507a6046f3dfc97ddfa214a5be33f293",
+    "part2action/models/visual_pose_policy_v1.py": "b05f5854009a0ab6dd7d4430f7ff7786fc84b029ece8fdb19273d3fdfee8a305"
+  },
+  "files_sha256": {
+    "visual_pose_architectures.mmd": "87ab7e7669b6ded5429fd54aa17b3339915c64568798eb5df470b5454bedf47a",
+    "visual_pose_architectures.pdf": "0bb959022384912f1edbed296b4286075492b6371ce2ab28fb4dfd22930250e8",
+    "visual_pose_architectures.png": "8ca7af38c0bc9ee535e7d85fbce3a790aa5d007443847a70ad788d9cef8f6939",
+    "visual_pose_architectures.svg": "211ed309c0e039aa279a11ac6db9622370b62655c4802db307993be7e71b1788",
+    "report_figure.tex": "5b1830646f41b88e750eb45a9936a7bd680f339b7344880f1c36bd45b0929037"
+  },
+  "status": "GT experiment queued; new predicted-pose architecture implemented but untrained"
+}
