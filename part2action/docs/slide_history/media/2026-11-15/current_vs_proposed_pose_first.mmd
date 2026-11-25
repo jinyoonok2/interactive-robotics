@@ -1,0 +1,20 @@
+flowchart TB
+  subgraph A["Current evaluated GT-pose architecture"]
+    A0["Visual observations + language + measured robot state"] --> A1["Original policy features"]
+    AG["Supplied GT grasp pose + current TCP"] --> AP["Pose MLP"]
+    AP --> AS["Add embedding to features"]
+    A1 --> AS --> AD["Pooled conditioning → diffusion decoder"] --> AA["Actions"]
+  end
+  subgraph B["Proposed pose-first architecture: not trained/evaluated"]
+    B0["Same available visual observations, language and robot state"] --> BE["Spatially associated RGB / 3D features"]
+    BE --> BG["Task-conditioned region"] --> BP["Learned target TCP pose + applicability"]
+    BE --> BD["Cross-attention diffusion decoder"]
+    BP --> BD
+    B0 --> BS["Robot / skill / history tokens + relative pose error"] --> BD
+    BD --> BA["Actions"]
+    BP --> BH["Skill progress from goal, scene and state"]
+    BE --> BH
+    BS --> BH --> BG
+  end
+%% GT can replace predicted target poses for a controlled interface experiment.
+%% Later-skill goals require new supervision; a single pose is not a full task trajectory.

@@ -7,6 +7,7 @@ table, then rerun this command with --slides pointing to the same document.
 import argparse
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
 
@@ -84,7 +85,8 @@ def main():
     if not date:
         raise ValueError('Slide document must start with YYYY-MM-DD')
     date = date.group()
-    output = document.parent / 'media' / date
+    history = document.parent.parent if document.parent.name == 'slides' else document.parent
+    output = history / 'media' / date
     output.mkdir(parents=True, exist_ok=True)
     source = document.read_text()
     slide, title, blocks, block = 0, '', [], []
@@ -134,7 +136,7 @@ def main():
         files = manifest['slide_mapping'].setdefault(str(row['slide']), [])
         if row['file'] not in files:
             files.append(row['file'])
-        link = f'media/{date}/{row["file"]}'
+        link = Path(os.path.relpath(file, document.parent)).as_posix()
         replacement = (f'![Slide {row["slide"]} table: {row["title"]}]({link})\n\n'
                        f'Use this image: [{row["file"]}]({link}).')
         if row['markdown_source'] in source:
@@ -145,7 +147,8 @@ def main():
     manifest['table_images'] = records
     manifest['supporting_files'] = ['tables.json']
     manifest['generators']['tables'] = str(Path(__file__).resolve().relative_to(ROOT))
-    preview_link = f'Slide media: [PNG preview](media/{date}/index.html) · [download all table images](media/{date}/{date}_slide_media.zip).'
+    media_link = Path(os.path.relpath(output, document.parent)).as_posix()
+    preview_link = f'Slide media: [PNG preview]({media_link}/index.html) · [download all table images]({media_link}/{date}_slide_media.zip).'
     if preview_link not in source:
         heading, remainder = source.split('\n', 1)
         source = heading + '\n\n' + preview_link + '\n' + remainder

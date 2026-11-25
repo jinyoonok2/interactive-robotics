@@ -1,0 +1,210 @@
+{
+  "updated_at": "2026-11-16T10:34:03.113955-05:00",
+  "authorization": "User requested native evaluation settings and removal of other DP/DP3 evaluation versions.",
+  "execution_settings": {
+    "test1_max_executed_actions": 250,
+    "execute_steps": 8,
+    "test4_max_executed_actions": 400
+  },
+  "status": "completed",
+  "removed_directories": [
+    {
+      "path": "/p/part2action/results/partinstruct/evaluations/official_fixed_20261031",
+      "files": 31,
+      "file_bytes": 374443
+    },
+    {
+      "path": "/p/part2action/results/partinstruct/evaluations/official_fixed_20261101_recovery1",
+      "files": 1847,
+      "file_bytes": 46648983
+    },
+    {
+      "path": "/p/part2action/results/partinstruct/evaluations/dp3_s_6613129_eval_gt_6619773",
+      "files": 13,
+      "file_bytes": 735651
+    },
+    {
+      "path": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/visualizations/dp3_success",
+      "files": 5,
+      "file_bytes": 8873629
+    },
+    {
+      "path": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/visualizations/dp3_failures",
+      "files": 14,
+      "file_bytes": 52668139
+    }
+  ],
+  "removed_shortcuts": [
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/evaluations/official_fixed_20261031",
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/evaluations/official_fixed_20261101_recovery1",
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/evaluations/dp3_s_6613129_eval_gt_6619773",
+    "/u/xna8aw/workspace/research_projects/interactive-robotics/results/partinstruct/dp3_eval"
+  ],
+  "retired_figure": "/u/xna8aw/workspace/research_projects/interactive-robotics/part2action/docs/slide_history/media/2026-11-02/robustness_pilot/slide02_fixed_reference_status.png",
+  "protected": {
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/summary.json": {
+      "sha256": "ecf64d56319afff90f29bb5c9f5f58c90f150037f5ab3b061de9eb6cc8c61200"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/provenance.json": {
+      "sha256": "6e32395bf74c03929a0c77b8253826a7389b033ab14f13602cb504d1276e4aff"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/evaluation_config.yaml": {
+      "sha256": "9fe8248cb0c9c41a5cc63fd1c61c142f43c834ee19e6a5fc50ca15c5df24b9cb"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/bottle/split-test1/rollout_logs.json": {
+      "sha256": "dba32e6f30c8a8a42e4583f5f7ee37e2593493526bc843371ed677801016d9a2"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/box/split-test1/rollout_logs.json": {
+      "sha256": "1ea2cbfa417d8dd55a5acbdc23f9f18d39e0116b4037d73e110b8bd02600a5cf"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/stapler/split-test1/rollout_logs.json": {
+      "sha256": "5818f1e34dcb23eb10562d3cfdb67bcf26e1d8af37ff453d2a69f43b8c7bc3ba"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/display/split-test1/rollout_logs.json": {
+      "sha256": "886fce6dfca685027797c8673aa52f87385c529fa97ea568e53d6a761ff017a2"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/knife/split-test1/rollout_logs.json": {
+      "sha256": "7983e58e9b9a674208c4171070895bad4b6609cb5ee5a91fd46d214df7786212"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/scissors/split-test1/rollout_logs.json": {
+      "sha256": "7a7a593904c9a8ec245111009659f49edc42a246c74f78c859e329083bc3f208"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/bucket/split-test1/rollout_logs.json": {
+      "sha256": "cf237e6acb10d063047c33be45223a42e9b21e3e9a9206840f6a959b6226e3a5"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/kitchenpot/split-test1/rollout_logs.json": {
+      "sha256": "458244b4aa7311497d55f24dc48e57be6c33cf143270bb6e0d3d3c018fd88851"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/pliers/split-test1/rollout_logs.json": {
+      "sha256": "c106b262946cf3dfeea93dc6082c3c8491659bbb4540d35c79c579a43e3ae05d"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/mug/split-test1/rollout_logs.json": {
+      "sha256": "75bb8a2f433c68746c1ee76ae07f61de8afffbc95c016e53691430839395d1a2"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP-S/full/media/0/dispenser/split-test1/rollout_logs.json": {
+      "sha256": "96c90ce6d2659d0deb157ca7b04e248a20333a7c638efd33998b0f402a193442"
+    },
+    "/p/part2action/data/official_checkpoints/PartInstruct/checkpoints/DP-S/latest.ckpt": {
+      "size": 5504403026,
+      "mtime_ns": 1792692373572615854,
+      "inode": 427901
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/summary.json": {
+      "sha256": "00580094d1580ea4c6e2e63c084cae0816023b2b6a7d07becae42fd33792e450"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/provenance.json": {
+      "sha256": "e58e55c03d997bb0e142644392bca8dc7374dc23a7a8217e83a2579b7bc617e7"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/evaluation_config.yaml": {
+      "sha256": "94662e0c7d2ed25076bfc4ff31358a752d06fbe6f53c8cc6de99d95ec7d0e054"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/knife/split-test1/rollout_logs.json": {
+      "sha256": "50e72ef47c5113bb0fb7ad2bd9e3fcbb185e67a825bd555b371480bead9dc917"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/stapler/split-test1/rollout_logs.json": {
+      "sha256": "d82aa1e7c4108a890ff1264e6c1441880b6b9896434b7c5beaddcf97d36e8eda"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/display/split-test1/rollout_logs.json": {
+      "sha256": "ef37dcb047a0da5e85611ff58b3850e5deb8f97c47ebc3e23ad70e13c6add7a7"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/box/split-test1/rollout_logs.json": {
+      "sha256": "56ee9fc223b0d531559b81c1f6a1327ec91835df1e09c9935d8a7f96dbbb1826"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/pliers/split-test1/rollout_logs.json": {
+      "sha256": "5cd598a6a311f85c7da2fb1c4b866f85ebc9cd5d727e261626f3b3a82e990b59"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/dispenser/split-test1/rollout_logs.json": {
+      "sha256": "22ead4b297dd482a3caacdd06da9a68179debf1054b35d931ede92be15de7ad0"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/bucket/split-test1/rollout_logs.json": {
+      "sha256": "8718d0fddf72f6067b101abe79fb89b7dc040a85b7e3536e3417bf0d4b95e46e"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/kitchenpot/split-test1/rollout_logs.json": {
+      "sha256": "9b0cd5433a08645682ed876b8c5ee96c33a4935e266197e5e3e63f53827f2e71"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/bottle/split-test1/rollout_logs.json": {
+      "sha256": "042dc95a3bb5ba79233218e7da36f89f6092e2a449b5112c563c73ed7c39983e"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/scissors/split-test1/rollout_logs.json": {
+      "sha256": "031f96dfff5a49d7f4f24ffb567c8ede268cd3a5e4d476d8152e4baca90f489b"
+    },
+    "/p/part2action/results/partinstruct/evaluations/official_release_20261022/DP3-S/full/media/0/mug/split-test1/rollout_logs.json": {
+      "sha256": "8a5dea75d52e1d43319f0894f97e77d3f5a46d27e804889a17a0d82cbcf9df41"
+    },
+    "/p/part2action/data/official_checkpoints/PartInstruct/checkpoints/DP3-S/latest.ckpt": {
+      "size": 4614106626,
+      "mtime_ns": 1792692536059306766,
+      "inode": 432367
+    }
+  },
+  "training_or_evaluation_jobs_submitted": false,
+  "scope": "Native official_release_20261022 results, all datasets/checkpoints and Part2Action evaluation results retained. Only explicitly listed DP/DP3 variants are removed.",
+  "protected_files_verified": 30,
+  "deleted_roots_verified_absent": true,
+  "source_revisions": {
+    "part2action/scripts/rollout_partgym.py": {
+      "before_sha256": "1ef8ea458022984233b061697b58ce5d5b12c188b75d87fd54e0abfd5199ed20",
+      "after_sha256": "40f971bda6f5ca17e92824e0fb1be330b963522999c774935bf8b17b7ba81649"
+    },
+    "part2action/models/pose_token_diffusion/evaluation.py": {
+      "before_sha256": "63f56856e93906fcdd357a95a3155b651f4e64e989963798a3a2153817df42fa",
+      "after_sha256": "ff05be18d510628da930ab7bb101c9f9e3a36f7aafa361de98e1cbc66b56b57e"
+    },
+    "part2action/scripts/run_pose_token_evaluation.py": {
+      "before_sha256": "2bad1746cb6fadb1c5e88d4579db654fdccc274b68b0e08503960be2d65d6c07",
+      "after_sha256": "947ffafd2c6852d54442dbd07d1a52e48360b844a32a0e537f8a599102a65644"
+    },
+    "part2action/slurm/rollout_bigtemp_full_eval_a40.sbatch": {
+      "before_sha256": "abac9d98ee989ead1c3327c2165dd04d39446548e66ec4528e46420708a007a8",
+      "after_sha256": "1f1f41fde3656c93739c8deedfacabad5238bb16ef4745401ea5bd5cdf0f2e26"
+    },
+    "part2action/slurm/evaluate_policy_diagnostic.sbatch": {
+      "before_sha256": "a6eff1e181d1e25727ddad0daa4b8738b7c1fe2e034f214ff533e8cfe9a8df4d",
+      "after_sha256": "c20c61d1fb87cf2b47d4348aedba359036378bf0bcda2f854aac4805821c5c67"
+    },
+    "part2action/slurm/evaluate_official_fixed_scenarios.sbatch": {
+      "before_sha256": "acc90baf87ee3d8feced94ea752e74a2dc2d93f29229df97584e4d7fbbfad083",
+      "after_sha256": "64e1580e095ce505de7bdde0bf68ad6124a837c1d145347ea02b2cac922f7080"
+    },
+    "part2action/scripts/official_partinstruct/fixed_scenarios.py": {
+      "before_sha256": "4be05801efcb27cb098fbb932637b07a7126a71d5a37c362c000e59d6eb09214",
+      "after_sha256": "1a379f0ccd064d9557a7da2a1120ccdede9cf4f206ba1c206340083481ed85fd"
+    },
+    "part2action/docs/DATASET.md": {
+      "before_sha256": "a2335443784889164368978b5808e689b47b5a0783f4e3956989694caee6f3fc",
+      "after_sha256": "0bc289012b100a9cf44626ef6804bfb7c6b5fc3e7e0250bba297ec8d4f572410"
+    },
+    "part2action/docs/SETUP.md": {
+      "before_sha256": "8b234117f68e23bda037a5505e5ab5640f4117f512e9eab81482588567774851",
+      "after_sha256": "54fe798a358fead2b577448b3e17dadd75dfce8e4461d5f1c20b1202cdde4ec7"
+    },
+    "part2action/docs/RESEARCH_PLAN.md": {
+      "before_sha256": "dcfe6c7b7c816813638bc0b85143d95d87f3dfbd758a61a770d288d1a03e0014",
+      "after_sha256": "d13f646371d7605fb2a2fdf388955ef98e586931c6e3f0f1af28ac9c1fd32ef8"
+    },
+    "part2action/README.md": {
+      "before_sha256": "a4372b7bdbaae177ab04a4e1fa0a7fd775b6ac5bb00dccfb72d5eb36887c561a",
+      "after_sha256": "9975e767e25a1562f1351e071826af2661c5e91a4fa19dc04652b11fb6e1bd34"
+    },
+    "results/README.md": {
+      "before_sha256": "9b9078a794f12390cc92fea13081f6d29e4b40e42db7dd539e1458f56ebf1d83",
+      "after_sha256": "0c028da33c90e69763304057ee4bba52063967d933adf36b5bf67155ff397305"
+    }
+  },
+  "validation": {
+    "rollout_budget_and_termination_checks": 4,
+    "matched_population_and_protocol_checks": 6,
+    "official_evaluator_adapter_checks": 4,
+    "pose_token_v1_regressions": 21,
+    "pose_token_v2_regressions": 15,
+    "preserved_namespace_checks": 3,
+    "total_passed": 53,
+    "shell_syntax": "passed",
+    "diff_whitespace": "passed",
+    "v2_evaluation_cli_help": "passed",
+    "new_prepared_study": "results/diagnostics/pose_token_diffusion_evaluation_20261116_native",
+    "native_gpu_rollout": "not run for the new protocol",
+    "full_benchmark_submitted": false
+  },
+  "completed_at": "2026-11-16T10:39:04.602431-05:00"
+}

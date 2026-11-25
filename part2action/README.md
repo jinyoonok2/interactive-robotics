@@ -16,6 +16,16 @@ This README describes the model and implementation. The repository
 [RESEARCH_PLAN.md](docs/RESEARCH_PLAN.md) for current decisions/results,
 [SETUP.md](docs/SETUP.md) for paths/environments/commands, and
 [DATASET.md](docs/DATASET.md) for annotations and split definitions.
+Architecture guides cover the [v2 skill-specific pose model](docs/POSE_TOKEN_DIFFUSION_V2_ARCHITECTURE.md)
+and the [v3 hierarchical planner/executor](docs/POSE_TOKEN_DIFFUSION_V3_ARCHITECTURE.md).
+
+Experiments run on the **UVA CS servers through Slurm**; see
+[SETUP.md](docs/SETUP.md#slurm-and-status). Source is grouped by model generation
+in [models/README.md](models/README.md) and [scripts/README.md](scripts/README.md).
+
+**Status, November 24, 2026:** v3 is the latest implemented model. The sections
+below describe the original visual policy and its two pose paths, which remain
+as baselines. Current results are in the [research plan](docs/RESEARCH_PLAN.md).
 
 ## Inputs and outputs
 
@@ -59,7 +69,7 @@ The original visual checkpoint and its configuration remain available for
 initialization and comparison. Earlier architecture descriptions are historical;
 the two supported pose paths below define current work.
 
-## Supported pose architectures
+## Baseline pose architectures
 
 The [config index](configs/README.md) identifies the three current recipes:
 the original visual baseline and the two pose paths. Older recipes are archived;
@@ -71,11 +81,11 @@ policy. Neither uses a separate small action controller.
 
 | Path | Implementation | Status |
 | --- | --- | --- |
-| Original visual policy + supplied GT grasp pose | `models/visual_pose_policy_v1.py`, `scripts/run_visual_oracle_pose_v1.py` | GPU checks passed; fine-tuning pending GPU priority; evaluation queued behind it |
+| Original visual policy + supplied GT grasp pose | `models/visual_pose_policy_v1.py`, `scripts/run_visual_oracle_pose_v1.py` | Trained and evaluated; results in the research plan |
 | Shared visual grounding + predicted grasp pose | `models/grounded_visual_pose_policy_v1.py`, `scripts/train_grounded_visual_pose_v1.py` | Implemented; 15 CPU/regression checks and GPU smoke 6865392 passed; full training not submitted |
 
-The [GT-stage diagram](docs/figures/2026-11-10_visual_gt_pose_finetuning/visual_gt_pose_finetuning.pdf)
-shows its matched control. The [current two-path diagram](docs/figures/2026-11-11_grounded_visual_pose/visual_pose_architectures.pdf)
+The [GT-stage diagram](docs/slide_history/media/2026-11-10/visual_gt_pose_finetuning.pdf)
+shows its matched control. The [current two-path diagram](docs/slide_history/media/2026-11-11/visual_pose_architectures.pdf)
 compares supplied versus predicted pose conditioning.
 
 In the new path, shared skill-conditioned grounding weights pool local observed
@@ -104,7 +114,7 @@ At the user's request, the non-visual pose/controller pipeline is retired and it
 eight result roots, including trained models and rollout metrics, were deleted.
 Dedicated source/config/test/figure files remain only in a source archive;
 unused modules fingerprinted by the queued GT experiment remain unchanged to
-preserve that run's integrity. [Cleanup receipt](docs/cleanup_20261111_nonvisual_pose.json).
+preserve that run's integrity. [Cleanup receipt](docs/records/cleanup_20261111_nonvisual_pose.json).
 
 ## Dataset and evaluation
 
@@ -117,8 +127,11 @@ All four variants completed 30 epochs and passed five-action H100 smoke tests on
 2026-10-08. From October 12, evaluation covers **all 149 test1 scenarios**
 across 32 object/task combinations for these four objects, once each per fixed
 evaluation seed42,43,44 (447 rollouts per model), with explicit scenario selection.
-Report per-seed success and its mean and sample standard deviation. It uses a 120-step limit,
-legacy learned termination, and one action executed per policy cycle.
+Report per-seed success and its mean and sample standard deviation. Historical
+runs used a 120-action limit and one action per prediction. New evaluations use
+the [released execution settings](configs/evaluation/partinstruct_native.json):
+250 executed actions, eight per prediction (400 actions for Test4), with native
+physics thresholds. Learned progression remains part of our policy.
 Point-cloud sampling uses deterministic PyTorch3D CPU FPS; policy inference uses
 GPU. Detailed progress and job IDs belong in the research plan. The current GT-pose
 study has zero policy rollouts so far; 333/339 native grasp references are
@@ -126,8 +139,10 @@ available, and the remaining six are coverage gaps.
 
 Released PartInstruct DP-S/DP3-S weights are downloaded and their native
 GT-part/oracle-skill evaluations completed. Those 176 sampled trials per model
-are separate from our 447 fixed-scenario comparison. Earlier self-trained DP/DP3
-runs and the five-trial scissors pilot are historical; they are not evaluations
+are the retained released-policy reference. Superseded fixed 120/1 DP/DP3 outputs
+and the earlier self-trained DP3 evaluation pilot were removed on November 16.
+New 250/8 evaluations of our models have not yet been run. These native reference
+scores use privileged part observations and oracle progression; they are not evaluations
 of the author-released weights. See the research plan for comparison limitations.
 
 ## Implementation layout
@@ -159,5 +174,4 @@ remain in the repository. Follow that guide for new experiments.
 
 - [Diffusion comparison](../results/part2action/evaluations/diffusion_30epoch_20261013/index.html): 447 combined GIFs with expert reference left, historical MLP control, diffusion control, and diffusion contact. Future experiments use diffusion heads.
 - [Archived MLP experiments](../results/part2action/archive/mlp/README.md): earlier checkpoints, evaluations, and policy diagnostics.
-- [DP3 success GIFs](../results/partinstruct/visualizations/dp3_success/) and
-  [failure GIFs](../results/partinstruct/visualizations/dp3_failures/).
+- [Retained native DP/DP3 evaluation records](../results/partinstruct/evaluations/README.md).

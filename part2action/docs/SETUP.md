@@ -1,6 +1,6 @@
 # Part2Action setup and run commands
 
-Updated November 11, 2026. This is the operational guide for the existing UVA CS
+Updated November 19, 2026. This is the operational guide for the existing UVA CS
 installation. Decisions, results and active job IDs: [RESEARCH_PLAN](RESEARCH_PLAN.md).
 Dataset schema, labels and split counts: [DATASET](DATASET.md).
 [Archived documentation](archive/2026-10-22/README.md) is historical, not a launch plan.
@@ -23,6 +23,38 @@ registered browsing links. Do not create new heavy outputs under
 | Generated DP/DP3 caches | `/p/part2action/caches/partinstruct` |
 | Runs/evaluations/diagnostics | `/p/part2action/results/` |
 | Slurm logs | `/p/part2action/logs/` via repository log links |
+
+### Storage verification and enforcement — November 19
+
+Use **`/p/part2action/results/` for physical run outputs**, not the home-backed
+workspace. Browse the same files through `part2action/storage/results/` or the
+registered root `results/` links. Moving files into the repository's physical
+`part2action/` directory does not move them off the home filesystem.
+
+The v3 prepare/train/evaluation entry points now normalize fresh repository
+`results/...` destinations onto the project allocation and reject arbitrary
+home output directories. V3 Slurm launchers additionally verify the resolved
+study and stdout/stderr paths before running. Put logs under the project run
+directory or `/p/part2action/logs/`.
+
+`slurm/project_storage_env.sh` and `diagnostics/storage.py` put Hugging Face,
+Torch, DINOv2, Matplotlib, CUDA and compiler caches under
+`/p/part2action/caches/`. Cached Flan-T5-base and DINOv2 files were copied and
+checksum-verified there; no download is necessary. Global caches used by other
+projects are not reconfigured by these project-local settings.
+
+The cleanup migrated remaining local Part2Action run artifacts with verified
+checksums and preserved their original browsing paths as links. Actual trained
+checkpoints, demonstration data, historical records, and report assets are
+retained. Redundant one-update v3 smoke weights were removed, and the source
+tree was checked for regenerable Python/test caches. See the
+[cleanup receipt](records/storage_cleanup_20261119.json).
+
+The ten-epoch job 6957500 had already failed during epoch 3; checkpoints for
+epochs 1 and 2 are retained. The failure log does not establish quota as the
+cause. The failed run and cancelled dependent evaluation are not completed
+training/benchmark results. Operational storage changes require a new matching
+smoke receipt before another training launch; old source snapshots are preserved.
 
 `datasets/PartInstruct`, `PartInstruct/data`, and `results/data/PartInstruct`
 resolve to the same dataset. The framework source is root `PartInstruct/`, not
@@ -87,7 +119,7 @@ architecture is implemented in `models/grounded_visual_pose_policy_v1.py`; the
 training recipe is `configs/pose_learning/grounded_visual_pose_v1.yaml`.
 It fine-tunes the original visual Transformer, with newly initialized pose
 modules and frozen DINO/T5. Dedicated non-visual study launchers and results have
-been retired; see [the cleanup receipt](cleanup_20261111_nonvisual_pose.json).
+been retired; see [the cleanup receipt](records/cleanup_20261111_nonvisual_pose.json).
 
 CPU checks use the existing training environment:
 
@@ -123,7 +155,8 @@ pretrained encoders. Its frozen source plan, logs and receipts are under
 It completed one optimization step and observation-only diffusion sampling; its
 checkpoint is a smoke artifact, not a completed training run. Full new-model
 training is not submitted. The independent GT-stage GPU preflight also passed;
-training 6864652 awaits GPU priority and evaluation 6864664 awaits that training.
+both fine-tuning arms 6864652 finished. V2 evaluation failed before any rollout
+because of a missing helper import; V3 smoke 6910609 now gates evaluation 6910610.
 
 After a trained checkpoint exists, the observation-only rollout adapter is
 `scripts/evaluate_grounded_visual_pose_v1.py --config CONFIG --ckpt CHECKPOINT
@@ -169,16 +202,28 @@ not the current recipe. Do not silently change other settings with a tested flag
 ## Evaluate
 
 Use the versioned pose adapters for the two pose architectures: the current
-GT-stage jobs use `evaluate_visual_oracle_pose_v2.py`, and predicted-pose
+GT-stage recovery jobs use `evaluate_visual_oracle_pose_v3.py`, and predicted-pose
 checkpoints use `evaluate_grounded_visual_pose_v1.py` in `partgym_rollout`.
 The generic baseline launch commands below load original visual-policy
 checkpoints; they do not construct the added pose modules.
 
-Part2Action standard: fixed 149 four-object test1 scenarios x seeds 42/43/44 =447
-rollouts per model, max 120 actions, execute one, legacy termination, gripper
+As of November 16, the Part2Action standard uses fixed 149 four-object Test1
+scenarios x seeds 42/43/44 =447 rollouts per model, **250 executed actions and
+eight actions per prediction**, learned termination, gripper
 clamp [0, .04] m, deterministic CPU point sampling and GPU inference. This is
 not all test splits. GT masks/part clouds/contact targets never enter the policy.
 Report rollout-seed variability separately from training-seed variability.
+The shared [execution configuration](../configs/evaluation/partinstruct_native.json)
+uses the released evaluator's 400-action budget for Test4 and 250 for other splits.
+Camera/physics thresholds follow its native environment configuration, including
+the 0.15 m release height. The last action block is shortened at the budget cap;
+250 commands with eight-command blocks require at most 32 policy predictions.
+This matches execution settings, not input privilege or skill/success scoring.
+Historical Part2Action 120/1 results retain their original protocol and are not
+merged into new 250/8 reports. Historical recovery adapters remain frozen;
+use `evaluate_pose_token_diffusion.py` or `evaluate_pose_token_diffusion_v2.py`
+for the current pose-token families. Do not reuse a historical pinned plan as
+a new-protocol submission. No new full evaluation was submitted by this change.
 
 Single-policy launcher requires absolute `RUN_DIR` and a fresh `OUT_DIR`:
 
@@ -278,8 +323,13 @@ parameters remain intact. Use absolute paths because Hydra may change directorie
 
 ## Slurm and status
 
-All current launchers allow `a40|a100_40gb|a100_80gb|h100_94gb`, one GPU, without
-node pinning. Current requests: screening train 8 CPUs/40G/96h; Part2Action
+Training and evaluation run on the UVA CS Slurm cluster. The baseline launchers
+allow `a40|a100_40gb|a100_80gb|h100_94gb`, one GPU, without node pinning. V3
+launchers contain no resource directives, so pass them at submission. V3 training
+and phase evaluation also allowed `a4000|a4500|rtx_4000_ada`; the November 22
+grasp probes used `a16`. Each v3 study keeps its exact sbatch commands in
+`submissions.json`; the epoch-10 phase evaluation commands are in the restart
+training study. Baseline requests: screening train 8 CPUs/40G/96h; Part2Action
 rollout 8 CPUs/32G/24h; official native evaluation 16 CPUs/100G/48h; CPU GIF/report
 export 4 CPUs/12G/3h. GPU model/hardware differences must accompany latency claims.
 
@@ -287,6 +337,18 @@ export 4 CPUs/12G/3h. GPU model/hardware differences must accompany latency clai
 squeue -u xna8aw -o '%.18i %.38j %.12T %.12M %.35R'
 sacct -j JOBID --format=JobID,JobName,State,Elapsed,ExitCode -X
 scontrol show job JOBID
+```
+
+V3 training, after a successful `MODE=smoke` submission for the same study:
+
+```bash
+STUDY=/p/part2action/results/diagnostics/MY_V3_STUDY
+sbatch --no-requeue --kill-on-invalid-dep=yes --partition=gpu --gres=gpu:1 \
+  --cpus-per-task=4 --mem=32G --time=12:00:00 \
+  --constraint="a40|a100_40gb|a100_80gb|h100_94gb|a4000|a4500|rtx_4000_ada" \
+  --output="$STUDY/%x_%A_%a.out" --error="$STUDY/%x_%A_%a.err" \
+  --export=ALL,STUDY="$STUDY",MODE=train \
+  part2action/slurm/pose_token_diffusion_v3.sbatch
 ```
 
 `Priority` and `Resources` are scheduler waits; `Dependency` waits on another job.
@@ -301,11 +363,13 @@ requested otherwise), concise `Part2Action:` titles, no speaker notes. Use one
 block of short individual lines per slide without leading bullet dashes, before
 media; do not split explanation above and below a table.
 
+Keep dated slide documents under `docs/slide_history/slides/` and paper PDFs
+under `docs/slide_history/papers/YYYY-MM-DD/`.
 Slide tables are PNGs under `docs/slide_history/media/YYYY-MM-DD/`, embedded at
 their intended position with an explicit "Use this image" download link. Reuse
 `docs/slide_history/scripts/export_slide_tables.py --slides PATH`; editable values
 remain in the dated `tables.json`. Keep code under `slide_history/scripts/` and
-do not recreate the removed `slide_history/figures/` folder. Reports also provide
+all figure exports in the dated media folders. Reports also provide
 PNG tables and their underlying CSV/JSON rather than requiring video inspection.
 
 
@@ -321,11 +385,15 @@ new feature-conditioning path. A separately fine-tuned control receives no pose
 signal. The learned estimator is a later stage. The submitted screen has two
 fine-tuning epochs per arm from the same original visual control checkpoint.
 
-Verified November 11: GPU preflight **6864650** passed in both arms. Matched
-training **6864652** is pending GPU priority; evaluation **6864664** waits for
-training. Reference collection produced 333 successful references and six
-unavailable records out of 339 grasp starts. There are no policy rollouts yet.
-The report/statistics jobs are already queued; do not submit duplicates.
+Verified November 13: both fine-tuning arms **6864652** completed with identical
+initial shared weights and matched minibatches/update counts. All V2 evaluation
+shards **6864664** failed before any rollout because `oracle_path` was not imported.
+The trained checkpoints are reused unchanged. Both V3 smoke jobs **6910609**
+passed; they gate full evaluation **6910610**, report **6910611**, and statistics
+**6910612**. Their one-case outcomes are runtime checks, not benchmark estimates. Reference
+coverage remains 333 completed / 339 grasp starts; six unavailable records are
+coverage gaps. No benchmark grasp/task rate is available yet. Do not retrain or
+submit duplicate evaluations.
 
 The installed run is
 `results/diagnostics/visual_oracle_pose_20261110_01`, linked to
@@ -346,7 +414,8 @@ export PYTHONPATH=part2action:part2action/scripts
 
 The submitted run preserves its original V1 source snapshot and records the
 versioned evaluation correction in `evaluation_revision.json`; use the recorded
-jobs and `evaluate_visual_oracle_pose_v2.py` for that run. The V1 submitter is
+jobs and `evaluate_visual_oracle_pose_v3.py` for the current recovery. V3 is pinned
+by `evaluation_revision_v3.json` and requires passed smoke receipts for both arms. The V1 submitter is
 historical; do not submit it again or edit its frozen sources. Reuse unchanged
 models/training/data for a new versioned submission, with a validated evaluation
 entry point. Scheduler commands require the usual cluster access.

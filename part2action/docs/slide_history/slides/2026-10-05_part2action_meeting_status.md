@@ -16,10 +16,10 @@ benchmark. Poor performance does not establish that the dataset is broken.
 The successful task was previously misidentified as screw touch; video metadata
 confirms left-part grasp.
 
-Visuals:
-[Successful grasp](../../../results/partinstruct/visualizations/dp3_success/dp3_scissors_left_grasp_success.gif)
-[Failed screw touch](../../../results/partinstruct/visualizations/dp3_failures/dp3_scissors_touch_screw_failed.gif)
-[Failed grasp/move/release](../../../results/partinstruct/visualizations/dp3_failures/dp3_scissors_grasp_move_release_failed.gif)
+Historical pilot visuals were removed on November 16 at the user's request.
+The dated observations above remain historical context; use the
+[native released-model reference](../../../../results/partinstruct/evaluations/README.md)
+for current DP/DP3 evaluation records.
 
 ## Slide 2 — Part2Action: Contact-gate diagnosis
 
@@ -39,8 +39,8 @@ bounded action offset are separate parameters. These are diagnostic comparisons,
 not retrained threshold ablations or model rollout results.
 
 Visuals:
-[Bottle touch: synchronized thresholds](../../../results/diagnostics/contact_label_audit/gate_gifs/bottle_touch_obj_demo_11_thresholds.gif)
-[Scissors grasp: synchronized thresholds](../../../results/diagnostics/contact_label_audit/gate_gifs/scissors_grasp_obj_demo_1_thresholds.gif)
+[Bottle touch: synchronized thresholds](../../../../results/diagnostics/contact_label_audit/gate_gifs/bottle_touch_obj_demo_11_thresholds.gif)
+[Scissors grasp: synchronized thresholds](../../../../results/diagnostics/contact_label_audit/gate_gifs/scissors_grasp_obj_demo_1_thresholds.gif)
 
 ## Slide 3 — Part2Action: Rethinking contact switching
 
@@ -124,7 +124,7 @@ Run unified-policy smoke tests, then matched control/contact training.
 Evaluate success by object and skill, contact localization, motion errors, and latency.
 Expand dataset coverage and test a stronger action decoder after the initial comparison.
 
-Sources of local evidence: [research plan](../RESEARCH_PLAN.md),
-[contact audit](../archive/2026-10-22/CONTACT_LABEL_AUDIT.md),
-[DP3 visualization provenance](../../../results/partinstruct/visualizations/dp3_success/manifest.json),
-[download manifest](../../../results/data/full_dataset_download/manifest.json).
+Sources of local evidence: [research plan](../../RESEARCH_PLAN.md),
+[contact audit](../../archive/2026-10-22/CONTACT_LABEL_AUDIT.md),
+[DP3 visualization provenance](../../../../results/partinstruct/visualizations/dp3_success/manifest.json),
+[download manifest](../../../../results/data/full_dataset_download/manifest.json).

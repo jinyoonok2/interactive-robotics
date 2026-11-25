@@ -1,0 +1,163 @@
+{
+  "status": "completed",
+  "migrations": [
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/contact_label_audit",
+      "destination": "/p/part2action/results/diagnostics/contact_label_audit",
+      "files": 30,
+      "bytes": 142932370,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_evaluation_20261116_native",
+      "destination": "/p/part2action/results/diagnostics/pose_token_diffusion_evaluation_20261116_native",
+      "files": 101,
+      "bytes": 1223887,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_v3_10epoch_20261118_01",
+      "destination": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_10epoch_20261118_01",
+      "files": 214,
+      "bytes": 62899494,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_v3_implementation_20261118_01",
+      "destination": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_implementation_20261118_01",
+      "files": 208,
+      "bytes": 21894646,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_v3_phase_10epoch_20261118_01",
+      "destination": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_phase_10epoch_20261118_01",
+      "files": 3,
+      "bytes": 5467,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_v3_phase_20261118_01",
+      "destination": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_phase_20261118_01",
+      "files": 4,
+      "bytes": 6030,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/part2action/archive/mlp",
+      "destination": "/p/part2action/results/part2action/archive/mlp",
+      "files": 14,
+      "bytes": 87054351,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/part2action/archive/superseded",
+      "destination": "/p/part2action/results/part2action/archive/superseded",
+      "files": 1,
+      "bytes": 244,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/data/full_dataset_download",
+      "destination": "/p/part2action/results/data/full_dataset_download",
+      "files": 1,
+      "bytes": 2761,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/data/gt_demo_videos",
+      "destination": "/p/part2action/results/data/gt_demo_videos",
+      "files": 38,
+      "bytes": 78870829,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/data/storage_cleanup_20261008",
+      "destination": "/p/part2action/results/data/storage_cleanup_20261008",
+      "files": 11,
+      "bytes": 27578,
+      "sha256_verified": true
+    },
+    {
+      "source": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/data/storage_migration_20261007",
+      "destination": "/p/part2action/results/data/storage_migration_20261007",
+      "files": 3,
+      "bytes": 724,
+      "sha256_verified": true
+    }
+  ],
+  "cache_migrations": [
+    {
+      "source": "/bigtemp/xna8aw/hf_cache/models--google--flan-t5-base",
+      "destination": "/p/part2action/caches/huggingface/hub/models--google--flan-t5-base",
+      "bytes": 993566963,
+      "sha256_verified": true,
+      "original_shared_cache_preserved": true
+    },
+    {
+      "source": "/u/xna8aw/.cache/torch/hub/facebookresearch_dinov2_main",
+      "destination": "/p/part2action/caches/torch/hub/facebookresearch_dinov2_main",
+      "sha256_verified": true,
+      "original_small_source_cache_preserved": true
+    },
+    {
+      "source": "/u/xna8aw/.cache/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth",
+      "destination": "/p/part2action/caches/torch/hub/checkpoints/dinov2_vits14_reg4_pretrain.pth",
+      "bytes": 88291785,
+      "sha256_verified": true,
+      "original_path_preserved_as_symlink": true
+    }
+  ],
+  "removed_files": [
+    {
+      "path": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_10epoch_20261118_01/smoke/epoch_001.pt",
+      "bytes": 18845778,
+      "sha256": "59a0114525cf53d2f496a468845ceb57527283debd0cf96a8c63a7582e679dc2",
+      "reason": "Regenerable one-update smoke weights; the smoke receipt and all trained-policy checkpoints are retained."
+    },
+    {
+      "path": "/p/part2action/results/diagnostics/pose_token_diffusion_v3_implementation_20261118_01/smoke/epoch_001.pt",
+      "bytes": 18845778,
+      "sha256": "513262927ba4597748e2f55bc7d5a75dd1e5fd21c68ce50817a5e3f64026eb92",
+      "reason": "Regenerable one-update smoke weights; the smoke receipt and all trained-policy checkpoints are retained."
+    }
+  ],
+  "home_bytes_relocated": 483210166,
+  "project_bytes_deleted_as_redundant_smoke_weights": 37691556,
+  "unrelated_PAP_Molmo_cache_untouched": true,
+  "training_failure": {
+    "job_id": "6957500",
+    "state": "FAILED",
+    "last_logged_epoch": 3,
+    "completed_checkpoint_epochs": [
+      1,
+      2
+    ],
+    "quota_cause_confirmed": false
+  },
+  "removed_code_caches": [],
+  "storage_guard_tests_passed": 7,
+  "v3_regression_tests_passed": 19,
+  "phase_diagnostic_tests_passed": 8,
+  "slurm_preflight_job_id": "6958110",
+  "global_home_quota_verified": false,
+  "global_home_quota_limit_reason": "Home .zfsinfo is unavailable; filesystem free space is not a user quota measurement.",
+  "slurm_preflight": {
+    "status": "passed",
+    "slurm_job_id": "6958110",
+    "slurm_log_guard": "passed",
+    "HF_HOME": "/p/part2action/caches/huggingface",
+    "TORCH_HOME": "/p/part2action/caches/torch",
+    "new_result": "/p/part2action/results/diagnostics/NEW_PROJECT_RESULT",
+    "offline_tokenizer": "passed",
+    "scope": "CPU-only storage and cache verification; no model training."
+  },
+  "final_verification": {
+    "status": "passed",
+    "storage_tests": 7,
+    "v3_tests": 19,
+    "phase_tests": 8,
+    "total_tests": 34,
+    "quota_cause_of_training_failure": "not established"
+  }
+}

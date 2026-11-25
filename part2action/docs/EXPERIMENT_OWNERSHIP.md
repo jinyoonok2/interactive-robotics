@@ -25,7 +25,7 @@ Explanations of that servo must not be applied to the P2A neural actor.
 
 | Unambiguous run label | Output |
 | --- | --- |
-| `P2A non-visual geometry/controller studies` | Removed November 11 at user request; [cleanup receipt](cleanup_20261111_nonvisual_pose.json) |
+| `P2A non-visual geometry/controller studies` | Removed November 11 at user request; [cleanup receipt](records/cleanup_20261111_nonvisual_pose.json) |
 | `PAP pose predictor / 20k` | `/bigtemp/xna8aw/part-aware-policy-learning/training/pose_20k_20261107_01/train/checkpoints/step20000.pt` |
 | `LRL previous policy / 20k` | `/bigtemp/xna8aw/nav_door/train/final/house/llm_20k_gb4_20261021/model/step20000` |
 | `LRL corrected policy / 20k` | `/bigtemp/xna8aw/nav_door/train/final/house/grounded_20k_gb4_20261030/model/step20000` |

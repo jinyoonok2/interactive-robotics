@@ -1,0 +1,16 @@
+flowchart TB
+  subgraph A["Evaluated: pose guidance OFF"]
+    A0["RGB + observed PCD + language + measured TCP/opening"] --> A1["Original visual policy features h"]
+    A1 --> A2["Action features h + 0"]
+    AZ["Same pose module; disabled"] --> A2
+    A2 --> A3["Transformer diffusion decoder"] --> A4["Motion and gripper commands"]
+  end
+  subgraph B["Evaluated: GT pose guidance ON"]
+    B0["Same observations and measured robot state"] --> B1["Original visual policy features h"]
+    BG["Supplied expert target grasp pose"] --> BP["Current-TCP-relative pose → MLP 10 → 256 → 256"]
+    B0 --> BP
+    BP --> B2["Action features h + pose embedding"]
+    B1 --> B2 --> B3["Same diffusion decoder architecture"] --> B4["Motion and gripper commands"]
+  end
+%% Neither evaluated arm uses a learned target-pose estimator.
+%% Both initialize from the same pretrained policy and fine-tune for two epochs.

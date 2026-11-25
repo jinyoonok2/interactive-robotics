@@ -1,0 +1,4852 @@
+{
+  "report_date": "2026-11-02",
+  "pilot": {
+    "status": "completed",
+    "stage": "pilot",
+    "cases": 8,
+    "planned_cases": 8,
+    "runtime_error_cases": 0,
+    "eligible_cases": 5,
+    "variation_successes": 72,
+    "variation_failures": 12,
+    "expansion_gate": {
+      "passed": false,
+      "reasons": [
+        "Missing validated categories: scissors"
+      ],
+      "generated_stable_successes": 5,
+      "validated_references": 5,
+      "covered_categories": [
+        "bottle",
+        "mug",
+        "pliers"
+      ]
+    },
+    "limits": [
+      "Training-source initial grasp adapter only; unsupported touch-starting/closed/later skills explicitly inventoried.",
+      "New native-expert executions, not reproductions or replacements of released expert trajectories.",
+      "Controller-conditioned grasp/lift outcomes, not full-task benchmark success or guarantees under unknown physics.",
+      "Expert environment uses state-only observations; native VGN TSDF uses TinyRenderer. Predictor captures use the validated prototype full-scene RGB-D path.",
+      "No policy training; predefined single-variable and selected joint perturbations."
+    ]
+  },
+  "probe_states": [
+    {
+      "directory": "results/diagnostics/lift_handoff_probe_20261101",
+      "status": "completed",
+      "completed": 25,
+      "planned": 25
+    },
+    {
+      "directory": "results/diagnostics/lift_handoff_factorial_20261101",
+      "status": "completed",
+      "completed": 10,
+      "planned": 10
+    }
+  ],
+  "probe_rows": [
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "legacy",
+      "success": false,
+      "lift_m": -0.0029999090698371034,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0057043155772786335,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "legacy",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02308/legacy/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_closure_gain",
+      "success": false,
+      "lift_m": 0.006533184200403677,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.004480010601047404,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "preserve_closure_gain",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.1
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02308/preserve_closure_gain/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "settle_only",
+      "success": false,
+      "lift_m": 0.03585315247540309,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.16666666666666666
+      },
+      "drift_m": 0.005839043398359025,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "settle_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02308/settle_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "slow_lift_only",
+      "success": false,
+      "lift_m": 0.0003738081756584216,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0032233310034467623,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "slow_lift_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02308/slow_lift_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_and_settle",
+      "success": false,
+      "lift_m": 0.040676814285916116,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.9722222222222222
+      },
+      "drift_m": 0.007949366989983782,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "preserve_and_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.1
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02308/preserve_and_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "legacy",
+      "success": false,
+      "lift_m": 1.394668357607154e-07,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.005795668023240813,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "legacy",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02416/legacy/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_closure_gain",
+      "success": false,
+      "lift_m": 1.394668357607154e-07,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.005795668023240813,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "preserve_closure_gain",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02416/preserve_closure_gain/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "settle_only",
+      "success": false,
+      "lift_m": 1.5202480788553685e-05,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0057703999668053145,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "settle_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02416/settle_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "slow_lift_only",
+      "success": false,
+      "lift_m": 1.6653345369377348e-15,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0032322354386405843,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "slow_lift_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02416/slow_lift_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_and_settle",
+      "success": false,
+      "lift_m": 1.5202480788553685e-05,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0057703999668053145,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "preserve_and_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02416/preserve_and_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "legacy",
+      "success": false,
+      "lift_m": 0.029233019286212802,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.002110212664088484,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "legacy",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02240/legacy/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_closure_gain",
+      "success": false,
+      "lift_m": 0.029233019286212802,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.002110212664088484,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "preserve_closure_gain",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02240/preserve_closure_gain/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "settle_only",
+      "success": false,
+      "lift_m": 0.04320902452027063,
+      "hold": {
+        "bilateral_fraction": 0.2361111111111111,
+        "target_contact_fraction": 0.9722222222222222
+      },
+      "drift_m": 0.018259611821863312,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "settle_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02240/settle_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "slow_lift_only",
+      "success": false,
+      "lift_m": 0.045549117579558596,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.9722222222222222
+      },
+      "drift_m": 0.021398495158968012,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "slow_lift_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02240/slow_lift_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_and_settle",
+      "success": false,
+      "lift_m": 0.04320902452027063,
+      "hold": {
+        "bilateral_fraction": 0.2361111111111111,
+        "target_contact_fraction": 0.9722222222222222
+      },
+      "drift_m": 0.018259611821863312,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "preserve_and_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02240/preserve_and_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "legacy",
+      "success": true,
+      "lift_m": 0.03818349919220232,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 6.453617344788798e-05,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "legacy",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02219/legacy/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_closure_gain",
+      "success": true,
+      "lift_m": 0.03818349919220232,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 6.453617344788798e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "preserve_closure_gain",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02219/preserve_closure_gain/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "settle_only",
+      "success": true,
+      "lift_m": 0.04384673510261938,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 6.21315475914922e-05,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "settle_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02219/settle_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "slow_lift_only",
+      "success": true,
+      "lift_m": 0.04133944159118216,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 2.9697706008909765e-05,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "slow_lift_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02219/slow_lift_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_and_settle",
+      "success": true,
+      "lift_m": 0.04384673510261938,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 6.21315475914922e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "preserve_and_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/02219/preserve_and_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "legacy",
+      "success": true,
+      "lift_m": 0.04481236980835923,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 5.8724555311574145e-05,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "legacy",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/00670/legacy/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_closure_gain",
+      "success": true,
+      "lift_m": 0.04481236980835923,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 5.8724555311574145e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 20,
+        "profile": "preserve_closure_gain",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/00670/preserve_closure_gain/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "settle_only",
+      "success": true,
+      "lift_m": 0.04494011637633666,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.0001317818279068716,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "settle_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/00670/settle_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "slow_lift_only",
+      "success": true,
+      "lift_m": 0.04754845526730625,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 5.874021876170712e-05,
+      "continuation": {
+        "preserve_closure_gain": false,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "slow_lift_only",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/00670/slow_lift_only/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_and_settle",
+      "success": true,
+      "lift_m": 0.04494011637633666,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.0001317818279068716,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 20,
+        "profile": "preserve_and_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_probe_20261101/trials/00670/preserve_and_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow",
+      "success": false,
+      "lift_m": 0.007041598280320249,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.0021366734927534083,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "preserve_slow",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.1
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02308/preserve_slow/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02308",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_7",
+        "episode_id": "40038",
+        "object_id": "10450",
+        "task_type": "7",
+        "part": "top",
+        "instruction": "Grasp the scissors at its top",
+        "episode": {
+          "ep_id": "40038",
+          "obj_id": "10450",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.014865038104191805,
+            -0.05584850938922021,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Pick up the scissors by its top and move it to the right.",
+          "skill_instructions": [
+            "Grasp the scissors at its top",
+            "Move upwards",
+            "Move to the right"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "top"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "right",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow_settle",
+      "success": false,
+      "lift_m": 0.039968760996127756,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.9027777777777778
+      },
+      "drift_m": 0.007072994792023968,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 40,
+        "profile": "preserve_slow_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.1,
+        "finger_gain": 0.1
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02308/preserve_slow_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow",
+      "success": false,
+      "lift_m": 1.6653345369377348e-15,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.0032322354386405843,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "preserve_slow",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02416/preserve_slow/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02416",
+      "case": {
+        "object": "scissors",
+        "demo": "demo_241",
+        "episode_id": "95085",
+        "object_id": "10559",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the scissors at its right",
+        "episode": {
+          "ep_id": "95085",
+          "obj_id": "10559",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.013970865398364991,
+            -0.05692091672959096,
+            0.15
+          ],
+          "obj_scale": 0.15,
+          "part_names": [
+            "blade",
+            "handle",
+            "screw"
+          ],
+          "task_instruction": "Hold onto the right of the scissors.",
+          "skill_instructions": [
+            "Grasp the scissors at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow_settle",
+      "success": false,
+      "lift_m": -2.3567875692687146e-08,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.0
+      },
+      "drift_m": 0.003202130393947527,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 40,
+        "profile": "preserve_slow_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02416/preserve_slow_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow",
+      "success": false,
+      "lift_m": 0.045549117579558596,
+      "hold": {
+        "bilateral_fraction": 0.0,
+        "target_contact_fraction": 0.9722222222222222
+      },
+      "drift_m": 0.021398495158968012,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "preserve_slow",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02240/preserve_slow/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02240",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_222",
+        "episode_id": "30158",
+        "object_id": "102288",
+        "task_type": "8",
+        "part": "leg",
+        "instruction": "Grasp the pliers at its leg",
+        "episode": {
+          "ep_id": "30158",
+          "obj_id": "102288",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.011027919316739321,
+            -0.009455232515100012,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+          "skill_instructions": [
+            "Grasp the pliers at its leg",
+            "Move upwards",
+            "Reorient the right of the pliers to face upwards"
+          ],
+          "chain_params": [
+            {
+              "skill_name": "grasp_obj",
+              "params": {
+                "part_grasp": "leg"
+              }
+            },
+            {
+              "skill_name": "move_gripper",
+              "params": {
+                "dir_move": "top",
+                "grasping": true,
+                "touching": false,
+                "put_down": false
+              }
+            },
+            {
+              "skill_name": "rotate_obj",
+              "params": {
+                "part_rotate": "right",
+                "dir_rotate": "top"
+              }
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow_settle",
+      "success": false,
+      "lift_m": 0.028920343135478768,
+      "hold": {
+        "bilateral_fraction": 0.4444444444444444,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 0.008860907311020702,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 40,
+        "profile": "preserve_slow_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02240/preserve_slow_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow",
+      "success": true,
+      "lift_m": 0.04133944159118216,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 2.9697706008909765e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "preserve_slow",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02219/preserve_slow/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/02219",
+      "case": {
+        "object": "pliers",
+        "demo": "demo_158",
+        "episode_id": "150016",
+        "object_id": "100144",
+        "task_type": "1",
+        "part": "right",
+        "instruction": "Grasp the pliers at its right",
+        "episode": {
+          "ep_id": "150016",
+          "obj_id": "100144",
+          "obj_pose": [
+            0.0,
+            0.0,
+            1.0,
+            6.123233995736766e-17,
+            0.006944744135839263,
+            -0.03715401485534861,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "base body",
+            "leg"
+          ],
+          "task_instruction": "Grab the right of the pliers.",
+          "skill_instructions": [
+            "Grasp the pliers at its right"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "right"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow_settle",
+      "success": true,
+      "lift_m": 0.044804421540843464,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 9.593503572782514e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 40,
+        "profile": "preserve_slow_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/02219/preserve_slow_settle/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow",
+      "success": true,
+      "lift_m": 0.04754845526730625,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 5.874021876170712e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 0,
+        "lift_steps": 40,
+        "profile": "preserve_slow",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/00670/preserve_slow/result.json"
+    },
+    {
+      "source": "/p/part2action/results/diagnostics/logged_expert_references_20261101_recovery2/pilot/cases/00670",
+      "case": {
+        "object": "bottle",
+        "demo": "demo_1029",
+        "episode_id": "80071",
+        "object_id": "4064",
+        "task_type": "1",
+        "part": "left",
+        "instruction": "Grasp the bottle at its left",
+        "episode": {
+          "ep_id": "80071",
+          "obj_id": "4064",
+          "obj_pose": [
+            0.0,
+            0.0,
+            0.7071067811865476,
+            -0.7071067811865475,
+            -0.01325355778805061,
+            -0.022897059600134034,
+            0.15
+          ],
+          "obj_scale": 0.1,
+          "part_names": [
+            "neck",
+            "lid",
+            "body"
+          ],
+          "task_instruction": "Take hold of the left of the bottle.",
+          "skill_instructions": [
+            "Grasp the bottle at its left"
+          ],
+          "chain_params": [
+            {
+              "params": {
+                "part_grasp": "left"
+              },
+              "skill_name": "grasp_obj"
+            }
+          ]
+        }
+      },
+      "profile": "preserve_slow_settle",
+      "success": true,
+      "lift_m": 0.04756162580229317,
+      "hold": {
+        "bilateral_fraction": 1.0,
+        "target_contact_fraction": 1.0
+      },
+      "drift_m": 3.7891784192360706e-05,
+      "continuation": {
+        "preserve_closure_gain": true,
+        "settle_steps": 10,
+        "lift_steps": 40,
+        "profile": "preserve_slow_settle",
+        "lift_m": 0.05,
+        "hold_steps": 10,
+        "source_finger_gain": 0.01,
+        "finger_gain": 0.01
+      },
+      "grasp_prefix_agreement": {
+        "max_tcp_position_m": 0.0,
+        "max_tcp_rotation_deg": 0.0,
+        "max_finger_difference_m": 0.0,
+        "max_robot_joint_difference_rad": 0.0,
+        "max_object_position_m": 0.0,
+        "max_object_rotation_deg": 0.0,
+        "initial_state_max_difference": 0.0
+      },
+      "trial_file": "results/diagnostics/lift_handoff_factorial_20261101/trials/00670/preserve_slow_settle/result.json"
+    }
+  ],
+  "training": {
+    "status": "completed",
+    "records": 107,
+    "instances": 6,
+    "sources": 6,
+    "success_labels": 92.0,
+    "protocol": "Leave one whole object instance out; 250 fixed full-batch updates; three training seeds; no held-out tuning or early stopping.",
+    "model_scope": "Supervised candidate-outcome heads; no robot-policy training, rollout selection, or demonstrated robustness improvement.",
+    "results": {
+      "train_prior": {
+        "per_seed": [
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8598130841121495,
+            "balanced_accuracy": 0.5,
+            "auroc": 0.14673913043478262,
+            "brier": 0.13339048404106565,
+            "binary_cross_entropy": 0.4669623143977105,
+            "success_recall": 1.0,
+            "failure_recall": 0.0,
+            "seed": 42,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8888888888888888,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.10059171519257543,
+                "binary_cross_entropy": 0.3564705363459892,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.03024575300162624,
+                "binary_cross_entropy": 0.19105525872231544,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.030914137118998042,
+                "binary_cross_entropy": 0.19337138026488213,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.139455782718399,
+                "binary_cross_entropy": 0.45277725968761906,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.06441116665944177,
+                "binary_cross_entropy": 0.2702752217193801,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.42899408671982897,
+                "binary_cross_entropy": 1.3224960598863331,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8598130841121495,
+            "balanced_accuracy": 0.5,
+            "auroc": 0.14673913043478262,
+            "brier": 0.13339048404106565,
+            "binary_cross_entropy": 0.4669623143977105,
+            "success_recall": 1.0,
+            "failure_recall": 0.0,
+            "seed": 43,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8888888888888888,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.10059171519257543,
+                "binary_cross_entropy": 0.3564705363459892,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.03024575300162624,
+                "binary_cross_entropy": 0.19105525872231544,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.030914137118998042,
+                "binary_cross_entropy": 0.19337138026488213,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.139455782718399,
+                "binary_cross_entropy": 0.45277725968761906,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.06441116665944177,
+                "binary_cross_entropy": 0.2702752217193801,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.42899408671982897,
+                "binary_cross_entropy": 1.3224960598863331,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8598130841121495,
+            "balanced_accuracy": 0.5,
+            "auroc": 0.14673913043478262,
+            "brier": 0.13339048404106565,
+            "binary_cross_entropy": 0.4669623143977105,
+            "success_recall": 1.0,
+            "failure_recall": 0.0,
+            "seed": 44,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8888888888888888,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.10059171519257543,
+                "binary_cross_entropy": 0.3564705363459892,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.03024575300162624,
+                "binary_cross_entropy": 0.19105525872231544,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.030914137118998042,
+                "binary_cross_entropy": 0.19337138026488213,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.139455782718399,
+                "binary_cross_entropy": 0.45277725968761906,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.06441116665944177,
+                "binary_cross_entropy": 0.2702752217193801,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5,
+                "brier": 0.42899408671982897,
+                "binary_cross_entropy": 1.3224960598863331,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          }
+        ],
+        "mean": {
+          "accuracy": 0.8598130841121495,
+          "balanced_accuracy": 0.5,
+          "auroc": 0.14673913043478262,
+          "brier": 0.13339048404106565,
+          "binary_cross_entropy": 0.46696231439771047
+        },
+        "training_seed_std": {
+          "accuracy": 0.0,
+          "balanced_accuracy": 0.0,
+          "auroc": 0.0,
+          "brier": 0.0
+        }
+      },
+      "candidate_only": {
+        "per_seed": [
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8317757009345794,
+            "balanced_accuracy": 0.483695652173913,
+            "auroc": 0.5079710144927536,
+            "brier": 0.1321403027445753,
+            "binary_cross_entropy": 0.47790239482365854,
+            "success_recall": 0.967391304347826,
+            "failure_recall": 0.0,
+            "seed": 42,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.71875,
+                "brier": 0.1119707433471206,
+                "binary_cross_entropy": 0.35187681092497924,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 0.9411764705882353,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.050970015957375644,
+                "binary_cross_entropy": 0.20333813525891212,
+                "success_recall": 0.9411764705882353,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.05081084014903922,
+                "binary_cross_entropy": 0.20544989040946648,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.8666666666666667,
+                "brier": 0.10374238009634675,
+                "binary_cross_entropy": 0.32745413003217505,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 1.0,
+                "brier": 0.05074384128309539,
+                "binary_cross_entropy": 0.20470266597272405,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5432098765432098,
+                "brier": 0.42009453525740764,
+                "binary_cross_entropy": 1.559339166367875,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8317757009345794,
+            "balanced_accuracy": 0.483695652173913,
+            "auroc": 0.5036231884057971,
+            "brier": 0.13099888237001098,
+            "binary_cross_entropy": 0.47167498111718525,
+            "success_recall": 0.967391304347826,
+            "failure_recall": 0.0,
+            "seed": 43,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.75,
+                "brier": 0.11104355909878022,
+                "binary_cross_entropy": 0.3500482476331668,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 0.9411764705882353,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.04964539363156843,
+                "binary_cross_entropy": 0.2021701308965482,
+                "success_recall": 0.9411764705882353,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.04961859377814198,
+                "binary_cross_entropy": 0.20457920721201095,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.9333333333333333,
+                "brier": 0.1041561004051918,
+                "binary_cross_entropy": 0.33139340853853316,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 1.0,
+                "brier": 0.047581552877331075,
+                "binary_cross_entropy": 0.20125940825914584,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5185185185185185,
+                "brier": 0.4194284561658055,
+                "binary_cross_entropy": 1.5256269924847818,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8317757009345794,
+            "balanced_accuracy": 0.483695652173913,
+            "auroc": 0.5260869565217391,
+            "brier": 0.1311358576700883,
+            "binary_cross_entropy": 0.49014373028117236,
+            "success_recall": 0.967391304347826,
+            "failure_recall": 0.0,
+            "seed": 44,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.6875,
+                "brier": 0.10946533733578098,
+                "binary_cross_entropy": 0.3426503274445284,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 0.9411764705882353,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.05293469759156748,
+                "binary_cross_entropy": 0.20488074875383558,
+                "success_recall": 0.9411764705882353,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.05283450755458041,
+                "binary_cross_entropy": 0.20755589407974673,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.9333333333333333,
+                "brier": 0.10019348202586266,
+                "binary_cross_entropy": 0.3121169070608981,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.9411764705882353,
+                "brier": 0.05271372990177387,
+                "binary_cross_entropy": 0.20694061799214547,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5555555555555556,
+                "brier": 0.4143288827177134,
+                "binary_cross_entropy": 1.6508699429376945,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          }
+        ],
+        "mean": {
+          "accuracy": 0.8317757009345795,
+          "balanced_accuracy": 0.483695652173913,
+          "auroc": 0.5125603864734299,
+          "brier": 0.1314250142615582,
+          "binary_cross_entropy": 0.4799070354073387
+        },
+        "training_seed_std": {
+          "accuracy": 1.3597399555105182e-16,
+          "balanced_accuracy": 0.0,
+          "auroc": 0.011914359860037194,
+          "brier": 0.0006232325157278819
+        }
+      },
+      "context_candidate": {
+        "per_seed": [
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8317757009345794,
+            "balanced_accuracy": 0.483695652173913,
+            "auroc": 0.34456521739130436,
+            "brier": 0.16055853910202492,
+            "binary_cross_entropy": 1.4406719274309907,
+            "success_recall": 0.967391304347826,
+            "failure_recall": 0.0,
+            "seed": 42,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.78125,
+                "brier": 0.15491094299526237,
+                "binary_cross_entropy": 0.858042046295028,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 0.9411764705882353,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.026784545840114478,
+                "binary_cross_entropy": 0.07267791136384032,
+                "success_recall": 0.9411764705882353,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.05400215171010272,
+                "binary_cross_entropy": 0.23491146757606207,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.8666666666666667,
+                "brier": 0.16569422246555515,
+                "binary_cross_entropy": 1.2241910639646423,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 1.0,
+                "brier": 0.05550845021198805,
+                "binary_cross_entropy": 0.431484398936835,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5370370370370371,
+                "brier": 0.4990190328745761,
+                "binary_cross_entropy": 5.74672500889025,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8411214953271028,
+            "balanced_accuracy": 0.4891304347826087,
+            "auroc": 0.34492753623188405,
+            "brier": 0.15493772577730539,
+            "binary_cross_entropy": 1.3226129986342858,
+            "success_recall": 0.9782608695652174,
+            "failure_recall": 0.0,
+            "seed": 43,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.75,
+                "brier": 0.13321230934075146,
+                "binary_cross_entropy": 0.9724244104559805,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.01472983814896079,
+                "binary_cross_entropy": 0.06968463705177641,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.053792440389959534,
+                "binary_cross_entropy": 0.23029622563091362,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.8666666666666667,
+                "brier": 0.16598845621929234,
+                "binary_cross_entropy": 1.1917720950637767,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 1.0,
+                "brier": 0.0553330963017622,
+                "binary_cross_entropy": 0.3454198364816264,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5308641975308642,
+                "brier": 0.4987808871726423,
+                "binary_cross_entropy": 5.056473655922614,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          },
+          {
+            "n": 107,
+            "success_labels": 92,
+            "failure_labels": 15,
+            "accuracy": 0.8411214953271028,
+            "balanced_accuracy": 0.4891304347826087,
+            "auroc": 0.3652173913043478,
+            "brier": 0.15406132568116948,
+            "binary_cross_entropy": 1.237279626987864,
+            "success_recall": 0.9782608695652174,
+            "failure_recall": 0.0,
+            "seed": 44,
+            "per_instance": {
+              "bottle/4043": {
+                "n": 18,
+                "success_labels": 16,
+                "failure_labels": 2,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.46875,
+                "auroc": 0.71875,
+                "brier": 0.1377098138385582,
+                "binary_cross_entropy": 0.9384268598734314,
+                "success_recall": 0.9375,
+                "failure_recall": 0.0
+              },
+              "bottle/4064": {
+                "n": 17,
+                "success_labels": 17,
+                "failure_labels": 0,
+                "accuracy": 1.0,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.004725425219724019,
+                "binary_cross_entropy": 0.026869044247284053,
+                "success_recall": 1.0,
+                "failure_recall": null
+              },
+              "mug/8584": {
+                "n": 18,
+                "success_labels": 18,
+                "failure_labels": 0,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": null,
+                "auroc": null,
+                "brier": 0.0532123849975551,
+                "binary_cross_entropy": 0.21560845406125406,
+                "success_recall": 0.9444444444444444,
+                "failure_recall": null
+              },
+              "mug/8614": {
+                "n": 18,
+                "success_labels": 15,
+                "failure_labels": 3,
+                "accuracy": 0.8333333333333334,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.8666666666666667,
+                "brier": 0.1658465749714097,
+                "binary_cross_entropy": 1.0795643655044398,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "mug/8616": {
+                "n": 18,
+                "success_labels": 17,
+                "failure_labels": 1,
+                "accuracy": 0.9444444444444444,
+                "balanced_accuracy": 0.5,
+                "auroc": 1.0,
+                "brier": 0.0554708538432135,
+                "binary_cross_entropy": 0.3989663343922048,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              },
+              "pliers/100144": {
+                "n": 18,
+                "success_labels": 9,
+                "failure_labels": 9,
+                "accuracy": 0.5,
+                "balanced_accuracy": 0.5,
+                "auroc": 0.5555555555555556,
+                "brier": 0.4991064623020317,
+                "binary_cross_entropy": 4.696997671474094,
+                "success_recall": 1.0,
+                "failure_recall": 0.0
+              }
+            }
+          }
+        ],
+        "mean": {
+          "accuracy": 0.838006230529595,
+          "balanced_accuracy": 0.48731884057971014,
+          "auroc": 0.35157004830917876,
+          "brier": 0.15651919685349994,
+          "binary_cross_entropy": 1.3335215176843802
+        },
+        "training_seed_std": {
+          "accuracy": 0.005395796908314259,
+          "balanced_accuracy": 0.0031377732021175453,
+          "auroc": 0.011820334041659008,
+          "brier": 0.0035255118256312715
+        }
+      }
+    },
+    "limits": [
+      "Six source instances in three categories; no scissors coverage.",
+      "Pre-intervention full-scene observations; expert nominal target/time-to-close is prototype context.",
+      "Existing legacy labels are not relabeled after observing handoff probe outcomes.",
+      "Only 15 negative labels; dataset and instances are too small for broad generalization claims.",
+      "Candidate-only and full-context heads share architecture/loss/optimizer; only context inputs differ.",
+      "All predictions are out of fold, but this is a development pilot, not a final benchmark."
+    ]
+  },
+  "alternative_proposals": {
+    "directory": "results/diagnostics/alternative_expert_proposals_20261101",
+    "rows": [
+      {
+        "case_index": 2308,
+        "proposal_rank": 1,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 1,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "scissors",
+            "demo": "demo_7",
+            "episode_id": "40038",
+            "object_id": "10450",
+            "task_type": "7",
+            "part": "top",
+            "instruction": "Grasp the scissors at its top",
+            "episode": {
+              "ep_id": "40038",
+              "obj_id": "10450",
+              "obj_pose": [
+                0.0,
+                0.0,
+                1.0,
+                6.123233995736766e-17,
+                0.014865038104191805,
+                -0.05584850938922021,
+                0.15
+              ],
+              "obj_scale": 0.15,
+              "part_names": [
+                "blade",
+                "handle",
+                "screw"
+              ],
+              "task_instruction": "Pick up the scissors by its top and move it to the right.",
+              "skill_instructions": [
+                "Grasp the scissors at its top",
+                "Move upwards",
+                "Move to the right"
+              ],
+              "chain_params": [
+                {
+                  "skill_name": "grasp_obj",
+                  "params": {
+                    "part_grasp": "top"
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "top",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "right",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                }
+              ]
+            }
+          },
+          "source_index": 2308,
+          "seed": 2350,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2350,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 148,
+            "grasp_physics_steps": 1752,
+            "generation_wall_s": 68.55599944805726,
+            "native_grasp_predicate_equivalent": false,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.1,
+              "finger_gain": 0.01
+            },
+            "lift_m": 0.0029198776706456514,
+            "hold": {
+              "bilateral_fraction": 1.0,
+              "target_contact_fraction": 1.0
+            },
+            "hold_relative_position_drift_m": 0.00559925047367162,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.027080122329354347,
+                "bilateral": 0.19999999999999996,
+                "target_contact": 0.19999999999999996,
+                "drift": 0.00440074952632838
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": true,
+                "target_contact": true,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      },
+      {
+        "case_index": 2308,
+        "proposal_rank": 2,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 2,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "scissors",
+            "demo": "demo_7",
+            "episode_id": "40038",
+            "object_id": "10450",
+            "task_type": "7",
+            "part": "top",
+            "instruction": "Grasp the scissors at its top",
+            "episode": {
+              "ep_id": "40038",
+              "obj_id": "10450",
+              "obj_pose": [
+                0.0,
+                0.0,
+                1.0,
+                6.123233995736766e-17,
+                0.014865038104191805,
+                -0.05584850938922021,
+                0.15
+              ],
+              "obj_scale": 0.15,
+              "part_names": [
+                "blade",
+                "handle",
+                "screw"
+              ],
+              "task_instruction": "Pick up the scissors by its top and move it to the right.",
+              "skill_instructions": [
+                "Grasp the scissors at its top",
+                "Move upwards",
+                "Move to the right"
+              ],
+              "chain_params": [
+                {
+                  "skill_name": "grasp_obj",
+                  "params": {
+                    "part_grasp": "top"
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "top",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "right",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                }
+              ]
+            }
+          },
+          "source_index": 2308,
+          "seed": 2350,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2350,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 151,
+            "grasp_physics_steps": 1788,
+            "generation_wall_s": 74.85080175800249,
+            "native_grasp_predicate_equivalent": false,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.1,
+              "finger_gain": 0.01
+            },
+            "lift_m": 0.0005354978044867925,
+            "hold": {
+              "bilateral_fraction": 0.0,
+              "target_contact_fraction": 0.0
+            },
+            "hold_relative_position_drift_m": 0.005776280988720421,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.029464502195513206,
+                "bilateral": -0.8,
+                "target_contact": -0.8,
+                "drift": 0.00422371901127958
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": false,
+                "target_contact": false,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift",
+                "bilateral",
+                "target_contact"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      },
+      {
+        "case_index": 2416,
+        "proposal_rank": 1,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 1,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "scissors",
+            "demo": "demo_241",
+            "episode_id": "95085",
+            "object_id": "10559",
+            "task_type": "1",
+            "part": "right",
+            "instruction": "Grasp the scissors at its right",
+            "episode": {
+              "ep_id": "95085",
+              "obj_id": "10559",
+              "obj_pose": [
+                0.0,
+                0.0,
+                0.7071067811865476,
+                -0.7071067811865475,
+                -0.013970865398364991,
+                -0.05692091672959096,
+                0.15
+              ],
+              "obj_scale": 0.15,
+              "part_names": [
+                "blade",
+                "handle",
+                "screw"
+              ],
+              "task_instruction": "Hold onto the right of the scissors.",
+              "skill_instructions": [
+                "Grasp the scissors at its right"
+              ],
+              "chain_params": [
+                {
+                  "params": {
+                    "part_grasp": "right"
+                  },
+                  "skill_name": "grasp_obj"
+                }
+              ]
+            }
+          },
+          "source_index": 2416,
+          "seed": 2458,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2458,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 108,
+            "grasp_physics_steps": 1272,
+            "generation_wall_s": 45.05476894497406,
+            "native_grasp_predicate_equivalent": true,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.01,
+              "finger_gain": 0.01
+            },
+            "lift_m": 1.963824530870628e-05,
+            "hold": {
+              "bilateral_fraction": 0.0,
+              "target_contact_fraction": 0.0
+            },
+            "hold_relative_position_drift_m": 0.0057310327127656786,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.029980361754691293,
+                "bilateral": -0.8,
+                "target_contact": -0.8,
+                "drift": 0.004268967287234322
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": false,
+                "target_contact": false,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift",
+                "bilateral",
+                "target_contact"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      },
+      {
+        "case_index": 2416,
+        "proposal_rank": 2,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 2,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "scissors",
+            "demo": "demo_241",
+            "episode_id": "95085",
+            "object_id": "10559",
+            "task_type": "1",
+            "part": "right",
+            "instruction": "Grasp the scissors at its right",
+            "episode": {
+              "ep_id": "95085",
+              "obj_id": "10559",
+              "obj_pose": [
+                0.0,
+                0.0,
+                0.7071067811865476,
+                -0.7071067811865475,
+                -0.013970865398364991,
+                -0.05692091672959096,
+                0.15
+              ],
+              "obj_scale": 0.15,
+              "part_names": [
+                "blade",
+                "handle",
+                "screw"
+              ],
+              "task_instruction": "Hold onto the right of the scissors.",
+              "skill_instructions": [
+                "Grasp the scissors at its right"
+              ],
+              "chain_params": [
+                {
+                  "params": {
+                    "part_grasp": "right"
+                  },
+                  "skill_name": "grasp_obj"
+                }
+              ]
+            }
+          },
+          "source_index": 2416,
+          "seed": 2458,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2458,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 131,
+            "grasp_physics_steps": 1548,
+            "generation_wall_s": 69.7339528889861,
+            "native_grasp_predicate_equivalent": true,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.1,
+              "finger_gain": 0.01
+            },
+            "lift_m": 2.0355869767563206e-11,
+            "hold": {
+              "bilateral_fraction": 0.0,
+              "target_contact_fraction": 0.0
+            },
+            "hold_relative_position_drift_m": 0.005812581983880864,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.02999999997964413,
+                "bilateral": -0.8,
+                "target_contact": -0.8,
+                "drift": 0.0041874180161191365
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": false,
+                "target_contact": false,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift",
+                "bilateral",
+                "target_contact"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      },
+      {
+        "case_index": 2240,
+        "proposal_rank": 1,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 1,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "pliers",
+            "demo": "demo_222",
+            "episode_id": "30158",
+            "object_id": "102288",
+            "task_type": "8",
+            "part": "leg",
+            "instruction": "Grasp the pliers at its leg",
+            "episode": {
+              "ep_id": "30158",
+              "obj_id": "102288",
+              "obj_pose": [
+                0.0,
+                0.0,
+                0.7071067811865476,
+                -0.7071067811865475,
+                -0.011027919316739321,
+                -0.009455232515100012,
+                0.15
+              ],
+              "obj_scale": 0.1,
+              "part_names": [
+                "base body",
+                "leg"
+              ],
+              "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+              "skill_instructions": [
+                "Grasp the pliers at its leg",
+                "Move upwards",
+                "Reorient the right of the pliers to face upwards"
+              ],
+              "chain_params": [
+                {
+                  "skill_name": "grasp_obj",
+                  "params": {
+                    "part_grasp": "leg"
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "top",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                },
+                {
+                  "skill_name": "rotate_obj",
+                  "params": {
+                    "part_rotate": "right",
+                    "dir_rotate": "top"
+                  }
+                }
+              ]
+            }
+          },
+          "source_index": 2240,
+          "seed": 2282,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2282,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 167,
+            "grasp_physics_steps": 1980,
+            "generation_wall_s": 90.01326045207679,
+            "native_grasp_predicate_equivalent": true,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.1,
+              "finger_gain": 0.01
+            },
+            "lift_m": 0.02803878234289288,
+            "hold": {
+              "bilateral_fraction": 1.0,
+              "target_contact_fraction": 1.0
+            },
+            "hold_relative_position_drift_m": 0.002062750592901541,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.00196121765710712,
+                "bilateral": 0.19999999999999996,
+                "target_contact": 0.19999999999999996,
+                "drift": 0.00793724940709846
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": true,
+                "target_contact": true,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      },
+      {
+        "case_index": 2240,
+        "proposal_rank": 2,
+        "result": {
+          "eligible": false,
+          "native_rank_zero_based": 2,
+          "base_reference_checks": null,
+          "require_native_grasp_and_stable_lift_and_exact_replay": true,
+          "limits": "Training-source rejection sampling. No per-case controller changes or automatic dataset expansion."
+        },
+        "summary": {
+          "case": {
+            "object": "pliers",
+            "demo": "demo_222",
+            "episode_id": "30158",
+            "object_id": "102288",
+            "task_type": "8",
+            "part": "leg",
+            "instruction": "Grasp the pliers at its leg",
+            "episode": {
+              "ep_id": "30158",
+              "obj_id": "102288",
+              "obj_pose": [
+                0.0,
+                0.0,
+                0.7071067811865476,
+                -0.7071067811865475,
+                -0.011027919316739321,
+                -0.009455232515100012,
+                0.15
+              ],
+              "obj_scale": 0.1,
+              "part_names": [
+                "base body",
+                "leg"
+              ],
+              "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+              "skill_instructions": [
+                "Grasp the pliers at its leg",
+                "Move upwards",
+                "Reorient the right of the pliers to face upwards"
+              ],
+              "chain_params": [
+                {
+                  "skill_name": "grasp_obj",
+                  "params": {
+                    "part_grasp": "leg"
+                  }
+                },
+                {
+                  "skill_name": "move_gripper",
+                  "params": {
+                    "dir_move": "top",
+                    "grasping": true,
+                    "touching": false,
+                    "put_down": false
+                  }
+                },
+                {
+                  "skill_name": "rotate_obj",
+                  "params": {
+                    "part_rotate": "right",
+                    "dir_rotate": "top"
+                  }
+                }
+              ]
+            }
+          },
+          "source_index": 2240,
+          "seed": 2282,
+          "eligible": false,
+          "generated_stable_success": false,
+          "variation_successes": 0,
+          "variation_failures": 0,
+          "generation": {
+            "planner_reported_success": true,
+            "source_seed": 2282,
+            "native_full_task_termination_context": true,
+            "grasp_event_count": 180,
+            "grasp_physics_steps": 2136,
+            "generation_wall_s": 98.2583925279323,
+            "native_grasp_predicate_equivalent": true,
+            "continuation": {
+              "preserve_closure_gain": false,
+              "settle_steps": 0,
+              "lift_steps": 20,
+              "profile": "legacy",
+              "lift_m": 0.05,
+              "hold_steps": 10,
+              "source_finger_gain": 0.1,
+              "finger_gain": 0.01
+            },
+            "lift_m": 0.02688747467440697,
+            "hold": {
+              "bilateral_fraction": 1.0,
+              "target_contact_fraction": 1.0
+            },
+            "hold_relative_position_drift_m": 0.0024949567979983666,
+            "outcome_components": {
+              "thresholds": {
+                "lift_min_m": 0.03,
+                "bilateral_min": 0.8,
+                "target_contact_min": 0.8,
+                "drift_max_m": 0.01
+              },
+              "margins": {
+                "lift": -0.0031125253255930296,
+                "bilateral": 0.19999999999999996,
+                "target_contact": 0.19999999999999996,
+                "drift": 0.007505043202001634
+              },
+              "passes": {
+                "lift": false,
+                "bilateral": true,
+                "target_contact": true,
+                "drift": true
+              },
+              "failure_causes": [
+                "lift"
+              ]
+            },
+            "stable_target_grasp_lift": false
+          },
+          "status": "generation_failed_physical_criteria"
+        }
+      }
+    ],
+    "scope": "Bounded new native-ranked proposals; fixed criteria and controller, not a gain search."
+  },
+  "native_context_audit": {
+    "directory": "results/diagnostics/native_task_context_runtime_audit_20261101",
+    "completed_cases": 4,
+    "planned_cases": 4,
+    "rows": [
+      {
+        "case": {
+          "object": "scissors",
+          "demo": "demo_7",
+          "episode_id": "40038",
+          "object_id": "10450",
+          "task_type": "7",
+          "part": "top",
+          "instruction": "Grasp the scissors at its top",
+          "episode": {
+            "ep_id": "40038",
+            "obj_id": "10450",
+            "obj_pose": [
+              0.0,
+              0.0,
+              1.0,
+              6.123233995736766e-17,
+              0.014865038104191805,
+              -0.05584850938922021,
+              0.15
+            ],
+            "obj_scale": 0.15,
+            "part_names": [
+              "blade",
+              "handle",
+              "screw"
+            ],
+            "task_instruction": "Pick up the scissors by its top and move it to the right.",
+            "skill_instructions": [
+              "Grasp the scissors at its top",
+              "Move upwards",
+              "Move to the right"
+            ],
+            "chain_params": [
+              {
+                "skill_name": "grasp_obj",
+                "params": {
+                  "part_grasp": "top"
+                }
+              },
+              {
+                "skill_name": "move_gripper",
+                "params": {
+                  "dir_move": "top",
+                  "grasping": true,
+                  "touching": false,
+                  "put_down": false
+                }
+              },
+              {
+                "skill_name": "move_gripper",
+                "params": {
+                  "dir_move": "right",
+                  "grasping": true,
+                  "touching": false,
+                  "put_down": false
+                }
+              }
+            ]
+          }
+        },
+        "source_index": 2308,
+        "seed": 2350,
+        "eligible": false,
+        "generated_stable_success": false,
+        "variation_successes": 0,
+        "variation_failures": 0,
+        "generation": {
+          "planner_reported_success": true,
+          "source_seed": 2350,
+          "native_full_task_termination_context": true,
+          "grasp_event_count": 149,
+          "grasp_physics_steps": 1764,
+          "generation_wall_s": 82.9550224939594,
+          "native_grasp_predicate_equivalent": false,
+          "continuation": {
+            "preserve_closure_gain": false,
+            "settle_steps": 0,
+            "lift_steps": 20,
+            "profile": "legacy",
+            "lift_m": 0.05,
+            "hold_steps": 10,
+            "source_finger_gain": 0.1,
+            "finger_gain": 0.01
+          },
+          "lift_m": -0.0029999090698371034,
+          "hold": {
+            "bilateral_fraction": 0.0,
+            "target_contact_fraction": 0.0
+          },
+          "hold_relative_position_drift_m": 0.0057043155772786335,
+          "outcome_components": {
+            "thresholds": {
+              "lift_min_m": 0.03,
+              "bilateral_min": 0.8,
+              "target_contact_min": 0.8,
+              "drift_max_m": 0.01
+            },
+            "margins": {
+              "lift": -0.0329999090698371,
+              "bilateral": -0.8,
+              "target_contact": -0.8,
+              "drift": 0.004295684422721367
+            },
+            "passes": {
+              "lift": false,
+              "bilateral": false,
+              "target_contact": false,
+              "drift": true
+            },
+            "failure_causes": [
+              "lift",
+              "bilateral",
+              "target_contact"
+            ]
+          },
+          "stable_target_grasp_lift": false
+        },
+        "status": "generation_failed_physical_criteria"
+      },
+      {
+        "case": {
+          "object": "scissors",
+          "demo": "demo_241",
+          "episode_id": "95085",
+          "object_id": "10559",
+          "task_type": "1",
+          "part": "right",
+          "instruction": "Grasp the scissors at its right",
+          "episode": {
+            "ep_id": "95085",
+            "obj_id": "10559",
+            "obj_pose": [
+              0.0,
+              0.0,
+              0.7071067811865476,
+              -0.7071067811865475,
+              -0.013970865398364991,
+              -0.05692091672959096,
+              0.15
+            ],
+            "obj_scale": 0.15,
+            "part_names": [
+              "blade",
+              "handle",
+              "screw"
+            ],
+            "task_instruction": "Hold onto the right of the scissors.",
+            "skill_instructions": [
+              "Grasp the scissors at its right"
+            ],
+            "chain_params": [
+              {
+                "params": {
+                  "part_grasp": "right"
+                },
+                "skill_name": "grasp_obj"
+              }
+            ]
+          }
+        },
+        "source_index": 2416,
+        "seed": 2458,
+        "eligible": false,
+        "generated_stable_success": false,
+        "variation_successes": 0,
+        "variation_failures": 0,
+        "generation": {
+          "planner_reported_success": true,
+          "source_seed": 2458,
+          "native_full_task_termination_context": true,
+          "grasp_event_count": 108,
+          "grasp_physics_steps": 1272,
+          "generation_wall_s": 43.71974822203629,
+          "native_grasp_predicate_equivalent": true,
+          "continuation": {
+            "preserve_closure_gain": false,
+            "settle_steps": 0,
+            "lift_steps": 20,
+            "profile": "legacy",
+            "lift_m": 0.05,
+            "hold_steps": 10,
+            "source_finger_gain": 0.01,
+            "finger_gain": 0.01
+          },
+          "lift_m": 1.394668357607154e-07,
+          "hold": {
+            "bilateral_fraction": 0.0,
+            "target_contact_fraction": 0.0
+          },
+          "hold_relative_position_drift_m": 0.005795668023240813,
+          "outcome_components": {
+            "thresholds": {
+              "lift_min_m": 0.03,
+              "bilateral_min": 0.8,
+              "target_contact_min": 0.8,
+              "drift_max_m": 0.01
+            },
+            "margins": {
+              "lift": -0.029999860533164238,
+              "bilateral": -0.8,
+              "target_contact": -0.8,
+              "drift": 0.004204331976759187
+            },
+            "passes": {
+              "lift": false,
+              "bilateral": false,
+              "target_contact": false,
+              "drift": true
+            },
+            "failure_causes": [
+              "lift",
+              "bilateral",
+              "target_contact"
+            ]
+          },
+          "stable_target_grasp_lift": false
+        },
+        "status": "generation_failed_physical_criteria"
+      },
+      {
+        "case": {
+          "object": "pliers",
+          "demo": "demo_222",
+          "episode_id": "30158",
+          "object_id": "102288",
+          "task_type": "8",
+          "part": "leg",
+          "instruction": "Grasp the pliers at its leg",
+          "episode": {
+            "ep_id": "30158",
+            "obj_id": "102288",
+            "obj_pose": [
+              0.0,
+              0.0,
+              0.7071067811865476,
+              -0.7071067811865475,
+              -0.011027919316739321,
+              -0.009455232515100012,
+              0.15
+            ],
+            "obj_scale": 0.1,
+            "part_names": [
+              "base body",
+              "leg"
+            ],
+            "task_instruction": "Lift the pliers by its leg and turn it so the right faces upwards.",
+            "skill_instructions": [
+              "Grasp the pliers at its leg",
+              "Move upwards",
+              "Reorient the right of the pliers to face upwards"
+            ],
+            "chain_params": [
+              {
+                "skill_name": "grasp_obj",
+                "params": {
+                  "part_grasp": "leg"
+                }
+              },
+              {
+                "skill_name": "move_gripper",
+                "params": {
+                  "dir_move": "top",
+                  "grasping": true,
+                  "touching": false,
+                  "put_down": false
+                }
+              },
+              {
+                "skill_name": "rotate_obj",
+                "params": {
+                  "part_rotate": "right",
+                  "dir_rotate": "top"
+                }
+              }
+            ]
+          }
+        },
+        "source_index": 2240,
+        "seed": 2282,
+        "eligible": false,
+        "generated_stable_success": false,
+        "variation_successes": 0,
+        "variation_failures": 0,
+        "generation": {
+          "planner_reported_success": true,
+          "source_seed": 2282,
+          "native_full_task_termination_context": true,
+          "grasp_event_count": 165,
+          "grasp_physics_steps": 1956,
+          "generation_wall_s": 89.98653204494622,
+          "native_grasp_predicate_equivalent": true,
+          "continuation": {
+            "preserve_closure_gain": false,
+            "settle_steps": 0,
+            "lift_steps": 20,
+            "profile": "legacy",
+            "lift_m": 0.05,
+            "hold_steps": 10,
+            "source_finger_gain": 0.1,
+            "finger_gain": 0.01
+          },
+          "lift_m": 0.025982637226201685,
+          "hold": {
+            "bilateral_fraction": 1.0,
+            "target_contact_fraction": 1.0
+          },
+          "hold_relative_position_drift_m": 0.0032932253695245415,
+          "outcome_components": {
+            "thresholds": {
+              "lift_min_m": 0.03,
+              "bilateral_min": 0.8,
+              "target_contact_min": 0.8,
+              "drift_max_m": 0.01
+            },
+            "margins": {
+              "lift": -0.004017362773798314,
+              "bilateral": 0.19999999999999996,
+              "target_contact": 0.19999999999999996,
+              "drift": 0.006706774630475459
+            },
+            "passes": {
+              "lift": false,
+              "bilateral": true,
+              "target_contact": true,
+              "drift": true
+            },
+            "failure_causes": [
+              "lift"
+            ]
+          },
+          "stable_target_grasp_lift": false
+        },
+        "status": "generation_failed_physical_criteria"
+      },
+      {
+        "case": {
+          "object": "bottle",
+          "demo": "demo_1029",
+          "episode_id": "80071",
+          "object_id": "4064",
+          "task_type": "1",
+          "part": "left",
+          "instruction": "Grasp the bottle at its left",
+          "episode": {
+            "ep_id": "80071",
+            "obj_id": "4064",
+            "obj_pose": [
+              0.0,
+              0.0,
+              0.7071067811865476,
+              -0.7071067811865475,
+              -0.01325355778805061,
+              -0.022897059600134034,
+              0.15
+            ],
+            "obj_scale": 0.1,
+            "part_names": [
+              "neck",
+              "lid",
+              "body"
+            ],
+            "task_instruction": "Take hold of the left of the bottle.",
+            "skill_instructions": [
+              "Grasp the bottle at its left"
+            ],
+            "chain_params": [
+              {
+                "params": {
+                  "part_grasp": "left"
+                },
+                "skill_name": "grasp_obj"
+              }
+            ]
+          }
+        },
+        "source_index": 670,
+        "seed": 712,
+        "eligible": true,
+        "generated_stable_success": true,
+        "variation_successes": 0,
+        "variation_failures": 0,
+        "generation": {
+          "planner_reported_success": true,
+          "source_seed": 712,
+          "native_full_task_termination_context": true,
+          "grasp_event_count": 102,
+          "grasp_physics_steps": 1200,
+          "generation_wall_s": 8.539836390991695,
+          "native_grasp_predicate_equivalent": true,
+          "continuation": {
+            "preserve_closure_gain": false,
+            "settle_steps": 0,
+            "lift_steps": 20,
+            "profile": "legacy",
+            "lift_m": 0.05,
+            "hold_steps": 10,
+            "source_finger_gain": 0.01,
+            "finger_gain": 0.01
+          },
+          "lift_m": 0.04481236980835923,
+          "hold": {
+            "bilateral_fraction": 1.0,
+            "target_contact_fraction": 1.0
+          },
+          "hold_relative_position_drift_m": 5.8724555311574145e-05,
+          "outcome_components": {
+            "thresholds": {
+              "lift_min_m": 0.03,
+              "bilateral_min": 0.8,
+              "target_contact_min": 0.8,
+              "drift_max_m": 0.01
+            },
+            "margins": {
+              "lift": 0.014812369808359233,
+              "bilateral": 0.19999999999999996,
+              "target_contact": 0.19999999999999996,
+              "drift": 0.009941275444688426
+            },
+            "passes": {
+              "lift": true,
+              "bilateral": true,
+              "target_contact": true,
+              "drift": true
+            },
+            "failure_causes": []
+          },
+          "stable_target_grasp_lift": true
+        },
+        "unsupported_timing_conditions": [],
+        "reference_checks": [
+          {
+            "passed": true,
+            "max_tcp_position_m": 0.0,
+            "max_tcp_rotation_deg": 0.0,
+            "max_finger_difference_m": 0.0,
+            "max_robot_joint_difference_rad": 0.0,
+            "max_object_position_m": 0.0,
+            "max_object_rotation_deg": 0.0,
+            "initial_state_max_difference": 0.0
+          },
+          {
+            "passed": true,
+            "max_tcp_position_m": 0.0,
+            "max_tcp_rotation_deg": 0.0,
+            "max_finger_difference_m": 0.0,
+            "max_robot_joint_difference_rad": 0.0,
+            "max_object_position_m": 0.0,
+            "max_object_rotation_deg": 0.0,
+            "initial_state_max_difference": 0.0
+          },
+          {
+            "passed": true,
+            "max_tcp_position_m": 0.0,
+            "max_tcp_rotation_deg": 0.0,
+            "max_finger_difference_m": 0.0,
+            "max_robot_joint_difference_rad": 0.0,
+            "max_object_position_m": 0.0,
+            "max_object_rotation_deg": 0.0,
+            "initial_state_max_difference": 0.0
+          }
+        ],
+        "status": "completed"
+      }
+    ],
+    "protocol": "Original full-task termination context; pose_tcp wall-time guard disabled, native max iterations and physical criteria retained; initial grasp + additional lift only."
+  },
+  "scope": "Development pilot; grasp/lift outcomes under specified continuation, not policy robustness."
+}

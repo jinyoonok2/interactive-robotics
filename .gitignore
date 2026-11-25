@@ -89,3 +89,8 @@ part2action/storage
 !/results/README.md
 /part2action/docs/CONTACT_LABEL_AUDIT.md
 /part2action/docs/archive/**/CONTACT_LABEL_AUDIT.md
+
+# Third-party papers and figures extracted from them stay local
+/part2action/docs/slide_history/papers/
+/part2action/docs/slide_history/media/**/related_work/
+/part2action/docs/slide_history/media/2026-11-02/robustness_pilot/*.pdf

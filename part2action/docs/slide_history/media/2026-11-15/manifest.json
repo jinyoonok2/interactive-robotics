@@ -1,0 +1,56 @@
+{
+  "created_utc": "2026-11-14T18:26:20.882416+00:00",
+  "layout_checks": "passed: text containment, clipping, pairwise label overlap",
+  "figure_scope": {
+    "evaluated_pose_off_vs_gt_pose": "implemented and evaluated; not a learned-estimator comparison",
+    "current_vs_proposed_pose_first": "evaluated current design versus unimplemented research proposal"
+  },
+  "source_sha256": {
+    "part2action/scripts/draw_pose_architecture_comparison_v2.py": "fbb2d3bcb831393501d330dfbc48e644c9b95f746832312bce0ea2cbd4d49764",
+    "part2action/models/visual_pose_policy_v1.py": "b05f5854009a0ab6dd7d4430f7ff7786fc84b029ece8fdb19273d3fdfee8a305",
+    "part2action/models/pose_conditioning_v1.py": "a31d2aecc39e812d058b6f0b570ea34d224fea5653bfc89bd5e6a09630883eff",
+    "part2action/models/heads.py": "93edd39e2e437b6365a5a13d6aa804e8b1d103786c010e67700f26d4004e4e62",
+    "part2action/models/diffusion_transformer.py": "2ee40d652695671e5a4ddb5afad5e75595242f4fb0f57fde79562f8ca5419c3b",
+    "part2action/models/hierarchical.py": "d206e50608c2310836843c72d1f05e5cd9dfd3b63ae3b9ca7e43549e32b658e0",
+    "results/diagnostics/visual_oracle_pose_20261110_01/control.yaml": "23e01254fe7d5efd3e14053e0ad5a88b5b30e796490760e45f761bf36ba7f062",
+    "results/diagnostics/visual_oracle_pose_20261110_01/oracle_pose.yaml": "6f4ad4b3e68ef87cadb143bd5685ed0a8ab8e03636b2b884041b77a3df72d586"
+  },
+  "files": {
+    "current_vs_proposed_pose_first.mmd": {
+      "sha256": "de7d065e62f70e75730d1a1b72ea70f9b7341d016396adaa2c7a44931cba334d",
+      "bytes": 1087
+    },
+    "current_vs_proposed_pose_first.pdf": {
+      "sha256": "4fafaaca3208443784c49f4cf18b0a0a79c0acfecb4f7fd4ea2cd631206b56bc",
+      "bytes": 29588
+    },
+    "current_vs_proposed_pose_first.png": {
+      "sha256": "0a90e6f26c4c7d986b2cd16d415fcd406c7f8afdfb9c69bd8aaeb7aa04b264cd",
+      "bytes": 542181
+    },
+    "current_vs_proposed_pose_first.svg": {
+      "sha256": "0b7ff5a65c3f41014cfa2bb4663bf65ecb2f39315aa60822677a8f24decaae4b",
+      "bytes": 27816
+    },
+    "report_figures.tex": {
+      "sha256": "7c03234075ae0da2fb9b4284dfeac1589bb59a4a10d713bde97e4b3ee2e9a7b3",
+      "bytes": 1968
+    },
+    "architecture/evaluated_pose_off_vs_gt_pose.png": {
+      "sha256": "08144b4f410af36f064abe4a50ed75ad8cd40812f51c6bf637db5f332b6a2d76",
+      "bytes": 437576
+    },
+    "architecture/evaluated_pose_off_vs_gt_pose.pdf": {
+      "sha256": "568820be2757438ab97f174b56413ef70aaed6bb1d89bdab42e5bd5deff02e10",
+      "bytes": 28659
+    },
+    "architecture/evaluated_pose_off_vs_gt_pose.svg": {
+      "sha256": "79bdd0df037ca2542e2abcda7e55a0fe1edf643273122fa1a8f85db277674032",
+      "bytes": 24800
+    },
+    "architecture/evaluated_pose_off_vs_gt_pose.mmd": {
+      "sha256": "08487f268e79eebc424daf15571902b85533f4d6f06b63d732a53d06d2df132c",
+      "bytes": 904
+    }
+  }
+}

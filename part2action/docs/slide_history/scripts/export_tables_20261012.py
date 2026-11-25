@@ -4,12 +4,13 @@ from PIL import Image, ImageDraw, ImageFont
 import hashlib
 import argparse
 import json
+import os
 import re
 from media_bundle import write_bundle
 
 ROOT = Path(__file__).resolve().parents[4]
-DOC = ROOT/'part2action/docs/slide_history/2026-10-12_part2action_meeting_status.md'
-OUT = DOC.parent/'media/2026-10-12'
+DOC = ROOT/'part2action/docs/slide_history/slides/2026-10-12_part2action_meeting_status.md'
+OUT = DOC.parent.parent/'media/2026-10-12'
 font_dir = Path('/usr/share/fonts/truetype/dejavu')
 body_font = ImageFont.truetype(str(font_dir/'DejaVuSans.ttf'), 48)
 header_font = ImageFont.truetype(str(font_dir/'DejaVuSans-Bold.ttf'), 46)
@@ -54,7 +55,8 @@ def main():
     parser.add_argument('--out-dir', type=Path, default=None)
     args = parser.parse_args()
     DOC = args.slides.resolve()
-    OUT = args.out_dir.resolve() if args.out_dir else DOC.parent/'media/2026-10-12'
+    history = DOC.parent.parent if DOC.parent.name == 'slides' else DOC.parent
+    OUT = args.out_dir.resolve() if args.out_dir else history/'media/2026-10-12'
     if not (OUT/'manifest.json').is_file():
         raise FileNotFoundError('Build the slide GIF media first so its manifest and preview exist.')
     source = DOC.read_text()
@@ -135,7 +137,8 @@ def main():
                         'rendered_cells':rows,'dimensions':[full_width,height],'dpi':200,
                         'background':'white','bytes':file.stat().st_size,
                         'sha256':hashlib.sha256(file.read_bytes()).hexdigest(),'text_layout':text_boxes})
-        link=f'Table image: [download PNG](media/2026-10-12/{filename}).'
+        image_link = Path(os.path.relpath(OUT/filename, DOC.parent)).as_posix()
+        link=f'Table image: [download PNG]({image_link}).'
         if filename not in source:
             source=source.replace(raw,raw+'\n\n'+link,1)
         print(filename,full_width,height,flush=True)

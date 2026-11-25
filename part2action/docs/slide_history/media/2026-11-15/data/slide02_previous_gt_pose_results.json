@@ -1,0 +1,47 @@
+{
+  "slide": 2,
+  "title": "Earlier additive GT-pose conditioning results",
+  "rows": [
+    [
+      "Metric",
+      "Pose guidance OFF",
+      "GT pose guidance ON"
+    ],
+    [
+      "Initial phase end grasp",
+      "114/333 (34.2%)",
+      "160/333 (48.0%)"
+    ],
+    [
+      "Full task success",
+      "70/441 (15.9%)",
+      "76/441 (17.2%)"
+    ]
+  ],
+  "column_fractions": [
+    0.42,
+    0.29,
+    0.29
+  ],
+  "source_summary": "results/diagnostics/visual_oracle_pose_20261110_01/summary.json",
+  "source_summary_sha256": "0a57645a7b413a1723ae53f097f7f5ff935a466202dae4034b1b79fadc9ba30e",
+  "population": "Matched completed case/seed pairs from the earlier additive visual-pose experiment",
+  "paired_task_trials": 441,
+  "paired_grasp_trials": 333,
+  "reference_gaps_excluded": 6,
+  "training_seeds": 1,
+  "evaluation_seeds": [
+    42,
+    43,
+    44
+  ],
+  "grasp_scope": "Native target-part grasp predicate at initial-phase end; sustained retention is not measured",
+  "render_function": "part2action/docs/slide_history/scripts/export_slide_tables.py:render",
+  "image": "slide02_previous_gt_pose_results.png",
+  "dimensions": [
+    2600,
+    448
+  ],
+  "bytes": 49022,
+  "sha256": "cbcf2f57d9a58806bca01b6baaa1fdb0851b27eea33891e847b42dac3de28490"
+}

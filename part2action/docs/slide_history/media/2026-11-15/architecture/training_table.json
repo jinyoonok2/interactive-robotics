@@ -1,0 +1,36 @@
+{
+  "rows": [
+    [
+      "Run",
+      "Action goal input",
+      "Pose-head loss",
+      "Training status"
+    ],
+    [
+      "Pose input OFF",
+      "Zero / invalid pose tokens",
+      "Enabled",
+      "Epoch 2"
+    ],
+    [
+      "GT pose input",
+      "Expert first-grasp target",
+      "Enabled",
+      "Epoch 2"
+    ]
+  ],
+  "column_fractions": [
+    0.21,
+    0.35,
+    0.23,
+    0.21
+  ],
+  "snapshot": "part2action/docs/slide_history/media/2026-11-15/data/slide07_training_snapshot.json",
+  "snapshot_sha256": "e2f192e728addd0339bebbf5c4b302ab4dae1acb89154411aa61b6d4365f00ec",
+  "dimensions": [
+    2600,
+    448
+  ],
+  "image": "current_training_comparison.png",
+  "sha256": "afdd342fb6ecd42d34fe0d1b24036712cdd88b9315dc905cd395d7cd9ab80106"
+}

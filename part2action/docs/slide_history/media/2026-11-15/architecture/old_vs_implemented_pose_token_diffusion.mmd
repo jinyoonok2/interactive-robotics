@@ -1,0 +1,23 @@
+flowchart TB
+  subgraph A["Earlier additive visual policy: evaluated"]
+    AO["RGB history + observed PCD + language + measured TCP/opening"] --> AE["Existing DINOv2/T5, scene, history and skill features"]
+    AE --> AF["Original action features"]
+    AG["Supplied GT grasp pose + measured TCP"] --> AM["Relative pose MLP"]
+    AF --> AS["Add pose embedding to action features"]
+    AM --> AS --> AD["Original diffusion decoder"] --> AA["8 x 7 commands; execute first and observe"]
+  end
+  subgraph B["Implemented Pose-token Diffusion: current GT-input arm"]
+    BO["Same available RGB/PCD/language and measured robot inputs"] --> BE["DINOv2/T5 frozen; trainable RGB/3D association, history and skill features"]
+    BE --> BC["Visual, scene, skill and robot memory tokens"]
+    BE --> BR["Task-relevant 3D region"]
+    BR --> BH["MLP predicts target grasp pose + applicability"]
+    BH -.-> BL["Auxiliary pose losses; prediction bypassed for current actions"]
+    BG["Supplied GT first-grasp goal + measured TCP"] --> BP["Separate relative translation and orientation tokens"]
+    BC --> BD["Cross-attention diffusion decoder"]
+    BR --> BD
+    BP --> BD --> BA["8 x 7 commands; execute first and observe"]
+  end
+%% The pose-disabled arm supplies zero and invalid pose-memory tokens.
+%% Both current arms train the pose head with identical auxiliary supervision.
+%% Predicted-pose action conditioning is supported but is not the current screen.
+%% The optional pose-aware progress head is disabled; the existing skill hierarchy remains.

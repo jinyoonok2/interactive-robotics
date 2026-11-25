@@ -9,7 +9,7 @@ Current pose work retains the visual Transformer in two paths: the queued
 [matched GT-pose study](diagnostics/visual_oracle_pose_20261110_01/README.md) and the
 [implemented shared grounding/pose architecture](../part2action/models/grounded_visual_pose_policy_v1.py).
 The latter passed one real-data GPU smoke step; it has no completed training run. Eight separate non-visual pose/controller
-result roots were deleted at the user's request; [cleanup receipt](../part2action/docs/cleanup_20261111_nonvisual_pose.json).
+result roots were deleted at the user's request; [cleanup receipt](../part2action/docs/records/cleanup_20261111_nonvisual_pose.json).
 
 Current work uses diffusion action heads. Completed MLP experiments are retained
 in the [MLP archive](part2action/archive/mlp/README.md).
@@ -27,6 +27,15 @@ seeds 42, 43, and 44, producing 447 rollouts per model. Pending gallery pages
 are replaced after their evaluation jobs finish. Setup checks remain under
 `diagnostics/preflight_checks/`. Dataset label audits remain separate from the
 archived MLP policy results.
+
+As of November 16, new evaluations use **250 executed actions / eight actions
+per prediction**, with the released simulator physics thresholds (Test4: 400
+actions). Historical 120/1 Part2Action measurements remain separate. The retained
+DP/DP3 reference is
+[the completed native evaluation](partinstruct/evaluations/official_release_20261022).
+Superseded fixed DP/DP3 outputs, the self-trained scissors pilot evaluation, and
+its copied review media were removed at the user's request; training runs and
+released checkpoints remain intact.
 
 | Section | Contents |
 | --- | --- |
@@ -96,8 +105,14 @@ absolute output paths for Slurm/Hydra jobs. CPU visualization scripts default
 to `results/diagnostics/contact_label_audit/` when run from the outer repo root.
 
 Project storage is accessible through `part2action/storage -> /p/part2action`.
-Environments are under `envs/`, generated caches under `caches/partinstruct/`,
-and Slurm logs under `logs/<project>/slurm/` in that allocation. Maintained
+The November 19 cleanup moved remaining local Part2Action artifacts onto that
+allocation, leaving browsing links. Current v3 entry points enforce project
+result destinations and project-local caches; Slurm jobs verify log paths too.
+See the [storage audit](data/storage_cleanup_20261119/receipt.json) and
+[operational setup](../part2action/docs/SETUP.md#storage-verification-and-enforcement--november-19).
+Environments are under `envs/`, DP/DP3 caches under `caches/partinstruct/`,
+and v3 model/compiler caches under the other project `caches/` subdirectories.
+Slurm logs live under `logs/<project>/slurm/` or the run directory in that allocation. Maintained
 launchers use these paths. Saved historical checkpoint configs are preserved
 verbatim and may contain obsolete paths. The finished downloader's temporary
 `part2action/results/` redirect has been removed.

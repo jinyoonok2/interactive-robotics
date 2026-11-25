@@ -3,7 +3,7 @@
 Seven-slide meeting deck. Use six to seven slides for future decks by combining
 related sections; omit speaker notes and dash bullets.
 
-Media: [preview](media/2026-10-12/index.html) · [download bundle](media/2026-10-12/2026-10-12_slide_media.zip).
+Media: [preview](../media/2026-10-12/index.html) · [download bundle](../media/2026-10-12/2026-10-12_slide_media.zip).
 
 ## Slide 1 — Part2Action: Contact-conditioned policy
 
@@ -14,10 +14,10 @@ Normalize contact-dependent features and learn one global weight, shared across 
 The weight decreased from 0.01 to 0.00435 in the 10-epoch normalized continuation; it is not distance-dependent.
 Question: does explicit contact information improve manipulation?
 
-![Unified policy with optional normalized contact conditioning](media/2026-10-12/slide04_unified_architecture.png)
+![Unified policy with optional normalized contact conditioning](../media/2026-10-12/slide04_unified_architecture.png)
 
-Architecture: [PNG](media/2026-10-12/slide04_unified_architecture.png) · [SVG](media/2026-10-12/slide04_unified_architecture.svg).
-Optional illustration: [Expert demonstration with contact and TCP overlays](media/2026-10-12/slide01_bottle_neck_contact_demo.gif).
+Architecture: [PNG](../media/2026-10-12/slide04_unified_architecture.png) · [SVG](../media/2026-10-12/slide04_unified_architecture.svg).
+Optional illustration: [Expert demonstration with contact and TCP overlays](../media/2026-10-12/slide01_bottle_neck_contact_demo.gif).
 
 ## Slide 2 — Part2Action: Contact localization
 
@@ -37,9 +37,9 @@ Original unified contact: two frames; predicted geometry feeds the action head a
 | Unified control | 1.00 cm | 37/39 |
 | Unified contact | 1.27 cm | 36/39 |
 
-Table image: [PNG](media/2026-10-12/slide02_contact_localization_table.png).
-Visual: [Expert → original control → original contact](media/2026-10-12/slide02_original_contact_localization.gif).
-Evidence: [39 initial observations per original 30-epoch model](../../../results/diagnostics/contact_motion_20261008/reference_reports/contact_localization_20261008/summary.json).
+Table image: [PNG](../media/2026-10-12/slide02_contact_localization_table.png).
+Visual: [Expert → original control → original contact](../media/2026-10-12/slide02_original_contact_localization.gif).
+Evidence: [39 initial observations per original 30-epoch model](../../../../results/diagnostics/contact_motion_20261008/reference_reports/contact_localization_20261008/summary.json).
 
 ## Slide 3 — Part2Action: Contact strength changes actions
 
@@ -54,10 +54,10 @@ Zero input here is an intervention on the same model, not a separately trained c
 | 25% | 0/39 | 28.13 cm |
 | 0% | 2/39 | 24.35 cm |
 
-Table image: [PNG](media/2026-10-12/slide03_contact_strength_table.png).
-Visual: [Expert → 100% → 25% → 0% contact](media/2026-10-12/slide03_contact_strength_100_25_0.gif).
+Table image: [PNG](../media/2026-10-12/slide03_contact_strength_table.png).
+Visual: [Expert → 100% → 25% → 0% contact](../media/2026-10-12/slide03_contact_strength_100_25_0.gif).
 All policies fail this example; their approach behavior differs.
-Evidence: [Contact-strength measurements](../../../results/diagnostics/contact_intervention_20261008/summary.json).
+Evidence: [Contact-strength measurements](../../../../results/diagnostics/contact_intervention_20261008/summary.json).
 
 ## Slide 4 — Part2Action: Contact and motion failures
 
@@ -77,9 +77,9 @@ All 21 grasp-starting trials per model moved more than 5 cm.
 The action head also predicts gripper opening, bounded to 0–0.04 m per finger at execution.
 Diagnose approach initiation separately from grasp pose and closure.
 
-Table image: [PNG](media/2026-10-12/slide05_normalized_results_table.png).
-Visuals: [Mug grasp](media/2026-10-12/slide05_normalized_mug_grasp.gif) · [Stalled mug touch](media/2026-10-12/slide06_stalled_mug_touch.gif).
-Evidence: [Historical 39-rollout results](../../../results/part2action/evaluations/normalized_global_20261010/summary.json) · [Motion traces](../../../results/part2action/evaluations/normalized_global_20261010/motion_diagnostics.json).
+Table image: [PNG](../media/2026-10-12/slide05_normalized_results_table.png).
+Visuals: [Mug grasp](../media/2026-10-12/slide05_normalized_mug_grasp.gif) · [Stalled mug touch](../media/2026-10-12/slide06_stalled_mug_touch.gif).
+Evidence: [Historical 39-rollout results](../../../../results/part2action/evaluations/normalized_global_20261010/summary.json) · [Motion traces](../../../../results/part2action/evaluations/normalized_global_20261010/motion_diagnostics.json).
 
 ## Slide 5 — Part2Action: Recording order and action alignment
 
@@ -104,9 +104,9 @@ Both receive 10 extra epochs from the same 30-epoch control checkpoint; only the
 This tests continuation behavior; the additional from-scratch comparison is skipped.
 Native touch-frame spacing remains unresolved; replay checks cover initial prefixes.
 
-Table images: [Recording order](media/2026-10-12/slide07_recording_order_table.png) · [Action alignment](media/2026-10-12/slide08_action_alignment_table.png).
-Visual: [Same recorded RGB with alternative action labels](media/2026-10-12/slide07_observation_action_timing.gif).
-Evidence: [Timing audit](../../../results/diagnostics/observation_action_timing_20261010/timing_report.json).
+Table images: [Recording order](../media/2026-10-12/slide07_recording_order_table.png) · [Action alignment](../media/2026-10-12/slide08_action_alignment_table.png).
+Visual: [Same recorded RGB with alternative action labels](../media/2026-10-12/slide07_observation_action_timing.gif).
+Evidence: [Timing audit](../../../../results/diagnostics/observation_action_timing_20261010/timing_report.json).
 
 ## Slide 6 — Part2Action: Next-action targets improve pilot success
 
@@ -123,10 +123,10 @@ Overall success remains low; validate this pilot result with expanded coverage.
 The five successes cover mug and pliers, three object–task combinations, and four unique episodes.
 This is a continuation result, not a contact or diffusion comparison.
 
-Table image: [PNG](media/2026-10-12/slide06_timing_results_table.png).
-Visual: [Expert → same-index → next-action, mug example](media/2026-10-12/slide06_next_action_mug.gif).
+Table image: [PNG](../media/2026-10-12/slide06_timing_results_table.png).
+Visual: [Expert → same-index → next-action, mug example](../media/2026-10-12/slide06_next_action_mug.gif).
 Next-action succeeds and same-index fails in this example.
-Evidence: [Pilot summary](../../../results/part2action/evaluations/action_timing_20261011/summary.json) · [39 comparison GIFs](../../../results/part2action/evaluations/action_timing_20261011/index.html).
+Evidence: [Pilot summary](../../../../results/part2action/evaluations/action_timing_20261011/summary.json) · [39 comparison GIFs](../../../../results/part2action/evaluations/action_timing_20261011/index.html).
 
 ## Slide 7 — Part2Action: Expanded evaluation and diffusion
 
@@ -140,8 +140,8 @@ Use failure traces to choose the next targeted fix; expand training categories s
 Existing MLP contact references differ in conditioning or training history; their comparison is not decoder-only.
 Evaluation seeds measure rollout randomness; each checkpoint still uses one training seed.
 
-Results: [Expanded test1 folder](../../../results/part2action/evaluations/action_timing_full_test1_20261012/).
-References: [Research plan](../RESEARCH_PLAN.md) · [Diffusion details](../archive/2026-10-22/DIFFUSION_ABLATION.md) · [Dataset splits](../DATASET.md).
+Results: [Expanded test1 folder](../../../../results/part2action/evaluations/action_timing_full_test1_20261012/).
+References: [Research plan](../../RESEARCH_PLAN.md) · [Diffusion details](../../archive/2026-10-22/DIFFUSION_ABLATION.md) · [Dataset splits](../../DATASET.md).
 
 ## Evidence and run records
 
@@ -150,9 +150,9 @@ Timing MLP: training6705831/6705832; pilot evaluation6712177/6711750; paired exp
 Expanded test1: evaluation6714294/6714295; export6714296.
 Diffusion: training6712229/6712230; evaluation not yet submitted.
 
-[Timing training records](../../../results/part2action/runs/timing_submissions_20261010.json) ·
-[Expanded evaluation records](../../../results/part2action/evaluations/action_timing_full_test1_20261012/submissions.json) ·
-[Diffusion training records](../../../results/part2action/runs/diffusion_submissions_20261012.json).
+[Timing training records](../../../../results/part2action/runs/timing_submissions_20261010.json) ·
+[Expanded evaluation records](../../../../results/part2action/evaluations/action_timing_full_test1_20261012/submissions.json) ·
+[Diffusion training records](../../../../results/part2action/runs/diffusion_submissions_20261012.json).
 
 Expert videos are task-matched references and may have different initial scenes.
 Historical 39-rollout scores and expanded test1 scores have different task coverage.

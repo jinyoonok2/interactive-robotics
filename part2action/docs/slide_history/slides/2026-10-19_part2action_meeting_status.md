@@ -2,7 +2,7 @@
 
 Six-slide meeting deck. Status checked October 19; no speaker notes.
 
-Slide media: [PNG preview](media/2026-10-19/index.html) · [download all table images](media/2026-10-19/2026-10-19_slide_media.zip).
+Slide media: [PNG preview](../media/2026-10-19/index.html) · [download all table images](../media/2026-10-19/2026-10-19_slide_media.zip).
 
 ## Slide 1 — Part2Action: Diffusion improves control
 
@@ -11,10 +11,10 @@ Evaluated 149 test1 scenarios at three seeds: 447 rollouts per model, with one t
 Diffusion improved control performance and is now our default action head; MLP-only results are archived.
 Early contact achieved the highest aggregate score, but contact conditioning has not consistently helped.
 
-![Slide 1 table: Diffusion improves control](media/2026-10-19/slide01_diffusion_improves_control_table.png)
+![Slide 1 table: Diffusion improves control](../media/2026-10-19/slide01_diffusion_improves_control_table.png)
 
-Use this image: [slide01_diffusion_improves_control_table.png](media/2026-10-19/slide01_diffusion_improves_control_table.png).
-Results: [Original decoder comparison](../../../results/part2action/evaluations/diffusion_30epoch_20261013/index.html) · [Early-contact comparison](../../../results/part2action/evaluations/diffusion_early_contact_20261018/index.html).
+Use this image: [slide01_diffusion_improves_control_table.png](../media/2026-10-19/slide01_diffusion_improves_control_table.png).
+Results: [Original decoder comparison](../../../../results/part2action/evaluations/diffusion_30epoch_20261013/index.html) · [Early-contact comparison](../../../../results/part2action/evaluations/diffusion_early_contact_20261018/index.html).
 
 ## Slide 2 — Part2Action: Earlier contact fusion
 
@@ -23,7 +23,7 @@ Remove the learned global scalar; retain coordinate scaling and LayerNorm.
 Success: early contact 40/447, control 33/447, late contact 22/447.
 Promising improvement, but upstream feature changes prevent isolating contact’s contribution.
 
-Visuals: [Expert → diffusion control → late contact → early contact](../../../results/part2action/evaluations/diffusion_early_contact_20261018/index.html).
+Visuals: [Expert → diffusion control → late contact → early contact](../../../../results/part2action/evaluations/diffusion_early_contact_20261018/index.html).
 
 ## Slide 3 — Part2Action: Timing and sampling
 
@@ -33,10 +33,10 @@ Next-index scored 16/447 versus 10/447 for same-index, but both trailed the earl
 Stride samples every step or every other step; it changes training examples and updates, not observation-frame spacing.
 Next-index helped within this test; the stronger stride-2 reference motivates a separate controlled stride investigation.
 
-![Slide 3 table: Timing and sampling](media/2026-10-19/slide03_next_index_targets_table.png)
+![Slide 3 table: Timing and sampling](../media/2026-10-19/slide03_next_index_targets_table.png)
 
-Use this image: [slide03_next_index_targets_table.png](media/2026-10-19/slide03_next_index_targets_table.png).
-Visuals: [Expert → same-index → next-index](../../../results/part2action/evaluations/diffusion_timing_scratch_20261015/index.html).
+Use this image: [slide03_next_index_targets_table.png](../media/2026-10-19/slide03_next_index_targets_table.png).
+Visuals: [Expert → same-index → next-index](../../../../results/part2action/evaluations/diffusion_timing_scratch_20261015/index.html).
 
 ## Slide 4 — Part2Action: Transformer diffusion
 
@@ -46,9 +46,9 @@ Keep the vision/language encoders, observation-history encoder, hierarchy, part-
 The comparison changes decoder architecture and capacity together; separate modality-token conditioning comes later.
 CPU checks and real-data GPU preflights passed for both new training runs.
 
-![Slide 4 table: Transformer diffusion](media/2026-10-19/slide04_transformer_diffusion_table.png)
+![Slide 4 table: Transformer diffusion](../media/2026-10-19/slide04_transformer_diffusion_table.png)
 
-Use this image: [slide04_transformer_diffusion_table.png](media/2026-10-19/slide04_transformer_diffusion_table.png).
+Use this image: [slide04_transformer_diffusion_table.png](../media/2026-10-19/slide04_transformer_diffusion_table.png).
 
 ## Slide 5 — Part2Action: Faster comparisons
 
@@ -58,9 +58,9 @@ Compare models at the same budget; short screening can miss slower-learning cand
 Thirty epochs is not a proven convergence requirement; reserve longer matched training for selected candidates.
 Cancelled the unused 30-epoch Transformer pipeline before training began.
 
-![Slide 5 table: Faster comparisons](media/2026-10-19/slide05_faster_comparisons_table.png)
+![Slide 5 table: Faster comparisons](../media/2026-10-19/slide05_faster_comparisons_table.png)
 
-Use this image: [slide05_faster_comparisons_table.png](media/2026-10-19/slide05_faster_comparisons_table.png).
+Use this image: [slide05_faster_comparisons_table.png](../media/2026-10-19/slide05_faster_comparisons_table.png).
 
 ## Slide 6 — Part2Action: Current runs and next steps
 
@@ -71,8 +71,8 @@ Use rollout videos to judge motion execution; training loss alone does not estab
 If the decoder helps, test richer modality-token conditioning; investigate early-contact gains with controlled input interventions.
 Expert references may use different starting scenes and are not guaranteed to align by task phase.
 
-![Slide 6 table: Current runs and next steps](media/2026-10-19/slide06_current_runs_and_next_steps_table.png)
+![Slide 6 table: Current runs and next steps](../media/2026-10-19/slide06_current_runs_and_next_steps_table.png)
 
-Use this image: [slide06_current_runs_and_next_steps_table.png](media/2026-10-19/slide06_current_runs_and_next_steps_table.png).
-Pending review: [10-epoch next-index decoder comparison](../../../results/part2action/evaluations/diffusion_screening_10epoch_next_action_20261018/index.html).
-Run records: [Submission and configuration snapshots](../../../results/part2action/runs/diffusion_screening_10epoch_submission_20261018/submissions.json).
+Use this image: [slide06_current_runs_and_next_steps_table.png](../media/2026-10-19/slide06_current_runs_and_next_steps_table.png).
+Pending review: [10-epoch next-index decoder comparison](../../../../results/part2action/evaluations/diffusion_screening_10epoch_next_action_20261018/index.html).
+Run records: [Submission and configuration snapshots](../../../../results/part2action/runs/diffusion_screening_10epoch_submission_20261018/submissions.json).

@@ -1,0 +1,32 @@
+{
+  "meeting_date": "2026-11-02",
+  "captured_at": "2026-11-02T10:32:39-05:00",
+  "slide_mapping": {
+    "1": [
+      "slide01_recovered_policy_results.png",
+      "slide01_gate_diagnostics_detailed.png",
+      "slide01_target_diagnostics_detailed.png"
+    ],
+    "2": [
+      "slide02_released_dp_dp3_results.png",
+      "slide02_fixed_reference_status.png"
+    ],
+    "3": [
+      "slide03_gpc_method.png"
+    ],
+    "4": [
+      "slide04_proposed_tolerance_architecture.png"
+    ],
+    "5": [
+      "slide05_implemented_baseline_collection.png"
+    ],
+    "6": [
+      "slide06_remaining_implementation.png"
+    ],
+    "7": [
+      "slide07_gpc_adopted_and_different.png"
+    ]
+  },
+  "generator": "part2action/docs/slide_history/scripts/build_20261102_research_update.py",
+  "format": "Markdown and numbered PNG tables only; no generated PDF/HTML/ZIP report."
+}

@@ -1,9 +1,50 @@
 # Part2Action research plan
 
-Updated November 11, 2026. Run status verified at 11:54 a.m. America/New_York.
+Updated November 24, 2026. Status checked against Slurm accounting and saved run receipts.
 Project: **Part2Action / P2A**, Franka Panda in PartGym with PartInstruct data.
 The RB-Y1 PAP/LRL projects are separate; see [experiment ownership](EXPERIMENT_OWNERSHIP.md).
 Commands: [SETUP](SETUP.md). Labels and splits: [DATASET](DATASET.md).
+
+## Current status — November 24, 2026
+
+No Part2Action jobs are queued. Sections after this one are dated history;
+their job states and "next" items are superseded where they disagree.
+
+| Generation | Result | Scope |
+| --- | --- | --- |
+| Original visual policy + GT pose | Initial-phase-end grasp 114/333 without, 160/333 with; full task 70/441 and 76/441 | Test1, three evaluation seeds, 120/1 protocol; six references missing |
+| Pose-token v1, GT input | Grasp acquired 56/333 without, 41/333 with; full task 20/441 and 33/441 | Test1, three evaluation seeds |
+| Pose-token v2, completion-corrected epoch 2 | Grasp 2/4, touch 0/4, sequence 0/4 | 12 development scenarios, one seed |
+| Pose-token v3, epoch 10 | Grasp 2/4, touch 1/4, sequence 0/4 under learned and oracle progression | 12 development scenarios, one seed |
+| V3 frozen grasp probe | Predicted/verified geometry × learned/forced gate: 0/4; reference replay succeeded | One mug scene, one seed |
+
+These rows use different data, budgets and protocols and are not a ranking.
+V3 held-out goal error stayed near 4 cm after epoch 2 while training goal loss
+kept falling (0.051 at epoch 1, 0.003 at epoch 10). V3 trained on 226
+demonstrations, and has no Test1 or VLM-planner evaluation.
+
+**Working hypothesis, untested:** the pose-token diffusion decoder shared by
+v1–v3 and the small training set limit execution more than skill progression.
+**Proposed next step:** compare the original decoder with the pose-token decoder
+under matched initialization, data, updates and protocol.
+
+## Evaluation protocol update — November 16, 2026
+
+New evaluations use the released PartInstruct execution settings: **250 executed
+actions and eight actions per prediction for Test1**; Test4 uses 400 actions.
+The [shared configuration](../configs/evaluation/partinstruct_native.json) and
+current pose-token evaluators cover both v1 and the separate v2 checkpoint family.
+Native camera/physics thresholds are retained, including the 0.15 m release
+height. Learned grounding/progression and full-task scoring remain explicit
+differences from the privileged released-policy evaluator.
+
+The existing 120/1 Part2Action results and dated run descriptions below are
+historical measurements, not new-protocol results. They are not relabeled or
+merged with new runs. The superseded fixed 120/1 DP/DP3 evaluations and the old
+self-trained DP3 pilot results were removed at the user's request. The completed
+[native released-weight evaluations](../../results/partinstruct/evaluations/official_release_20261022)
+and all model checkpoints are retained. This settings update does not submit
+new training or full evaluation jobs.
 
 ## Objective and current scope
 
@@ -17,7 +58,7 @@ The two supported paths are:
 
 | Path | Implementation | Current state |
 | --- | --- | --- |
-| Original visual policy + supplied GT grasp pose | `VisualPosePolicyV1` | Both GPU preflights passed; matched fine-tuning queued |
+| Original visual policy + supplied GT grasp pose | `VisualPosePolicyV1` | Both two-epoch fine-tuning arms completed; matched-training audit passed; evaluation recovery underway |
 | Shared visual grounding + predicted grasp pose | `GroundedVisualPosePolicyV1` | CPU and full-backbone GPU smoke checks passed; full training not submitted |
 
 The separate non-visual pose/controller pipeline is retired. Its eight result
@@ -34,15 +75,33 @@ current training plan. [Cleanup and historical sources](archive/2026-11-11_scope
 | Matched GT/control GPU preflight | 6864650 | Completed, exit 0; both variants optimized and sampled valid actions |
 | Exact simulation reset check | 6864687 | Completed; TCP, joints and object pose matched the separate reference reset |
 | Native grasp-reference collection | 6864651 | 339 records: 333 completed, six unavailable |
-| Two matched fine-tuning arms | 6864652, tasks 0–1 | Pending GPU priority; neither training checkpoint exists yet |
-| Full policy evaluation | 6864664, tasks 0–7 | Pending training dependency; zero policy rollouts recorded |
-| Paired report / statistics | 6864665 / 6864729 | Pending evaluation/report dependencies |
+| Two matched fine-tuning arms | 6864652, tasks 0–1 | Completed, exit 0: control 3h 53m; GT-pose 4h 33m; two epochs / 62,802 updates per arm |
+| Failed V2 evaluation | 6864664, tasks 0–7 | All failed before any rollout: missing `oracle_path` import |
+| V3 end-to-end smoke | 6910609, tasks 0–1 | Both completed, exit 0; control executed 120 actions, GT-pose completed its task in 72 |
+| Recovered full evaluation | 6910610, tasks 0–7 | Queued after successful smoke checks; original checkpoints and protocol reused |
+| Recovered report / statistics | 6910611 / 6910612 | Queued behind recovered evaluation/report; prior incomplete V2 reports preserved |
 | New visual pose architecture GPU smoke | 6865392 | Completed, exit 0; one optimization step and observation-only action sampling |
 
-The evaluation remains queued: **149 Test1 scenarios × seeds 42/43/44 = 447
-planned rollouts per arm, 894 total**. It waits for the two fine-tuning arms.
-The six unavailable grasp references are coverage gaps, not policy failures.
-No new grasp-success or task-success rate is available yet.
+Evaluation still plans **149 Test1 scenarios × seeds 42/43/44 = 447 rollouts
+per arm, 894 total**. Training completed with identical shared initial weights,
+per-epoch minibatch digests and update counts. V2 then failed before producing any
+policy measurement because the adapter did not import its reference-path helper.
+These missing measurements are not a 0% success result.
+
+V3 adds the missing import, four regression checks and a full-budget end-to-end
+rollout smoke check for each trained arm. Both smoke checks now passed. On that
+one matched start, control timed out at 120 actions and GT guidance completed
+the task in 72. These runtime checks are stored separately and do not establish
+a benchmark success-rate gain. Full evaluation verifies that both passed smoke
+receipts still match the trained checkpoint hashes before running. The
+same 120-step budget, native scoring, reset checks and learned action/phase logic
+are retained. Scheduler reservations are reduced to four CPUs and 24 GB host RAM;
+the existing two-thread compute settings are unchanged. No retraining is needed.
+Prior sources, failed logs and incomplete reports remain preserved in
+`evaluation_recovery_v3/previous_v2/`. The six unavailable expert references remain
+explicit coverage gaps. There is no valid benchmark grasp/task success rate yet.
+[Recovery revision](../../results/diagnostics/visual_oracle_pose_20261110_01/evaluation_revision_v3.json),
+[recovery jobs](../../results/diagnostics/visual_oracle_pose_20261110_01/evaluation_recovery_v3/submissions.json).
 
 [GT run](../../results/diagnostics/visual_oracle_pose_20261110_01/README.md),
 [job ledger](../../results/diagnostics/visual_oracle_pose_20261110_01/submissions.json),
@@ -116,11 +175,11 @@ object motion and is not an assured performance upper bound.
 [conditioner](../models/pose_conditioning_v1.py),
 [labels](../data/oracle_grasp_pose_v1.py),
 [trainer](../scripts/train_visual_pose_v1.py),
-[evaluation adapter](../scripts/evaluate_visual_oracle_pose_v2.py),
+[evaluation adapter](../scripts/evaluate_visual_oracle_pose_v3.py),
 [config](../configs/pose_learning/visual_oracle_pose_v1.json),
-[GT-stage diagram](figures/2026-11-10_visual_gt_pose_finetuning/visual_gt_pose_finetuning.pdf).
-The V1 submitter contains a superseded evaluation helper; the queued run uses
-the recorded V2 adapter. Preserve submitted sources and use the existing queue.
+[GT-stage diagram](slide_history/media/2026-11-10/visual_gt_pose_finetuning.pdf).
+The V1 submitter and V2 adapter remain historical frozen sources. The recovery
+uses V3 with its own source hashes and a smoke gate; preserve all trained artifacts.
 
 ## Stage 2: shared grounding and predicted pose
 
@@ -181,13 +240,13 @@ supervision-only ablation before isolating the effect of predicted pose input.
 [trainer](../scripts/train_grounded_visual_pose_v1.py),
 [rollout adapter](../scripts/evaluate_grounded_visual_pose_v1.py),
 [config](../configs/pose_learning/grounded_visual_pose_v1.yaml),
-[comparison diagram](figures/2026-11-11_grounded_visual_pose/visual_pose_architectures.pdf),
-[CPU validation](grounded_visual_pose_v1_validation.json).
+[comparison diagram](slide_history/media/2026-11-11/visual_pose_architectures.pdf),
+[CPU validation](records/grounded_visual_pose_v1_validation.json).
 
 ## Next decisions
 
-1. Let the already queued GT/control fine-tuning and evaluation finish; inspect
-   logs and completion receipts without resubmitting duplicate jobs.
+1. Let the V3 end-to-end smoke checks gate the recovered GT/control evaluation.
+   Training is complete; preserve both checkpoints and avoid duplicate training.
 2. Audit matched training, reference gaps and paired evaluation coverage, then
    compare grasp acquisition, phase-end grasp and full-task success.
 3. If GT guidance is useful, train/evaluate the shared visual pose estimator with
@@ -220,7 +279,7 @@ where required by the current run's broad source manifest. In particular,
 Do not remove these files or edit their hashes while the queue depends on them.
 
 [This cleanup manifest](archive/2026-11-11_scope_cleanup/manifest.json),
-[previous non-visual result deletion](cleanup_20261111_nonvisual_pose.json),
+[previous non-visual result deletion](records/cleanup_20261111_nonvisual_pose.json),
 [archived research history](archive/2026-11-11_scope_cleanup/README.md).
 Original visual checkpoints, released data, current result folders, other projects
 and dated slide history remain intact.

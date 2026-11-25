@@ -1,0 +1,437 @@
+[
+  {
+    "slide": 1,
+    "file": "slide01_recovered_policy_results.png",
+    "rows": [
+      [
+        "Separately trained model / checkpoint",
+        "Decoder / sample stride",
+        "Explicit target input to action",
+        "Success"
+      ],
+      [
+        "A: Earlier diffusion (6724877)",
+        "MLP denoiser; stride 1",
+        "OFF: zero relative geometry",
+        "46/447 (10.3%)"
+      ],
+      [
+        "B: Transformer control (6724878)",
+        "Transformer; stride 1",
+        "OFF: zero relative geometry",
+        "64/447 (14.3%)"
+      ],
+      [
+        "C: Transformer stride test (6731746)",
+        "Transformer; stride 2",
+        "OFF: zero relative geometry",
+        "48/447 (10.7%)"
+      ],
+      [
+        "D: Transformer target-input model (6744368)",
+        "Transformer; stride 1",
+        "ON: predicted target relative to TCP",
+        "63/447 (14.1%)"
+      ]
+    ],
+    "column_fractions": [
+      0.32,
+      0.25,
+      0.25,
+      0.18
+    ],
+    "dimensions": [
+      2600,
+      1044
+    ],
+    "sha256": "59e16a81992ba472ca849532780f352f9cea10035d33a9d74164254121bb7ba1"
+  },
+  {
+    "slide": 1,
+    "file": "slide01_gate_diagnostics_detailed.png",
+    "rows": [
+      [
+        "Gate diagnostic variant",
+        "Weights / training",
+        "Visual input at evaluation",
+        "Target geometry input",
+        "Success"
+      ],
+      [
+        "Predicted gate (control)",
+        "Reuse B: 6724878; no retraining",
+        "Model-predicted part emphasis",
+        "OFF",
+        "64/447 (14.3%)"
+      ],
+      [
+        "Oracle gate",
+        "Reuse B: 6724878; no retraining",
+        "GT-part projection at the learned phase; phase remains predicted",
+        "OFF",
+        "69/447 (15.4%)"
+      ],
+      [
+        "No visual gate",
+        "Reuse B: 6724878; no retraining",
+        "Identity visual weighting; no part emphasis",
+        "OFF",
+        "67/447 (15.0%)"
+      ]
+    ],
+    "column_fractions": [
+      0.19,
+      0.24,
+      0.25,
+      0.16,
+      0.16
+    ],
+    "dimensions": [
+      2600,
+      1120
+    ],
+    "sha256": "2df5aa3e1026406c782086176477a5b971fad1c72f2f57f3f6720de030a44f67"
+  },
+  {
+    "slide": 1,
+    "file": "slide01_target_diagnostics_detailed.png",
+    "rows": [
+      [
+        "Target diagnostic variant",
+        "Weights / training",
+        "Geometry fed into action features",
+        "Visual gate",
+        "Success"
+      ],
+      [
+        "Identity (control)",
+        "Reuse D: 6744368; no retraining",
+        "Unmodified predicted target relative to measured TCP",
+        "Predicted",
+        "66/447 (14.8%)"
+      ],
+      [
+        "Zero vector",
+        "Reuse D: 6744368; no retraining",
+        "Zero the relative geometry; keep ON-trained projection, bias and weights",
+        "Predicted",
+        "66/447 (14.8%)"
+      ],
+      [
+        "+5 cm world-X shift",
+        "Reuse D: 6744368; no retraining",
+        "Shift the target used for conditioning +0.05 m along world X",
+        "Predicted",
+        "68/447 (15.2%)"
+      ]
+    ],
+    "column_fractions": [
+      0.18,
+      0.22,
+      0.3,
+      0.14,
+      0.16
+    ],
+    "dimensions": [
+      2600,
+      1052
+    ],
+    "sha256": "39e700d46537f306f37585cce3e7879dbb7149a212014c808d853fc78d026664"
+  },
+  {
+    "slide": 2,
+    "file": "slide02_released_dp_dp3_results.png",
+    "rows": [
+      [
+        "Earlier native evaluation",
+        "11 categories",
+        "Four-category subset",
+        "Status"
+      ],
+      [
+        "DP-S",
+        "29/176 (16.5%)",
+        "11/64 (17.2%)",
+        "COMPLETED"
+      ],
+      [
+        "DP3-S",
+        "81/176 (46.0%)",
+        "30/64 (46.9%)",
+        "COMPLETED"
+      ]
+    ],
+    "column_fractions": [
+      0.27,
+      0.25,
+      0.26,
+      0.22
+    ],
+    "dimensions": [
+      2600,
+      516
+    ],
+    "sha256": "22e2701992e84ffc8721329cdcc8598c75e98dde737542e223aa8c85892855b6"
+  },
+  {
+    "slide": 2,
+    "file": "slide02_fixed_reference_status.png",
+    "rows": [
+      [
+        "New fixed evaluation",
+        "Trials finished / planned",
+        "Final success result",
+        "Status"
+      ],
+      [
+        "DP-S",
+        "413/447",
+        "Final result pending",
+        "IN PROGRESS"
+      ],
+      [
+        "DP3-S",
+        "447/447",
+        "58/447 (13.0%)",
+        "COMPLETED"
+      ]
+    ],
+    "column_fractions": [
+      0.25,
+      0.25,
+      0.28,
+      0.22
+    ],
+    "dimensions": [
+      2600,
+      516
+    ],
+    "sha256": "4739241e429779775d96cd2b53382307041bf94711f93c53279f9940c4253168"
+  },
+  {
+    "slide": 3,
+    "file": "slide03_gpc_method.png",
+    "rows": [
+      [
+        "GPC component",
+        "Role"
+      ],
+      [
+        "Frozen diffusion policy",
+        "Propose multiple plausible action chunks from current observations"
+      ],
+      [
+        "Action-conditioned world model",
+        "Predict future outcomes; learn from demonstrations and random exploration"
+      ],
+      [
+        "GPC-RANK",
+        "Score predicted outcomes with a reward function; select the best candidate"
+      ],
+      [
+        "GPC-OPT",
+        "Refine a proposal through world-model gradients; can combine with ranking"
+      ]
+    ],
+    "column_fractions": [
+      0.3,
+      0.7
+    ],
+    "dimensions": [
+      2600,
+      908
+    ],
+    "sha256": "148a399dbf0117e38bb9bcc3d0dd651c3c1312df93b5646fba7d2dfaaac4c30d"
+  },
+  {
+    "slide": 4,
+    "file": "slide04_proposed_tolerance_architecture.png",
+    "rows": [
+      [
+        "Component",
+        "Inputs",
+        "Output / purpose"
+      ],
+      [
+        "Existing perception",
+        "RGB / scene PCD, language, robot state and predicted part features",
+        "Observation and task features"
+      ],
+      [
+        "Existing action policy",
+        "Current observation history and task",
+        "Candidate action chunks"
+      ],
+      [
+        "New outcome scorer",
+        "Observation features + candidate action sequence",
+        "Task-success score under a declared continuation"
+      ],
+      [
+        "Later tolerance representation",
+        "Joint position, wrist rotation and closing-time changes",
+        "State- and part-conditioned acceptable interaction set"
+      ],
+      [
+        "Later candidate selection",
+        "Same candidate budget, scored alternatives",
+        "Execute chosen action, observe again"
+      ]
+    ],
+    "column_fractions": [
+      0.25,
+      0.39,
+      0.36
+    ],
+    "dimensions": [
+      2600,
+      1104
+    ],
+    "sha256": "438b6ceccf3959147fe883957cfab8d6d993c9e7c1f8347f1c202723e07a6e69"
+  },
+  {
+    "slide": 5,
+    "file": "slide05_implemented_baseline_collection.png",
+    "rows": [
+      [
+        "Source category",
+        "Finished / planned",
+        "Accepted baselines",
+        "Runtime errors"
+      ],
+      [
+        "bottle",
+        "1243/1243",
+        "926",
+        "0"
+      ],
+      [
+        "mug",
+        "889/1973",
+        "680",
+        "0"
+      ],
+      [
+        "pliers",
+        "1/468",
+        "1",
+        "0"
+      ],
+      [
+        "scissors",
+        "1/369",
+        "1",
+        "0"
+      ],
+      [
+        "TOTAL",
+        "2134/4053",
+        "1608",
+        "0"
+      ]
+    ],
+    "column_fractions": [
+      0.25,
+      0.27,
+      0.28,
+      0.2
+    ],
+    "dimensions": [
+      2600,
+      832
+    ],
+    "sha256": "7ffca75cf8c4c93ef80f0b2cfb7e48404c4c294b9aa7528136c236aaf272b29a"
+  },
+  {
+    "slide": 6,
+    "file": "slide06_remaining_implementation.png",
+    "rows": [
+      [
+        "Step",
+        "Implementation to add",
+        "Validation"
+      ],
+      [
+        "Collect variations",
+        "Preserve baseline prefix; change one factor, then joint factors; run the original task",
+        "Store actual pre-action RGB / PCD, candidate, continuation and outcome"
+      ],
+      [
+        "Train generic scorer",
+        "Freeze encoders; train candidate-sequence scores with BCE on success/failure labels",
+        "Split by object instance; report failure recall, calibration and candidate ranking"
+      ],
+      [
+        "Learn structured tolerance",
+        "Compare spatial-only and joint pose / closing-time representations",
+        "Compare against the generic scorer using identical records"
+      ],
+      [
+        "Connect to the actor",
+        "Rank a fixed number of policy proposals; execute and reobserve",
+        "Validate with policy continuation; compare rollout success and latency"
+      ],
+      [
+        "Matched controls",
+        "Policy only; successful-data augmentation; generic scorer; structured tolerance",
+        "Same source data, candidate count, evaluation cases and control budget"
+      ]
+    ],
+    "column_fractions": [
+      0.23,
+      0.39,
+      0.38
+    ],
+    "dimensions": [
+      2600,
+      1376
+    ],
+    "sha256": "86d66ac493863ea6e459010575623349b06aeb67d5b30f6cf4fb2bcbb6425855"
+  },
+  {
+    "slide": 7,
+    "file": "slide07_gpc_adopted_and_different.png",
+    "rows": [
+      [
+        "Aspect",
+        "GPC",
+        "Our proposed design"
+      ],
+      [
+        "Adopt: modular policy",
+        "Keep a trained diffusion actor fixed",
+        "Initially preserve our current actor and encoders"
+      ],
+      [
+        "Adopt: candidate evaluation",
+        "Evaluate proposals before execution",
+        "Score alternatives before selecting an action"
+      ],
+      [
+        "Adapt: additional data",
+        "Demonstrations plus random exploration",
+        "Successful full replays plus controlled local changes"
+      ],
+      [
+        "Change: prediction target",
+        "Future states / images, followed by reward evaluation",
+        "Direct outcome scores; later an explicit joint pose-time tolerance representation"
+      ],
+      [
+        "Evidence so far",
+        "Simulation and real-robot policy improvement",
+        "Reference collection only; no new closed-loop robustness gain established"
+      ]
+    ],
+    "column_fractions": [
+      0.23,
+      0.385,
+      0.385
+    ],
+    "dimensions": [
+      2600,
+      1308
+    ],
+    "sha256": "5e8e97e4379aed4ef332359570934328681ecc56cc29dbd101dc76fbbbc431bc"
+  }
+]

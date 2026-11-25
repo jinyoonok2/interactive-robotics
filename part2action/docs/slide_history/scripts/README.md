@@ -13,6 +13,8 @@ run new policy rollouts.
 | `draw_unified_architecture.py` | Draw the simple unified architecture as PNG and editable SVG |
 | `media_bundle.py` | Shared preview and ZIP writer used by the two slide exporters |
 | `export_slide_tables.py` | Export tables for any dated deck, replacing visible Markdown tables with PNG previews and explicit image links |
+| `extract_related_work_20261115.py` | Extract the cited GHOST and 3D Diffuser Actor figures from the versioned local paper PDFs |
+| `draw_pose_architecture_20261115.py` | Refresh the comparison for the implemented pose-token model and render the matched training table from a dated status snapshot |
 
 Each slide uses one concise block of individual lines without leading bullet
 dashes, before its images and download links. Do not split content into separate
@@ -21,12 +23,12 @@ blocks around tables.
 For new decks, always render tables as PNGs and place them under
 `media/YYYY-MM-DD/`. At the table's position in the slide document, embed the
 PNG and add an explicit “Use this image” link naming the file. Keep all media
-for that meeting in the same dated folder; do not recreate `slide_history/figures/`.
+for that meeting in the same dated folder, including architecture figures.
 
 October 19 tables can be regenerated with:
 
 ```bash
-/p/part2action/envs/part2action_train/bin/python part2action/docs/slide_history/scripts/export_slide_tables.py --slides part2action/docs/slide_history/2026-10-19_part2action_meeting_status.md
+/p/part2action/envs/part2action_train/bin/python part2action/docs/slide_history/scripts/export_slide_tables.py --slides part2action/docs/slide_history/slides/2026-10-19_part2action_meeting_status.md
 ```
 
 The first export reads the Markdown tables. After they are replaced by images,

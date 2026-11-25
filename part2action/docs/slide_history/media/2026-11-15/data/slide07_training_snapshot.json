@@ -1,0 +1,89 @@
+{
+  "observed_at_utc": "2026-11-15T03:05:31+00:00",
+  "run": "results/diagnostics/pose_token_diffusion_training_20261114_01",
+  "experiment": "Matched Pose-token Diffusion GT-provided versus pose-disabled two-epoch screen",
+  "arms": {
+    "disabled": {
+      "job_id": "6926619",
+      "scheduler_state": "RUNNING",
+      "elapsed": "3:29:55",
+      "node": "lynx01",
+      "pose_source": "disabled",
+      "latest_logged_update": {
+        "epoch": 2,
+        "step": 10750
+      },
+      "completed_epochs": 1,
+      "initial_trainable_state_sha256": "8d32b6d3383ffc95d807bb1880bcda89e5e63c559d4c6d0a3cb2689b80b90ccc",
+      "initial_checkpoint_sha256": "6058134e5fe5aa6d894b42408bf2e76f6b26e1e21055daeb3e549e6255f5c5f7",
+      "loaded_tensors": 124,
+      "initialization_note": "Only compatible blocks transferred; new pose/feature fusion/cross-attention weights are newly initialized.",
+      "epoch1_batch_order_sha256": "de600275ae9215ec1f19df3ad443638cb678f4bbf471efee3b0ec3986cc71398",
+      "used_samples": 502431,
+      "parameter_counts": {
+        "total": 139287445,
+        "trainable": 7600789
+      },
+      "pose_head_auxiliary_loss": true,
+      "predicted_pose_conditions_actions": false
+    },
+    "provided": {
+      "job_id": "6926620",
+      "scheduler_state": "RUNNING",
+      "elapsed": "3:25:23",
+      "node": "jaguar01",
+      "pose_source": "provided",
+      "latest_logged_update": {
+        "epoch": 2,
+        "step": 18700
+      },
+      "completed_epochs": 1,
+      "initial_trainable_state_sha256": "8d32b6d3383ffc95d807bb1880bcda89e5e63c559d4c6d0a3cb2689b80b90ccc",
+      "initial_checkpoint_sha256": "6058134e5fe5aa6d894b42408bf2e76f6b26e1e21055daeb3e549e6255f5c5f7",
+      "loaded_tensors": 124,
+      "initialization_note": "Only compatible blocks transferred; new pose/feature fusion/cross-attention weights are newly initialized.",
+      "epoch1_batch_order_sha256": "de600275ae9215ec1f19df3ad443638cb678f4bbf471efee3b0ec3986cc71398",
+      "used_samples": 502431,
+      "parameter_counts": {
+        "total": 139287445,
+        "trainable": 7600789
+      },
+      "pose_head_auxiliary_loss": true,
+      "predicted_pose_conditions_actions": false
+    }
+  },
+  "training": {
+    "epochs_per_arm": 2,
+    "batch_size": 16,
+    "optimizer": "AdamW",
+    "learning_rate": 0.0001,
+    "weight_decay": 1e-05,
+    "gradient_clip": 1.0,
+    "mixed_precision": "BF16",
+    "seed": 42,
+    "frozen_backbones": [
+      "DINOv2 ViT-S/14 registers",
+      "Flan-T5-base"
+    ],
+    "init_checkpoint": "/p/part2action/results/part2action/runs/world_geometry_10epoch_diffusion_next_action_transformer_6724878/last.pt",
+    "optimizer_steps_per_arm": 62802
+  },
+  "dataset": {
+    "demos": 4053,
+    "frames": 502431,
+    "batch_size": 16,
+    "optimizer_steps_per_epoch": 31401,
+    "epochs": 2,
+    "train_seed": 42
+  },
+  "matching_checks": {
+    "same_initial_trainable_state": true,
+    "same_epoch1_batch_order": true,
+    "same_dataset_samples": true,
+    "pinned_training_sources_unchanged": 64
+  },
+  "optional_pose_aware_progress_enabled": false,
+  "benchmark_status": "Full training in progress; new-policy benchmark results pending",
+  "next_comparison": "Paired grasp/task evaluation of pose-disabled and GT-provided arms, followed by learned-pose conditioning",
+  "source_plan_sha256": "e7a883e4861a2f02a48e1cffb17a1bbaa05af717086ebb24de6bbfc6b92a09ec"
+}

@@ -1,0 +1,49 @@
+{
+  "created_utc": "2026-11-15T03:07:33+00:00",
+  "scope": "Earlier evaluated additive policy versus the implemented GT-input pose-token arm; no new benchmark claim",
+  "layout_checks": "Passed text containment, clipping, pairwise label overlap, and PNG table text checks",
+  "source_sha256": {
+    "part2action/docs/slide_history/scripts/draw_pose_architecture_20261115.py": "26a130e04f45699b0649abdf0138d6d9527dd1fd41eac121503f24754cad59ff",
+    "part2action/scripts/draw_pose_architecture_comparison_v2.py": "aca311554c3f3fd53f12a3036b78420b9c2cb5056940b14e9da7e163644fe283",
+    "part2action/docs/slide_history/scripts/export_slide_tables.py": "2d8ecc726a0b3a1b47ab1da12af5242cb5171cb4a4ad934b24a32b1493d98d2c",
+    "part2action/docs/slide_history/media/2026-11-15/data/slide07_training_snapshot.json": "e2f192e728addd0339bebbf5c4b302ab4dae1acb89154411aa61b6d4365f00ec",
+    "part2action/models/pose_token_diffusion/configs/model.yaml": "f478f114c9233d90fdea98b9705c47bf28f37fd37a93d0838de5c7cecdf9c4d0",
+    "part2action/models/pose_token_diffusion/configs/train.yaml": "1c69d1ca9a9777bf03318be6439108bf9d26d0d3ef3bac164f69df9ca5e24ad8",
+    "part2action/models/pose_token_diffusion/policy.py": "57aa58c32ec48a023a44b11d05eae80b7a27ba4c7af8353607db0d430fc7a38c",
+    "part2action/models/pose_token_diffusion/blocks/encoder.py": "8e90a80fcdd7cd9c2cf04c2ea358e0ec9d0f6baef3c25a2478245f44e72318c6",
+    "part2action/models/pose_token_diffusion/blocks/pose_head.py": "279d7a0d58b4218de99552f383aa74ff2311792ae5493de2c0dc27bb5177f3ce",
+    "part2action/models/pose_token_diffusion/blocks/pose_tokens.py": "32d4af5a456ed18de2bd3c65a4a60e2184e5ca773b5739e811260f829da9bb59",
+    "part2action/models/pose_token_diffusion/blocks/action_decoder.py": "db864ad21b6a15a68bb1d75cd5d752ab9c3fa0b64924c4b74e0caf7c15eb7fde",
+    "part2action/models/pose_token_diffusion/losses.py": "80f9e4df42b2e492d2e3f74af6308c6c30e2647774751af50c831cfcc2d47804"
+  },
+  "files": {
+    "current_training_comparison.png": {
+      "sha256": "afdd342fb6ecd42d34fe0d1b24036712cdd88b9315dc905cd395d7cd9ab80106",
+      "bytes": 42062
+    },
+    "old_vs_implemented_pose_token_diffusion.mmd": {
+      "sha256": "2792fd754aeeeb0c633786664507504eba636f4f7fd5a0c03bfa968a6f637ff7",
+      "bytes": 1538
+    },
+    "old_vs_implemented_pose_token_diffusion.pdf": {
+      "sha256": "ede8de941e5e9b45ac7f7222074d6389793ca3d37fe1d889e322d5b9eed30c95",
+      "bytes": 30628
+    },
+    "old_vs_implemented_pose_token_diffusion.png": {
+      "sha256": "1116e4ad06be8b479b935d42c31443159bf8aa033af2058ca6bd2bc97786c2a9",
+      "bytes": 832011
+    },
+    "old_vs_implemented_pose_token_diffusion.svg": {
+      "sha256": "594f4963af8c26cc6ad40845d538421eadfd4fcb759e56eb69e617006d1f1270",
+      "bytes": 27577
+    },
+    "report_figure.tex": {
+      "sha256": "33de3a545974d6660d0f28e9896d5b380ef332171de058ad31fad81489f56d0c",
+      "bytes": 1009
+    },
+    "training_table.json": {
+      "sha256": "7e3a12b7e2ac55fb663d245317c6ba8d851a35b95addaf508a37f5254a33eb51",
+      "bytes": 755
+    }
+  }
+}

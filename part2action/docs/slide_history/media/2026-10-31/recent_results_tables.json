@@ -1,0 +1,97 @@
+{
+  "date": "2026-10-31",
+  "tables": [
+    {
+      "file": "recent_policy_results.png",
+      "rows": [
+        [
+          "Our policy: test1, 4 categories",
+          "Successes",
+          "Rate"
+        ],
+        [
+          "Transformer: target input OFF",
+          "64/447",
+          "14.3%"
+        ],
+        [
+          "Transformer: target input ON",
+          "63/447",
+          "14.1%"
+        ]
+      ],
+      "column_fractions": [
+        0.62,
+        0.2,
+        0.18
+      ]
+    },
+    {
+      "file": "recent_released_dp_results.png",
+      "rows": [
+        [
+          "Released policy",
+          "11 categories",
+          "Our 4 categories"
+        ],
+        [
+          "DP-S",
+          "29/176 (16.5%)",
+          "11/64 (17.2%)"
+        ],
+        [
+          "DP3-S",
+          "81/176 (46.0%)",
+          "30/64 (46.9%)"
+        ]
+      ],
+      "column_fractions": [
+        0.3,
+        0.35,
+        0.35
+      ]
+    },
+    {
+      "file": "recent_target_diagnostics.png",
+      "rows": [
+        [
+          "Frozen target-input diagnostic",
+          "Successes",
+          "Rate"
+        ],
+        [
+          "Unmodified target input",
+          "66/447",
+          "14.8%"
+        ],
+        [
+          "Zero relative target input",
+          "66/447",
+          "14.8%"
+        ],
+        [
+          "Target shifted +5 cm in world X",
+          "68/447",
+          "15.2%"
+        ]
+      ],
+      "column_fractions": [
+        0.62,
+        0.2,
+        0.18
+      ]
+    }
+  ],
+  "sources": [
+    "results/part2action/evaluations/diffusion_transformer_contact_comparison_20261027_recovery1/quantitative_report/summary.json",
+    "results/part2action/evaluations/frozen_target_diagnostics_20261027_recovery1/quantitative_report/summary.json",
+    "results/partinstruct/evaluations/official_release_20261022/DP-S/full/summary.json",
+    "results/partinstruct/evaluations/official_release_20261022/DP3-S/full/summary.json"
+  ],
+  "notes": [
+    "Our matched policies: 10 epochs, stride 1, next-index, two frames, auxiliary target supervision ON in both; test1 149 fixed scenarios x 3 seeds.",
+    "Released policies: GT part inputs, oracle skill progression, 16 sampled trials per category; four-category subset still not matched to our fixed scenarios.",
+    "Frozen target diagnostics use one ON checkpoint with controlled forked diffusion noise; compare to their own identity reference.",
+    "One-case expert replay perturbation result 42/42 is not a learned-policy task-success score."
+  ]
+}

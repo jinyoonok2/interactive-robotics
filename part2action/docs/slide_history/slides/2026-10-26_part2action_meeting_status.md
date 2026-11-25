@@ -64,7 +64,7 @@ References: [PartInstruct](https://www.cs.jhu.edu/~alanlab/Pubs25/yin2025PartIns
 [ReKep](https://arxiv.org/abs/2409.01652),
 [GLiDE](https://arxiv.org/abs/2403.17124).
 
-Code: [label derivation](../../data/targets.py),
-[loader](../../data/partinstruct_loader.py),
-[contact conditioning](../../models/heads.py),
-[unified contact config](../archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_unified_contact.yaml).
+Code: [label derivation](../../../data/targets.py),
+[loader](../../../data/partinstruct_loader.py),
+[contact conditioning](../../../models/heads.py),
+[unified contact config](../../archive/2026-11-11_config_history/hierarchical_world_geometry_30epoch_unified_contact.yaml).

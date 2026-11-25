@@ -1,0 +1,178 @@
+"""Build dated slide-history Markdown and PNGs from recorded evidence."""
+import argparse
+from datetime import date
+import gzip
+import json
+from pathlib import Path
+import shutil
+import sys
+
+import numpy as np
+
+ROOT=Path(__file__).resolve().parents[2]
+
+
+def read(path):
+    return json.loads(path.read_text()) if path.exists() else None
+
+
+def main():
+    p=argparse.ArgumentParser(description=__doc__)
+    p.add_argument('--study',type=Path,required=True)
+    p.add_argument('--training',type=Path,required=True)
+    p.add_argument('--probes',type=Path,nargs='+',required=True)
+    p.add_argument('--out-dir',type=Path,required=True)
+    p.add_argument('--slides',type=Path,required=True)
+    p.add_argument('--native-context',type=Path,default=Path('results/diagnostics/native_task_context_runtime_audit_20261101'))
+    p.add_argument('--proposals',type=Path,default=Path('results/diagnostics/alternative_expert_proposals_20261101'))
+    args=p.parse_args();out=args.out_dir;out.mkdir(parents=True,exist_ok=True)
+    report_date=date.fromisoformat(args.slides.name[:10])
+    sys.path.insert(0,str(ROOT/'part2action/docs/slide_history/scripts'))
+    from export_slide_tables import render
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    pilot=read(args.study/'pilot/summary.json')
+    case_paths=sorted((args.study/'pilot/cases').glob('*/summary.json'))
+    cases=[read(p) for p in case_paths]
+    table=[['Category','Validated references','Variation labels']]
+    for category in ['bottle','mug','pliers','scissors']:
+        rows=[r for r in cases if r['case']['object']==category]
+        table.append([category,f'{sum(r["eligible"] for r in rows)} / {len(rows)}',
+                      f'{sum(r["variation_successes"] for r in rows)} pass, {sum(r["variation_failures"] for r in rows)} fail'])
+    render(table,[.30,.30,.40],out/'slide01_reference_validation.png')
+    probe_rows=[];probe_states=[]
+    for directory in args.probes:
+        summary=read(directory/'trials/summary.json')
+        if summary:
+            probe_states.append({'directory':str(directory),'status':summary['status'],
+                                 'completed':len(summary['rows']),'planned':summary['planned_trials']})
+            for row in summary['rows']:
+                probe_rows.append({**row,'trial_file':str(directory/'trials'/Path(row['source']).name/row['profile']/'result.json')})
+    profiles=['legacy','preserve_closure_gain','settle_only','slow_lift_only','preserve_and_settle','preserve_slow','preserve_slow_settle']
+    names={'legacy':'Original added lift','preserve_closure_gain':'Preserve closing gain',
+           'settle_only':'Add 0.5 s settling','slow_lift_only':'Lift over 2 s',
+           'preserve_and_settle':'Preserve + settle','preserve_slow':'Preserve + 2 s lift',
+           'preserve_slow_settle':'Preserve + settle + 2 s lift'}
+    table=[['Continuation','Scissors top','Scissors right','Pliers leg']]
+    for profile in profiles:
+        cells=[names[profile]]
+        for case in ['02308','02416','02240']:
+            found=[r for r in probe_rows if Path(r['source']).name==case and r['profile']==profile]
+            cells.append(f'{"PASS" if found[0]["success"] else "FAIL"}; {found[0]["lift_m"]*1000:.1f} mm' if found else 'Pending')
+        table.append(cells)
+    render(table,[.37,.21,.21,.21],out/'slide02_handoff_comparison.png')
+    context_plan=read(args.native_context/'plan.json')
+    context_rows=[]
+    if context_plan:
+        table=[['Source','First-skill episode','Original task context','Reference replay']]
+        for index in context_plan['pilot_indices']:
+            source=args.study/'pilot/cases'/f'{index:05d}'
+            previous=read(source/'summary.json')
+            current=read(args.native_context/'audit/cases'/f'{index:05d}'/'summary.json')
+            label=previous['case']['object']+' '+previous['case']['part']
+            old_result='PASS' if previous['generated_stable_success'] else 'FAIL added lift'
+            if current:
+                new_result='PASS added lift' if current['generated_stable_success'] else 'Not validated'
+                replay='PASS' if current.get('eligible') else 'Not eligible'
+                context_rows.append(current)
+            else:new_result='Pending';replay='Pending'
+            table.append([label,old_result,new_result,replay])
+        render(table,[.25,.25,.28,.22],out/'slide02_native_context_comparison.png')
+    fig,axes=plt.subplots(2,2,figsize=(10,7),sharex='col')
+    any_trace=False
+    for col,case in enumerate(['02308','02416']):
+        for profile in ['legacy','preserve_closure_gain','preserve_slow','preserve_slow_settle']:
+            found=[r for r in probe_rows if Path(r['source']).name==case and r['profile']==profile]
+            if not found:continue
+            row=found[0];trial=Path(row['trial_file']).parent
+            original=read(Path(row['source'])/'summary.json')
+            with gzip.open(trial/'physics.json.gz','rt') as f:physics=json.load(f)
+            start=original['generation']['grasp_physics_steps']
+            values=physics[start:];time=np.array([r['elapsed_s'] for r in values])-values[0]['elapsed_s']
+            with gzip.open(trial/'execution.json.gz','rt') as f:execution=json.load(f)
+            initial_z=execution['initial']['object_xyz'][2]
+            axes[0,col].plot(time,[(r['object_xyz'][2]-initial_z)*1000 for r in values],label=names[profile])
+            # Bin force-qualified finger contacts over 0.1 s for legibility.
+            bilateral=np.array([len({c['robot_link'] for c in r['contacts'] if c['is_finger'] and c['normal_force_n']>=.1})==2 for r in values],float)
+            centers=[];fractions=[]
+            for i in range(0,len(values)-23,24):centers.append(time[i:i+24].mean());fractions.append(bilateral[i:i+24].mean())
+            axes[1,col].plot(centers,fractions,label=names[profile]);any_trace=True
+        axes[0,col].axhline(30,color='black',linestyle='--',alpha=.4,label='30 mm criterion')
+        axes[0,col].set(title='Scissors '+('top' if col==0 else 'right'),ylabel='Object rise (mm)')
+        axes[1,col].set(xlabel='Time since grasp finished (s)',ylabel='Bilateral-contact fraction',ylim=(-.05,1.05))
+        axes[0,col].grid(alpha=.2);axes[1,col].grid(alpha=.2)
+    if any_trace:
+        axes[0,0].legend(fontsize=7);fig.suptitle('Same expert grasp, changed continuation; unchanged success criteria')
+        fig.tight_layout();fig.savefig(out/'slide02_supplement_scissors_handoff_traces.png',dpi=180)
+    plt.close(fig)
+    training=read(args.training/'run/summary.json')
+    curve_source=args.training/'run/media/2026-11-01/training_curves.png'
+    if curve_source.exists():shutil.copy2(curve_source,out/'slide03_training_curves.png')
+    if training:
+        table=[['Held-instance pilot','Balanced accuracy','Brier (lower)','Pooled AUROC']]
+        for model,label in [('train_prior','Train-prior constant'),('candidate_only','Candidate only'),('context_candidate','Context + candidate')]:
+            r=training['results'][model]['mean']
+            table.append([label,f'{r["balanced_accuracy"]:.3f}',f'{r["brier"]:.3f}',f'{r["auroc"]:.3f}'])
+        render(table,[.34,.24,.21,.21],out/'slide03_predictor_results.png')
+    proposal_plan=read(args.proposals/'plan.json');proposal_rows=[]
+    if proposal_plan:
+        for trial in proposal_plan['proposal_trials']:
+            path=args.proposals/'trials'/f'rank_{trial["proposal_rank"]}'/'cases'/f'{trial["case_index"]:05d}'
+            result=read(path/'proposal_validation.json')
+            proposal_rows.append({**trial,'result':result,'summary':read(path/'summary.json')})
+    evidence={'report_date':report_date.isoformat(),'pilot':pilot,'probe_states':probe_states,'probe_rows':probe_rows,'training':training,
+              'alternative_proposals':{'directory':str(args.proposals),'rows':proposal_rows,
+                                      'scope':'Bounded new native-ranked proposals; fixed criteria and controller, not a gain search.'},
+              'native_context_audit':{'directory':str(args.native_context),'completed_cases':len(context_rows),
+                                      'planned_cases':len(context_plan['pilot_indices']) if context_plan else None,'rows':context_rows,
+                                      'protocol':'Original full-task termination context; pose_tcp wall-time guard disabled, native max iterations and physical criteria retained; initial grasp + additional lift only.'},
+              'scope':'Development pilot; grasp/lift outcomes under specified continuation, not policy robustness.'}
+    (out/'evidence.json').write_text(json.dumps(evidence,indent=2)+'\n')
+    all_probes=bool(probe_states) and len(probe_states)==len(args.probes) and all(r['status']=='completed' for r in probe_states)
+    context_done=bool(context_plan) and len(context_rows)==len(context_plan['pilot_indices'])
+    status='complete' if training and all_probes and context_done else 'training and handoff report ready; native-context audit incomplete' if training and all_probes else 'continuation probes incomplete'
+    def link(name):return str(out.relative_to(args.slides.parent)/name)
+    training_text=(f'{training["records"]} labeled executions: {int(training["success_labels"])} success, {training["records"]-int(training["success_labels"])} failure.\n'
+                   'Six object instances; frozen DINOv2 and Flan-T5 features; full-scene point statistics.\n'
+                   'Six instance-held-out folds, three seeds, 250 fixed updates per head.\n'
+                   'Context reduces training loss, but held-out performance does not improve.\n'
+                   'No action-policy training or candidate-selection rollout claim.\n') if training else 'Outcome predictor training is still running.\n'
+    slides=(
+        f'# Part2Action robustness and training update — {report_date:%B} {report_date.day}, {report_date.year}\n\n'
+        f'Date: {report_date.isoformat()}\n\n'
+        f'Report status: {status}. Values are derived from linked execution records.\n\n'
+        '## Slide 1 — Part2Action: A reproducible collection pipeline\n\n'
+        'Generate fresh initial grasps with the released native expert.\n'
+        'Record actual motor calls, collision filters, physics cadence and physical outcomes.\n'
+        'Five of eight pilot references pass grasp/lift validation and exact replay.\n'
+        'The separate mug smoke also passes three exact replays.\n'
+        'These are newly generated references, not original expert task reproductions.\n\n'
+        f'![Reference validation]({link("slide01_reference_validation.png")})\n\nUse this image: [{"slide01_reference_validation.png"}]({link("slide01_reference_validation.png")}).\n\n'
+        '## Slide 2 — Part2Action: Distinguish grasp detection from retention\n\n'
+        'All three rejected references pass the native instantaneous grasp check.\n'
+        'Two scissors grasps lose contact during our additional lift procedure.\n'
+        'The rejected pliers retains contact but rises 29.23 mm against a 30 mm criterion.\n'
+        '35 trials compare closing gain, settling and lift duration; no universal rescue.\n'
+        'Keep all physical success thresholds fixed; report each continuation separately.\n\n'
+        'Full-task termination context was audited separately; this remains our added lift test.\n\n'
+        f'![Handoff comparison]({link("slide02_handoff_comparison.png")})\n\nUse this image: [slide02_handoff_comparison.png]({link("slide02_handoff_comparison.png")}).\n\n'
+        +
+        (f'![Task-context audit]({link("slide02_native_context_comparison.png")})\n\nUse this image: [slide02_native_context_comparison.png]({link("slide02_native_context_comparison.png")}).\n\n' if context_plan else '')+
+        '## Slide 3 — Part2Action: First outcome-head training completed\n\n'+training_text+'\n'+
+        (f'![Training curves]({link("slide03_training_curves.png")})\n\nUse this image: [slide03_training_curves.png]({link("slide03_training_curves.png")}).\n\n'
+         f'![Held-instance results]({link("slide03_predictor_results.png")})\n\nUse this image: [slide03_predictor_results.png]({link("slide03_predictor_results.png")}).\n\n' if training else '')+
+        '## Slide 4 — Part2Action: Evidence and next decision\n\n'
+        'Pilot variations yield both successful alternatives and failures.\n'
+        'Classifier training works technically; the current data do not support a generalization gain.\n'
+        'Only 15 failure labels exist, with nine from one pliers instance.\n'
+        'Keep continuation fixed while testing alternative native grasp proposals.\n'
+        'Expand object-instance coverage and failure diversity before larger policy training.\n'
+        'Test learned candidate selection against matched-data generic scoring.\n\n'
+        f'Evidence: [machine-readable report]({link("evidence.json")}).\n')
+    args.slides.write_text(slides)
+    images=sorted(p.name for p in out.glob('*.png'))
+    print(json.dumps({'status':status,'slides':str(args.slides),'images':images}))
+
+
+if __name__=='__main__':main()

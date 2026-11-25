@@ -164,9 +164,20 @@ entries are only one split, not their entire test suite. Test5 has no entries
 for these four categories because its categories are held out from the full
 training release. The remaining2,337 test entries belong to other categories.
 
-## Current evaluation coverage
+## Evaluation coverage and current execution settings
 
-The queued timing comparison uses **all 149 four-object test1 scenarios** and
+Updated November 16: new evaluations use the
+[released execution settings](../configs/evaluation/partinstruct_native.json),
+250 executed actions with eight actions per prediction for Test1 (400 actions
+for Test4). The last block is clipped to the remaining action budget. Native
+camera/physics settings are used; policy modalities, learned versus oracle
+progression, and full-task versus sequential-skill scoring remain explicit.
+The retained released DP/DP3 reference is the 250/8 native-runner evaluation
+under `official_release_20261022`. Superseded fixed 120/1 DP/DP3 outputs were
+deleted at the user's request. Existing 120/1 Part2Action measurements remain
+historical and must not be pooled with new 250/8 results.
+
+The recorded four-object timing comparisons use **all 149 four-object test1 scenarios** and
 fixed evaluation seeds 42,43,44: **447 rollouts per model**. Each scenario is
 selected explicitly once per seed, using matching scenario/seed pairs between
 models. Report per-seed success and the mean with sample standard deviation.
