@@ -19,7 +19,7 @@ from PIL import Image
 import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_OUT = ROOT / "part2action/docs/figures/2026-11-10_visual_gt_pose_finetuning"
+DEFAULT_OUT = ROOT / "part2action/docs/slide_history/media/2026-11-10"
 DEFAULT_RUN = ROOT / "results/diagnostics/visual_oracle_pose_20261110_01"
 STEM = "visual_gt_pose_finetuning"
 

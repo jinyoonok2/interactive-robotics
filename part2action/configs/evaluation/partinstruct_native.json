@@ -1,0 +1,9 @@
+{
+  "protocol": "partinstruct_native_execution_v1",
+  "schema_version": 1,
+  "action_budgets": {"test1": 250, "test2": 250, "test3": 250, "test4": 400, "test5": 250},
+  "execute_steps": 8,
+  "budget_unit": "executed_environment_actions",
+  "evaluation_seeds": [42, 43, 44],
+  "scope": "Matches released evaluator action budgets and execution cadence. Grounding, skill progression, scenario sampling and success scoring must be reported separately."
+}

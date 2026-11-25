@@ -1,0 +1,43 @@
+# Independent recipe. Run provided/disabled with the same seed and budget first.
+model_config: model.yaml
+data:
+  train_hdf5:
+    - /p/part2action/data/PartInstruct/demos/bottle.hdf5
+    - /p/part2action/data/PartInstruct/demos/mug.hdf5
+    - /p/part2action/data/PartInstruct/demos/pliers.hdf5
+    - /p/part2action/data/PartInstruct/demos/scissors.hdf5
+  action_target_offset: 1
+  action_chunk: 8
+  n_obs_steps: 2
+  max_skill_slots: 4
+  sample_stride: 1
+  max_demos_per_file: null
+  batch_size: 16
+  num_workers: 4
+  pin_memory: true
+  use_pcd: true
+  use_tcp_pose: true
+  use_hierarchy: true
+  use_point_part_labels: true
+  use_part_pcd: false
+  use_contact_xyz: false
+train:
+  seed: 42
+  epochs: 2
+  lr: 0.0001
+  weight_decay: 0.00001
+  grad_clip: 1.0
+  amp: true
+  init_checkpoint: /p/part2action/results/part2action/runs/world_geometry_10epoch_diffusion_next_action_transformer_6724878/last.pt
+losses:
+  action_weight: 1.0
+  pose_position_weight: 1.0
+  pose_rotation_weight: 1.0
+  pose_applicability_weight: 0.1
+  grounding_region_weight: 1.0
+  gate_weight: 0.5
+  skill_embedding_weight: 1.0
+  slot_validity_weight: 0.25
+  phase_weight: 0.5
+  termination_weight: 0.5
+  termination_pos_weight: 10.0

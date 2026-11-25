@@ -1,0 +1,28 @@
+architecture: pose_token_diffusion_v1
+schema_version: 2
+implementation_stage: implemented
+hidden_dim: 256
+action_horizon: 8
+action_dim: 7
+pose_source: provided
+progress_enabled: false
+visual_backbone: dinov2_vits14_reg
+language_backbone: google/flan-t5-base
+img_size: 252
+n_obs_steps: 2
+max_skill_slots: 4
+hierarchy_layers: 2
+temporal_layers: 1
+attention_heads: 4
+decoder_layers: 2
+diffusion_steps: 100
+visual_token_grid: 8
+scene_token_budget: 64
+local_token_budget: 8
+translation_scale_m: 0.1
+camera_fov_degrees: 60.0
+diffusion_clip_sample: 2.0
+action_scale: [0.5, 0.5, 0.5, 3.141592653589793, 3.141592653589793, 3.141592653589793, 0.02]
+action_offset: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.02]
+text_device: cuda
+use_part_gate: true

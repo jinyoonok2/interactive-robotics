@@ -12,7 +12,7 @@
       "path": "pose_learning/visual_oracle_pose_v1.json",
       "model_class": "VisualPosePolicyV1",
       "entrypoint": "scripts/run_visual_oracle_pose_v1.py",
-      "submitted_evaluation_entrypoint": "scripts/evaluate_visual_oracle_pose_v2.py"
+      "submitted_evaluation_entrypoint": "scripts/evaluate_visual_oracle_pose_v3.py"
     },
     {
       "role": "shared_grounding_predicted_pose",

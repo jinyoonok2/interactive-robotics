@@ -37,6 +37,7 @@ from diagnostics.partgym_reach import (
 from diagnostics.partgym_skill_oracle import PartGymSkillOracle
 from diagnostics.evaluation_scenarios import load_scenarios, pin_scenario, rollout_plan, success_statistics, DEFAULT_EVALUATION_SEEDS
 from diagnostics.phase_controller import should_advance_phase
+from diagnostics.evaluation_protocol import execution_settings, execution_prefix, align_native_environment
 from models.part2action_model import Part2ActionModel
 
 
@@ -371,6 +372,8 @@ def rollout_one(
     collision_diagnostics: bool = False,
     selected_episode: dict | None = None,
 ) -> dict[str, Any]:
+    if type(max_steps) is not int or type(execute_steps) is not int or min(max_steps,execute_steps) < 1:
+        raise ValueError('Action budget and execution cadence must be positive integers')
     if termination_mode not in TERMINATION_MODES:
         raise ValueError(f"unsupported termination_mode={termination_mode}")
     set_seed(episode_seed)
@@ -424,6 +427,9 @@ def rollout_one(
     gif_path = None
     try:
         for inference_step in range(max_steps):
+            remaining_actions = max_steps-len(action_trace)
+            if remaining_actions <= 0:
+                break
             rgb = _make_rgb_tensor(history, n_obs_steps, device)
             kwargs = _model_observations(obs, device)
             model_instruction = [instruction]
@@ -511,7 +517,7 @@ def rollout_one(
                         action_target_xyz=chunk[0, 0, :3].detach().cpu().float().numpy(),
                     )
             chunk = chunk[0].detach().cpu().float().numpy()
-            for action in chunk[:execute_steps]:
+            for action in execution_prefix(chunk,execute_steps,remaining_actions):
                 raw_gripper_command_trace.append(float(action[6]))
                 executed_action = bound_gripper_command(action)
                 if collision_logger is not None:
@@ -618,10 +624,15 @@ def rollout_one(
         "trial_index": trial_index,
         "seed": episode_seed,
         "instruction": instruction,
-        "success": bool(done or info.get("Success", False)),
+        "success": bool(info.get("Success", False)),
         "completion_rate": float(info.get("Completion Rate", 0.0)) if info else 0.0,
         "steps": int(info.get("Steps", len(action_trace))) if info else len(action_trace),
         "num_actions": len(action_trace),
+        "max_steps": max_steps,
+        "execute_steps": execute_steps,
+        "budget_unit": "executed_environment_actions",
+        "num_policy_predictions": len(inference_latency_ms),
+        "success_definition": "PartGym full-task predicate; learned skill progression",
         "policy_forward_latency_ms": inference_latency_ms,
         "policy_forward_mean_ms": float(np.mean(inference_latency_ms)) if inference_latency_ms else None,
         "policy_forward_steady_mean_ms": float(np.mean(inference_latency_ms[1:])) if len(inference_latency_ms) > 1 else None,
@@ -665,8 +676,10 @@ def main() -> None:
                         help="Optional scenario limit for a smoke test; default evaluates every scenario.")
     parser.add_argument("--expected-episodes", type=int, default=None,
                         help="Fail before rollout if the selected scenario count differs.")
-    parser.add_argument("--max-steps", type=int, default=80)
-    parser.add_argument("--execute-steps", type=int, default=1)
+    parser.add_argument("--max-steps", type=int, default=None,
+                        help="Executed-action cap; defaults to released settings: 250, or 400 for Test4.")
+    parser.add_argument("--execute-steps", type=int, default=None,
+                        help="Actions per prediction; defaults to 8 from the shared evaluation protocol.")
     parser.add_argument("--device", default="cuda")
     parser.add_argument("--record", action="store_true")
     parser.add_argument("--gif-fps", type=float, default=10.0)
@@ -709,6 +722,8 @@ def main() -> None:
     seeds_group.add_argument("--eval-seeds", type=int, nargs="+", default=None,
                              help="Fixed seeds for every scenario; default: 42 43 44.")
     args = parser.parse_args()
+    settings = execution_settings(args.split,max_steps=args.max_steps,execute_steps=args.execute_steps)
+    args.max_steps,args.execute_steps = settings['max_steps'],settings['execute_steps']
     evaluation_seeds = args.eval_seeds or ([args.seed] if args.seed is not None else list(DEFAULT_EVALUATION_SEEDS))
     rollout_plan([], evaluation_seeds)  # Validate seeds before loading models.
 
@@ -729,6 +744,9 @@ def main() -> None:
     set_seed(evaluation_seeds[0])
     device = select_device(args.device)
     partgym_cfg = OmegaConf.load(partgym_config)
+    if args.partgym_config is None:
+        native = OmegaConf.load(partinstruct_root/'PartInstruct/baselines/evaluation/config/env/env_config.yaml')
+        align_native_environment(partgym_cfg,native)
     partgym_cfg.data_root = str(data_root)
     model_cfg = resolve_paths(load_yaml(config_path), ROOT)
     rollout_cfg = model_cfg.get("rollout", {}) or {}

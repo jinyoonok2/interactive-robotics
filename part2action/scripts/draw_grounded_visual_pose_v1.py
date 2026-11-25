@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch, FancyArrowPatch
 
 ROOT=Path(__file__).resolve().parents[2]
-OUT=ROOT/'part2action/docs/figures/2026-11-11_grounded_visual_pose'
+OUT=ROOT/'part2action/docs/slide_history/media/2026-11-11'
 STEM='visual_pose_architectures'
 MMD='''flowchart TB
   subgraph A["A. Current GT-pose experiment — queued"]

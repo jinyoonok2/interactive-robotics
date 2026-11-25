@@ -15,17 +15,8 @@ import torch
 from omegaconf import OmegaConf
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--model', choices=['DP-S', 'DP3-S'], required=True)
-    parser.add_argument('--checkpoint', type=Path, required=True)
-    parser.add_argument('--out-dir', type=Path, required=True)
-    parser.add_argument('--data-root', type=Path, required=True)
-    parser.add_argument('--framework-root', type=Path, required=True)
-    parser.add_argument('--smoke', action='store_true')
-    parser.add_argument('--load-only', action='store_true')
-    args = parser.parse_args()
-    args.out_dir.mkdir(parents=True, exist_ok=False)
+def load_released_policy(args):
+    """Shared release configuration and strict EMA loading for both protocols."""
     OmegaConf.register_new_resolver('eval', eval, replace=True)
     # Official trusted checkpoint uses dill and includes its training config.
     payload = torch.load(str(args.checkpoint), map_location='cpu', pickle_module=dill)
@@ -69,7 +60,6 @@ def main():
     if args.smoke:
         # One complete native scissors trial before the all-category pass.
         cfg.task_type = '1'
-    OmegaConf.save(cfg, args.out_dir / 'evaluation_config.yaml', resolve=True)
     info = {'model': args.model, 'checkpoint': str(args.checkpoint),
             'checkpoint_policy_config': OmegaConf.to_container(saved.policy, resolve=True),
             'compatibility': 'Legacy class paths mapped; Mask-name alias and DP convolution input dimension recovered from weights; strict parameter loading.',
@@ -80,12 +70,28 @@ def main():
             'limits': ['Not the fixed-scenario 447-rollout Part2Action protocol.',
                        'Not an exact reproduction of every paper evaluation setting.',
                        'Uses privileged target-part observations and oracle skill progression.']}
-    (args.out_dir / 'provenance.json').write_text(json.dumps(info, indent=2)+'\n')
     policy = hydra.utils.instantiate(cfg.policy)
     key = 'ema_model' if cfg.training.use_ema else 'model'
     policy.load_state_dict(payload['state_dicts'][key], strict=True)
     del payload
     policy.eval()
+    return cfg, policy, info
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--model', choices=['DP-S', 'DP3-S'], required=True)
+    parser.add_argument('--checkpoint', type=Path, required=True)
+    parser.add_argument('--out-dir', type=Path, required=True)
+    parser.add_argument('--data-root', type=Path, required=True)
+    parser.add_argument('--framework-root', type=Path, required=True)
+    parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--load-only', action='store_true')
+    args = parser.parse_args()
+    args.out_dir.mkdir(parents=True, exist_ok=False)
+    cfg, policy, info = load_released_policy(args)
+    OmegaConf.save(cfg, args.out_dir / 'evaluation_config.yaml', resolve=True)
+    (args.out_dir / 'provenance.json').write_text(json.dumps(info, indent=2)+'\n')
     if args.load_only:
         print('STRICT_CHECKPOINT_LOAD_OK', args.model, flush=True)
         return

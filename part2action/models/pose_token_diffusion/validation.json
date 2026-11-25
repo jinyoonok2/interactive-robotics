@@ -1,0 +1,168 @@
+{
+  "verified_at": "2026-11-14T16:58:47.374166-05:00",
+  "status": "implemented_cpu_gpu_and_native_runtime_validated",
+  "checks": {
+    "new_model_and_namespace_checks_passed": 24,
+    "existing_regressions_passed": 15
+  },
+  "real_hdf5_cpu": {
+    "status": "passed",
+    "dataset_samples": 448,
+    "rgb_shape": [
+      2,
+      2,
+      3,
+      300,
+      300
+    ],
+    "scene_shape": [
+      2,
+      1024,
+      3
+    ],
+    "camera_visible_fraction": 1.0,
+    "valid_pose_labels": 2,
+    "losses": {
+      "action": 1.4521070718765259,
+      "pose_position": 2.7182488441467285,
+      "pose_rotation": 0.6964450478553772,
+      "pose_applicability": 0.6874962449073792,
+      "grounding_region": 6.92606258392334,
+      "skill_embedding": 0.902611255645752,
+      "slot_validity": 0.8854138851165771,
+      "phase": 1.3807556629180908,
+      "termination": 0.5690271258354187,
+      "gate": 0.542861819267273,
+      "total": 14.23189926147461
+    },
+    "cross_attention_gradient_norm": 0.09837178885936737,
+    "scope": "Real HDF5 samples through actual new blocks; tiny frozen test backbones, 3-step action horizon, 4 diffusion steps; no policy performance claim."
+  },
+  "gpu_smoke": {
+    "job_id": "6923646",
+    "scheduler_state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:02:35",
+    "modes": {
+      "provided": {
+        "status": "passed",
+        "initial_state_sha256": "8d32b6d3383ffc95d807bb1880bcda89e5e63c559d4c6d0a3cb2689b80b90ccc",
+        "batch_order_sha256": "62daf4a8fa3682d7f2c946ddfddc63d19a1878e1e67c585fdf88ba6fe795af92",
+        "loaded_tensors": 124,
+        "valid_pose_labels": 2,
+        "action_shape": [
+          2,
+          8,
+          7
+        ],
+        "peak_gpu_memory_bytes": 761235456,
+        "parameters": {
+          "total": 139287445,
+          "trainable": 7600789
+        }
+      },
+      "disabled": {
+        "status": "passed",
+        "initial_state_sha256": "8d32b6d3383ffc95d807bb1880bcda89e5e63c559d4c6d0a3cb2689b80b90ccc",
+        "batch_order_sha256": "62daf4a8fa3682d7f2c946ddfddc63d19a1878e1e67c585fdf88ba6fe795af92",
+        "loaded_tensors": 124,
+        "valid_pose_labels": 2,
+        "action_shape": [
+          2,
+          8,
+          7
+        ],
+        "peak_gpu_memory_bytes": 760692736,
+        "parameters": {
+          "total": 139287445,
+          "trainable": 7600789
+        }
+      },
+      "predicted": {
+        "status": "passed",
+        "initial_state_sha256": "8d32b6d3383ffc95d807bb1880bcda89e5e63c559d4c6d0a3cb2689b80b90ccc",
+        "batch_order_sha256": "62daf4a8fa3682d7f2c946ddfddc63d19a1878e1e67c585fdf88ba6fe795af92",
+        "loaded_tensors": 124,
+        "valid_pose_labels": 2,
+        "action_shape": [
+          2,
+          8,
+          7
+        ],
+        "peak_gpu_memory_bytes": 761233920,
+        "parameters": {
+          "total": 139287445,
+          "trainable": 7600789
+        }
+      }
+    },
+    "matched_initial_weights_and_batches": true,
+    "result_root": "results/diagnostics/pose_token_diffusion_20261114_01",
+    "purpose": "One actual-backbone update and full diffusion sample per mode, not full training or a benchmark.",
+    "status": "passed"
+  },
+  "implementation": {
+    "core_network_complete": true,
+    "training_pipeline_complete": true,
+    "native_evaluation_adapter_complete": true,
+    "optional_progress_block_complete": true,
+    "progress_enabled_by_default": false,
+    "per_skill_pose_goal_sequence_implemented": false,
+    "full_training_started": false,
+    "benchmark_evaluation_started": false
+  },
+  "preservation": {
+    "existing_source_and_config_files_unchanged": 150,
+    "source_guard_files": 30,
+    "original_config_audit": "passed; same three active original recipes",
+    "original_model_weights_written": false,
+    "pinned_smoke_source_files_unchanged": 66
+  },
+  "source_sha256": {
+    "part2action/models/README.md": "2b8914e55deba4c0eac4b3e821c5b5031a1bb81d6e73d6dba2714e05c55d2c75",
+    "part2action/models/pose_token_diffusion/README.md": "330c35df391e0d48f237021fe8e89b5d517fd238f9ead6f5ec64fe481e2cf90a",
+    "part2action/models/pose_token_diffusion/__init__.py": "35d7ab50d5091194db89f0527a4713e6cfcd8c1af6d1f4feeb675b1e915f8d5a",
+    "part2action/models/pose_token_diffusion/backbones.py": "426ac1833b4fbb4356275d3126d2852022465587e8be1629723b271971f568ff",
+    "part2action/models/pose_token_diffusion/blocks/__init__.py": "7f73f136259ab3d3b6fe48dfc3cc67282d14393f5e58563bf78a37d4e03166bc",
+    "part2action/models/pose_token_diffusion/blocks/action_decoder.py": "db864ad21b6a15a68bb1d75cd5d752ab9c3fa0b64924c4b74e0caf7c15eb7fde",
+    "part2action/models/pose_token_diffusion/blocks/encoder.py": "8e90a80fcdd7cd9c2cf04c2ea358e0ec9d0f6baef3c25a2478245f44e72318c6",
+    "part2action/models/pose_token_diffusion/blocks/geometry.py": "5e91b3e615b730fe27022dd44b81d6dfa1ceabc0b2d494b8293483936baeb83f",
+    "part2action/models/pose_token_diffusion/blocks/grounding.py": "1f141a8f737e68cab55716a71aa1381b1de63946b8ba612be46c1ae376d80790",
+    "part2action/models/pose_token_diffusion/blocks/pose_head.py": "279d7a0d58b4218de99552f383aa74ff2311792ae5493de2c0dc27bb5177f3ce",
+    "part2action/models/pose_token_diffusion/blocks/pose_tokens.py": "32d4af5a456ed18de2bd3c65a4a60e2184e5ca773b5739e811260f829da9bb59",
+    "part2action/models/pose_token_diffusion/blocks/progress.py": "e02936d3e988c728290303c881ab832121f3df3cab427df58613833ebb1a6bb0",
+    "part2action/models/pose_token_diffusion/checkpoint.py": "0a99abbbf7c05a426436ce5622c065e2c90a7073e31f3396ef7ff2d5537f8954",
+    "part2action/models/pose_token_diffusion/config.py": "3275fcf1140c69cb44df64f3a564a15457ef6e9dd5395950ccd9dab88972fa11",
+    "part2action/models/pose_token_diffusion/configs/model.yaml": "f478f114c9233d90fdea98b9705c47bf28f37fd37a93d0838de5c7cecdf9c4d0",
+    "part2action/models/pose_token_diffusion/configs/train.yaml": "1c69d1ca9a9777bf03318be6439108bf9d26d0d3ef3bac164f69df9ca5e24ad8",
+    "part2action/models/pose_token_diffusion/contracts.py": "c167d3ae067f96df9fc80413e21bcc27b9e4a0bd667d84e1bbbd20eee9e07553",
+    "part2action/models/pose_token_diffusion/dataset.py": "acac8e91b80674352795d1a864d31399b635ef6eed58ce4096afc8c37564d93a",
+    "part2action/models/pose_token_diffusion/evaluation.py": "63f56856e93906fcdd357a95a3155b651f4e64e989963798a3a2153817df42fa",
+    "part2action/models/pose_token_diffusion/factory.py": "2a754c45f059cb0cf97b1458da3c487b85890aa7f94d5539f78ba2f0a3d83f9f",
+    "part2action/models/pose_token_diffusion/losses.py": "80f9e4df42b2e492d2e3f74af6308c6c30e2647774751af50c831cfcc2d47804",
+    "part2action/models/pose_token_diffusion/policy.py": "57aa58c32ec48a023a44b11d05eae80b7a27ba4c7af8353607db0d430fc7a38c",
+    "part2action/models/pose_token_diffusion/runtime.py": "befbf746d46087c2b30d98a62dd99d10ff19771186bf8b0a079f9fcfdda78ec9",
+    "part2action/models/pose_token_diffusion/tests/__init__.py": "3f7201486b608cf0fb5a8f26404625f2f66d664a0f306ed5884e7ad404914af2",
+    "part2action/models/pose_token_diffusion/tests/test_composition.py": "0503f1a4da2e8af3bf891d527a3bbe085e2e06a15207067ef0804bcab6b33361",
+    "part2action/models/pose_token_diffusion/tests/test_model.py": "c5d9b5060e6883b9b76f9cafe7e56a19d36af70bf50dd232f05c84662fd9ea47",
+    "part2action/models/pose_token_diffusion/tests/test_pipeline.py": "a7ab7197f17f066b0d9e2f525632d5af7f83dc39626d1007b415eb3229f274ce",
+    "part2action/models/pose_token_diffusion/training.py": "11dccff97e61e2e0b613f88d7b2c0e6e861469b057c26d6de936cce373aa2a5e",
+    "part2action/scripts/evaluate_pose_token_diffusion.py": "3c9ad29874948502453db654115cbb36f833d8e1f650a0e246f4420ec18db144",
+    "part2action/scripts/train_pose_token_diffusion.py": "0a90f2e5ab89392d3316f231e458a3136bd9f58970063204d8f28e7f6147efeb",
+    "part2action/slurm/pose_token_diffusion.sbatch": "a22ab2bd1899cb6f7873001b6e33dc96b8a2e36ddabafca3914451ff68e07466",
+    "part2action/slurm/smoke_pose_token_diffusion.sbatch": "a59337ba7c20b310dad165ca20b15da3c6f919deb7ff87cd2bc30d5cb479dde9"
+  },
+  "native_runtime_smoke": {
+    "job_id": "6923650",
+    "scheduler_state": "COMPLETED",
+    "exit_code": "0:0",
+    "elapsed": "00:03:59",
+    "status": "passed",
+    "debug_trials": 1,
+    "num_actions": 120,
+    "requested_episode_id": "300116",
+    "seed": 42,
+    "scope": "Native reset/action/execution/scoring integration using a one-update smoke checkpoint. Exclude from trained-policy success-rate comparisons.",
+    "result_root": "results/diagnostics/pose_token_diffusion_20261114_01/native_smoke"
+  }
+}

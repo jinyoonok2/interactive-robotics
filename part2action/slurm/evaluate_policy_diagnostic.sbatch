@@ -39,10 +39,10 @@ test ! -e "$SMOKE_OUT"
 test ! -e "$OUT_DIR"
 ARGS=(--diagnostic-mode "$MODE" --config "$RUN_DIR/config_source.yaml" --ckpt "$RUN_DIR/last.pt"
  --partinstruct-root "$ROOT/PartInstruct" --data-root /p/part2action/data/PartInstruct
- --model-key hierarchical --obj-classes bottle mug pliers scissors --execute-steps 1
+ --model-key hierarchical --obj-classes bottle mug pliers scissors --execute-steps 8
  --device cuda --termination-mode legacy --diagnostics --contact-diagnostics --diagnostic-every 20)
 python part2action/scripts/run_policy_diagnostic.py "${ARGS[@]}" \
  --num-episodes 1 --expected-episodes 1 --eval-seeds 42 --max-steps 5 --out-dir "$SMOKE_OUT"
 python part2action/scripts/run_policy_diagnostic.py "${ARGS[@]}" \
- --expected-episodes 149 --eval-seeds 42 43 44 --max-steps 120 --record --out-dir "$OUT_DIR"
+ --expected-episodes 149 --eval-seeds 42 43 44 --max-steps 250 --record --out-dir "$OUT_DIR"
 python part2action/scripts/summarize_contact_motion.py --run-dir "$OUT_DIR"

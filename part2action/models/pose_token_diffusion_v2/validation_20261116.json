@@ -1,0 +1,191 @@
+{
+  "created_utc": "2026-11-16T06:29:07.342107+00:00",
+  "architecture": "pose_token_diffusion_v2",
+  "status": "initial_baseline_implementation_checked",
+  "v2_unit_tests": {
+    "passed": 15
+  },
+  "v1_regression_tests": {
+    "passed": 21
+  },
+  "syntax_checked_files": 16,
+  "training_cli_help": "passed",
+  "preservation": {
+    "preserved_existing_models_and_plan": {
+      "files": 34,
+      "mismatches": 0
+    },
+    "v1_training_sources": {
+      "files": 64,
+      "mismatches": 0
+    },
+    "v1_evaluation_sources": {
+      "files": 95,
+      "mismatches": 0
+    }
+  },
+  "real_data_integration": {
+    "status": "passed",
+    "scope": "Real HDF5 labels/observations; tiny frozen test backbones; production-width v2 blocks. No simulator or success-rate measurement.",
+    "demonstrations": 128,
+    "max_demos_per_file": 32,
+    "phase_counts": {
+      "grasp_obj": 71,
+      "move_gripper": 73,
+      "rotate_obj": 8,
+      "release_obj": 12,
+      "touch_obj": 57
+    },
+    "valid_goal_counts": {
+      "grasp_obj": 71,
+      "move_gripper": 73,
+      "rotate_obj": 8,
+      "release_obj": 12,
+      "touch_obj": 51
+    },
+    "label_reasons": {
+      "valid": 215,
+      "no_nearby_fingertip_part_proxy": 6
+    },
+    "label_qualities": {
+      "measured_tcp_before_closure": 71,
+      "demonstrated_tcp_endpoint": 73,
+      "demonstrated_tcp_rotation_endpoint_proxy": 8,
+      "demonstrated_release_tcp_endpoint_proxy": 12,
+      "closest_fingertip_to_part_proxy": 57
+    },
+    "touch_proxy_distance_range_m": [
+      0.005207553505897522,
+      0.26183757185935974
+    ],
+    "train_demonstrations": 116,
+    "validation_demonstrations": 12,
+    "demonstration_overlap": 0,
+    "examples": [
+      {
+        "object": "bottle",
+        "demo": "demo_0",
+        "skill": "grasp_obj",
+        "instruction": "Grasp the bottle at its neck",
+        "phase_start": 0,
+        "target_t": 75,
+        "quality": "measured_tcp_before_closure",
+        "components": [
+          true,
+          true,
+          true
+        ],
+        "touch_proxy_to_part_distance_m": null
+      },
+      {
+        "object": "bottle",
+        "demo": "demo_0",
+        "skill": "move_gripper",
+        "instruction": "Move upwards",
+        "phase_start": 89,
+        "target_t": 120,
+        "quality": "demonstrated_tcp_endpoint",
+        "components": [
+          true,
+          false,
+          true
+        ],
+        "touch_proxy_to_part_distance_m": null
+      },
+      {
+        "object": "bottle",
+        "demo": "demo_3",
+        "skill": "rotate_obj",
+        "instruction": "Reorient the front of the bottle to face left",
+        "phase_start": 114,
+        "target_t": 155,
+        "quality": "demonstrated_tcp_rotation_endpoint_proxy",
+        "components": [
+          true,
+          true,
+          true
+        ],
+        "touch_proxy_to_part_distance_m": null
+      },
+      {
+        "object": "bottle",
+        "demo": "demo_4",
+        "skill": "release_obj",
+        "instruction": "Release",
+        "phase_start": 110,
+        "target_t": 156,
+        "quality": "demonstrated_release_tcp_endpoint_proxy",
+        "components": [
+          true,
+          false,
+          true
+        ],
+        "touch_proxy_to_part_distance_m": null
+      },
+      {
+        "object": "bottle",
+        "demo": "demo_11",
+        "skill": "touch_obj",
+        "instruction": "Touch the bottle at its right",
+        "phase_start": 0,
+        "target_t": 53,
+        "quality": "closest_fingertip_to_part_proxy",
+        "components": [
+          true,
+          false,
+          false
+        ],
+        "touch_proxy_to_part_distance_m": 0.014883376657962799
+      }
+    ],
+    "losses": {
+      "action": 1.0324598550796509,
+      "goal_position": 1.754739761352539,
+      "goal_rotation": 0.6315997838973999,
+      "goal_opening": 0.13765156269073486,
+      "goal_applicability": 0.6918782591819763,
+      "goal_skill": 1.7165074348449707,
+      "grounding_region": 6.968611717224121,
+      "skill_embedding": 0.9851750731468201,
+      "slot_validity": 0.6558580994606018,
+      "phase": 1.3459243774414062,
+      "termination": 0.6661942601203918,
+      "gate": 1.0479240417480469,
+      "total": 13.599300384521484
+    },
+    "nonzero_goal_gradient_parameters": 16,
+    "sampled_action_shape": [
+      5,
+      8,
+      7
+    ],
+    "diffusion_steps": 100
+  },
+  "not_validated": [
+    "Full pretrained DINOv2/Flan-T5 GPU smoke",
+    "Native simulator rollout for v2",
+    "Held-out pose errors or grasp/task success rates",
+    "Physical touch/contact or sustained retention"
+  ],
+  "full_training_launched": false,
+  "implementation_source_sha256": {
+    "part2action/models/pose_token_diffusion_v2/__init__.py": "74d01fd98f099841b80017ccbb6f728e91a491c0c8b268b242de45c4005689fb",
+    "part2action/models/pose_token_diffusion_v2/blocks.py": "bc1f1d7f56c880aa191782376cb7d19e53386ad132285e9f4910c88fe934010a",
+    "part2action/models/pose_token_diffusion_v2/checkpoint.py": "00ca885aaf81e3d0f21497d7b830bb66a0a0292a0e897d2a92b3e15a584ccd9c",
+    "part2action/models/pose_token_diffusion_v2/config.py": "d5132802fcf12135a2fec6bb58b37a85e8c2f55ac49e94326b63f3b26815cec8",
+    "part2action/models/pose_token_diffusion_v2/contracts.py": "d8dec5951cfe25198ba2f750b79e9627359a4e7c561c9abe77b37a2af3002582",
+    "part2action/models/pose_token_diffusion_v2/dataset.py": "617233361d57145cba8ba26065facc8886f2a95a76b8970a205d20425c60a395",
+    "part2action/models/pose_token_diffusion_v2/losses.py": "f23b460dcd99a030418d8b5254adf11fe5d3b58236f0080d62fb8c534936217a",
+    "part2action/models/pose_token_diffusion_v2/policy.py": "212cebed92d62552b09ad8013d94bec78db24c424ff55c9dfd8585a8086345fb",
+    "part2action/models/pose_token_diffusion_v2/runtime.py": "3bd0ce7ac42ebad93229cdecd23fd86625c25c5d6e0da5b8633855ceaabbfd33",
+    "part2action/models/pose_token_diffusion_v2/targets.py": "797dbb50156c286343a46a48fa65937ad79d247ba86d27088233ceffff4fdc44",
+    "part2action/models/pose_token_diffusion_v2/tests/__init__.py": "f2b0c391568209b73c05636b22a2ab17c3748b7a0cc03dea826885c2c7991dbb",
+    "part2action/models/pose_token_diffusion_v2/tests/check_real_data.py": "bca1590afab3251fd23c8e0003cb42328b2a3e54288cdcffd356a76f3954b2d8",
+    "part2action/models/pose_token_diffusion_v2/tests/test_model.py": "8eefb1a25e20c98c3f9bb0f40d0614ad8cc70e7e88315be0a63079e865325518",
+    "part2action/models/pose_token_diffusion_v2/tests/test_targets.py": "3295248f70ab4b9cc0da64655569452e48333b6000e272b6dd340408b9dccd70",
+    "part2action/models/pose_token_diffusion_v2/training.py": "b6b5f2d78e6d565dc0e8a3600843d1746c9874775b550880277d47cc2aa95c00",
+    "part2action/models/pose_token_diffusion_v2/configs/model.yaml": "baf75b0fd894df821637fe8a9b5bdd04c98b451cc5ba14cab369eda7466c1ab4",
+    "part2action/models/pose_token_diffusion_v2/configs/train.yaml": "fdc4f604c50a189c6591216ed850f589ed5bb429dc519bb9a2a2fbfe0669ec91",
+    "part2action/scripts/train_pose_token_diffusion_v2.py": "266d715e5bed8183891e219f3c7d4de547aeff1f5741a71c846ac1270cd37103"
+  }
+}

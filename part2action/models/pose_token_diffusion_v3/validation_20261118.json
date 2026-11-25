@@ -1,0 +1,78 @@
+{
+  "architecture": "pose_token_diffusion_v3",
+  "status": "unit_and_real_data_checks_passed",
+  "v3_tests_passed": 19,
+  "v1_regression_tests_passed": 21,
+  "v2_regression_tests_passed": 36,
+  "protected_reference_source_files": 55,
+  "changed_reference_sources": [],
+  "real_data_check": {
+    "status": "passed",
+    "scope": "Real HDF5 annotation/interface audit and one CPU update with tiny frozen test encoders. Production-width trainable blocks, four diffusion steps for sampling. Not pretrained-backbone or simulator performance.",
+    "train_demos": 226,
+    "validation_demos": 30,
+    "demo_overlap": 0,
+    "train_frames": 31837,
+    "validation_frames": 4444,
+    "phase_counts": {
+      "touch_obj": 65,
+      "grasp_obj": 161,
+      "move_gripper": 173,
+      "release_obj": 44,
+      "rotate_obj": 29
+    },
+    "sampled_action_shape": [
+      5,
+      8,
+      7
+    ],
+    "losses": {
+      "action": 1.3022352457046509,
+      "goal_position": 1.499556303024292,
+      "goal_rotation": 0.6155362725257874,
+      "goal_opening": 0.1248173862695694,
+      "goal_applicability": 0.6638345122337341,
+      "grounding_region": 6.969246864318848,
+      "gate": 0.5093352198600769,
+      "total": 11.086145401000977,
+      "progress": 0.6946319341659546
+    },
+    "nonzero_goal_gradient_parameters": 14,
+    "progress_queries": 10,
+    "report": "component_check/README.md"
+  },
+  "frozen_backbones_cached": {
+    "DINOv2": true,
+    "Flan-T5-base": true
+  },
+  "qwen_vl_weights_downloaded": false,
+  "qwen_vl_import_preflight": "passed in transformers 4.57.6; no weights loaded or generation tested",
+  "gpu_smoke_job_id": "6957272",
+  "full_training_submitted": true,
+  "gpu_smoke_status": "completed_passed",
+  "total_unit_regression_checks_passed": 76,
+  "training_job_id": "6957500",
+  "training_state_at_check": "FAILED",
+  "training_epochs": 10,
+  "phase_diagnostic_tests_passed": 8,
+  "phase_diagnostic_jobs": {
+    "prepare": "6957501",
+    "evaluate": "6957502",
+    "report": "6957503"
+  },
+  "training_initialization_verified_no_checkpoint": true,
+  "superseded_training_job_id": "6957455",
+  "ten_epoch_smoke_job_id": "6957499",
+  "ten_epoch_smoke_status": "submitted",
+  "current_training_study": "/u/xna8aw/workspace/research_projects/interactive-robotics/results/diagnostics/pose_token_diffusion_v3_10epoch_20261118_01",
+  "training_last_logged_epoch": 3,
+  "completed_checkpoint_epochs": [
+    1,
+    2
+  ],
+  "phase_evaluation_ran": false,
+  "storage_cleanup_receipt": "part2action/docs/storage_cleanup_20261119.json",
+  "runtime_storage_guards_validated": true,
+  "new_matching_smoke_required_for_restart": true,
+  "recovery_submitted": false
+}

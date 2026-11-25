@@ -1,0 +1,50 @@
+# Fresh-policy development recipe; prepare an isolated study before submission.
+model_config: model.yaml
+data:
+  train_hdf5:
+    - /p/part2action/data/PartInstruct/demos/bottle.hdf5
+    - /p/part2action/data/PartInstruct/demos/mug.hdf5
+    - /p/part2action/data/PartInstruct/demos/pliers.hdf5
+    - /p/part2action/data/PartInstruct/demos/scissors.hdf5
+  demo_manifest: null
+  action_target_offset: 1
+  action_chunk: 8
+  n_obs_steps: 2
+  max_skill_slots: 4
+  sample_stride: 1
+  batch_size: 16
+  num_workers: 2
+  pin_memory: true
+  validation_fraction: 0.1
+  split_seed: 42
+  use_pcd: true
+  use_tcp_pose: true
+  use_hierarchy: true
+  use_point_part_labels: true
+  use_part_pcd: false
+  use_contact_xyz: false
+goal_labels:
+  touch_max_distance_m: 0.03
+  touch_probe_offset_m: 0.05625
+progress:
+  post_transition_steps: 8
+  allow_endpoint_proxy: true
+train:
+  initialization: random_policy_frozen_backbones
+  seed: 42
+  epochs: 10
+  lr: 0.0001
+  weight_decay: 0.00001
+  grad_clip: 1.0
+  amp: true
+  validation_max_batches: null
+  log_every_steps: 50
+losses:
+  action_weight: 1.0
+  goal_position_weight: 1.0
+  goal_rotation_weight: 1.0
+  goal_opening_weight: 0.25
+  goal_applicability_weight: 0.1
+  grounding_region_weight: 1.0
+  gate_weight: 0.5
+  progress_weight: 0.5

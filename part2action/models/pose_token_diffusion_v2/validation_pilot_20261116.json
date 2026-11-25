@@ -1,0 +1,47 @@
+{
+  "created_at": "2026-11-16T12:33:53.953337-05:00",
+  "status": "cpu_implementation_checked",
+  "v2_tests_passed": 20,
+  "v1_regression_tests_passed": 21,
+  "new_validation_tests_passed": 5,
+  "checks": [
+    "physical error units and masks",
+    "annotated-slot versus learned-phase error separation",
+    "whole-demo stratified split",
+    "no parameter updates or RNG changes during validation",
+    "CSV/JSON/Markdown/HTML and image export",
+    "camera projection frame"
+  ],
+  "scope": "Tiny frozen encoders in CPU tests; actual pretrained-backbone GPU smoke remains the submission gate.",
+  "source_sha256": {
+    "part2action/models/pose_token_diffusion_v2/metrics.py": "0b0581809c6ee6896bec1cef31ed9c00bd4e09ea2ad7f6d56b8b6a31257ae4b9",
+    "part2action/models/pose_token_diffusion_v2/reporting.py": "95767a2d1f5cdbf7d7312dcb16e4cf4bdbbac4d00266e281e3400c6bd35f271f",
+    "part2action/models/pose_token_diffusion_v2/pilot.py": "9639c4772d5b981a6b1fab7869d81776675eaf75664557e6f6b0c43875da258a",
+    "part2action/models/pose_token_diffusion_v2/training.py": "b96e612797cdb1420aa004f76a20574cf243e12e37547324dd24d7f0fe98af26",
+    "part2action/models/pose_token_diffusion_v2/dataset.py": "9ac987b69798dca50f686bf8e77087fcd4c468dcc25b2eedbd7629f7fcb0c56f",
+    "part2action/models/pose_token_diffusion_v2/tests/test_validation.py": "907259aeb6c5c260b6e1e641c0e3a4dd8bf6f439bc70507423819526309dc195"
+  },
+  "gpu_smoke": {
+    "job_id": "6940925",
+    "status": "passed",
+    "gpu": "NVIDIA RTX 4000 Ada Generation",
+    "scope": "One pretrained-backbone GPU update, held-out component reporting and action sampling; not a performance result.",
+    "held_out_smoke_samples": 16,
+    "example_pngs": 5,
+    "initial_trainable_state_sha256": "964356960ec2617047e1ce021a12b563fb21d3c6e8b6710ecacc04ede58d0f98"
+  },
+  "pilot_training": {
+    "job_id": "6940926",
+    "submitted": true,
+    "epochs": 2,
+    "train_demonstrations": 226,
+    "validation_demonstrations": 30,
+    "train_observations": 30029,
+    "validation_observations": 4204,
+    "initialization_matches_smoke": true,
+    "policy_checkpoint_loaded": false,
+    "result_directory": "results/diagnostics/pose_token_diffusion_v2_pilot_20261116_01",
+    "scope": "Development training; no official simulator benchmark submitted."
+  },
+  "gpu_verified_at": "2026-11-16T12:38:58.686063-05:00"
+}

@@ -30,7 +30,8 @@ TERMINATION_MODE="${TERMINATION_MODE:-legacy}"
 EXPECTED_EPISODES="${EXPECTED_EPISODES:-149}"
 EVAL_SEEDS="${EVAL_SEEDS:-42 43 44}"
 read -r -a EVAL_SEED_ARGS <<< "$EVAL_SEEDS"
-MAX_STEPS="${MAX_STEPS:-120}"
+MAX_STEPS="${MAX_STEPS:-250}"
+EXECUTE_STEPS="${EXECUTE_STEPS:-8}"
 DIAGNOSTIC_EVERY="${DIAGNOSTIC_EVERY:-20}"
 # Save per-trial MP4/GIF media for failure review; RECORD=0 opts out.
 RECORD="${RECORD:-1}"
@@ -102,7 +103,7 @@ ARGS=(
   --expected-episodes "$EXPECTED_EPISODES"
   --eval-seeds "${EVAL_SEED_ARGS[@]}"
   --max-steps "$MAX_STEPS"
-  --execute-steps 1
+  --execute-steps "$EXECUTE_STEPS"
   --device cuda
   --termination-mode "$TERMINATION_MODE"
   --diagnostic-every "$DIAGNOSTIC_EVERY"

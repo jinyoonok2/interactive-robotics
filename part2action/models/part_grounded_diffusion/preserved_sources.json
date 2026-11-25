@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "scope": "Existing model sources, current/compatibility config files and model training/evaluation entry points at the modular separation boundary; new-family work lives outside these paths.",
+  "source_sha256": {
+    "part2action/configs/architecture_update/hierarchical_world_geometry_10epoch_diffusion_next_action_transformer.yaml": "45bba5da024005380d78a8f46c6e4fdf1edc6ed69335eee636aca2ac1de52f4d",
+    "part2action/configs/architecture_update/hierarchical_world_geometry_30epoch_no_residual.yaml": "61c8c16926d4ffd2ec0a43942d1c762312cf5d1dc6db251eebbf4883ca589d61",
+    "part2action/configs/index.json": "6f8bf96fab38394446bf7d6214ce837c7ec2e59826c487157124c57d31fc7a94",
+    "part2action/configs/pose_learning/grounded_visual_pose_v1.yaml": "2c4d8204b7c9c59ff924feeded7b69f97ae9a108846f28abf23bbdccbfad8ce4",
+    "part2action/configs/pose_learning/visual_oracle_pose_v1.json": "91e9099904079e6b961625fb4a922130aa75c606178a2e64b71a37dbb2cf998e",
+    "part2action/models/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "part2action/models/backbone.py": "4673ab388d09b1cbf8001d2f55c0efe40f3569e1a8f09c7ff19b95b4f53fbe60",
+    "part2action/models/diffusion_transformer.py": "2ee40d652695671e5a4ddb5afad5e75595242f4fb0f57fde79562f8ca5419c3b",
+    "part2action/models/grounded_pose_head_v1.py": "054999535e665728d19acefcdb2e596a507a6046f3dfc97ddfa214a5be33f293",
+    "part2action/models/grounded_visual_pose_policy_v1.py": "aeb4522ff91b1493346cac72cd82d18b27f141db0234f8593e46e36398b9c635",
+    "part2action/models/heads.py": "93edd39e2e437b6365a5a13d6aa804e8b1d103786c010e67700f26d4004e4e62",
+    "part2action/models/hierarchical.py": "d206e50608c2310836843c72d1f05e5cd9dfd3b63ae3b9ca7e43549e32b658e0",
+    "part2action/models/interaction_pose_head.py": "7516515968df8384e4b8b5d45043a682e881ef16e7d58ce18fa2f60297098f7d",
+    "part2action/models/interaction_success.py": "1f6a4000e62f24df9d44150fb5b7b913d60408b0e3593c6756faa3ecf32751d7",
+    "part2action/models/part2action_model.py": "d381b88d487a683b60b0f752b2570c4ffe586ab81e1e18524ac21eb6c9018fa2",
+    "part2action/models/part_conditioned_pose.py": "e32a3468c2d7505f6a17a253d1dc80476a0b83ef635c1d6b43a1d0cf7c84734c",
+    "part2action/models/pose_conditioning_v1.py": "a31d2aecc39e812d058b6f0b570ea34d224fea5653bfc89bd5e6a09630883eff",
+    "part2action/models/pose_geometry_ablation.py": "59dd3ea56cb627eace22ac3865d23aece54c567c16863d56c873abd2c60fef1c",
+    "part2action/models/pose_guided_actor.py": "d3826be9d386683258ac5266f4093223188cca9fe0280ae5a32a21e0942722e3",
+    "part2action/models/temporal.py": "856ffe9985e7e9e7447493a96e87786e666fa83a6835804c9190a626e9deaebe",
+    "part2action/models/visual_pose_policy_v1.py": "b05f5854009a0ab6dd7d4430f7ff7786fc84b029ece8fdb19273d3fdfee8a305",
+    "part2action/scripts/_common.py": "28426317ffaa2a2c75b1050af122c51fdc9923a19b00dbf313337d436b112110",
+    "part2action/scripts/evaluate_grounded_visual_pose_v1.py": "71237886ecf9853ac66d8d74b1fe1cfbd71d00d0abd5dbd47ef9aea9adadd450",
+    "part2action/scripts/evaluate_visual_oracle_pose_v2.py": "db13b74a6c2baaf06553d2693443b45bc956f7e380a6b55f34e5bdeea800446b",
+    "part2action/scripts/evaluate_visual_oracle_pose_v3.py": "48ee0c4077b6cba2fd29f76133fb405e3a4054a680fa8911dba16d1d5c9bb400",
+    "part2action/scripts/run_visual_oracle_pose_v1.py": "405832929ce6224514ef2bd6d68704f4296f637257bfa39c693859fd078eadfe",
+    "part2action/scripts/train.py": "f7ce25f4c96255cd750c747453a347e42695c67e410fbeb8c240d8b7309a95ee",
+    "part2action/scripts/train_grounded_visual_pose_v1.py": "8ede21121c5272ae13224aeb41092eacb4efa817fe79dceb9894bf48c5e0ef73",
+    "part2action/scripts/train_visual_pose_v1.py": "08e795c7994444d563bd216fdd0fbdff30991841d530751c23c1e4bfcffb584b",
+    "part2action/docs/archive/2026-11-16_evaluation_protocol/rollout_partgym_120_1.py": "1ef8ea458022984233b061697b58ce5d5b12c188b75d87fd54e0abfd5199ed20"
+  },
+  "evaluation_runtime_relocation_20261116": {
+    "original_path": "part2action/scripts/rollout_partgym.py",
+    "archived_path": "part2action/docs/archive/2026-11-16_evaluation_protocol/rollout_partgym_120_1.py",
+    "sha256": "1ef8ea458022984233b061697b58ce5d5b12c188b75d87fd54e0abfd5199ed20",
+    "reason": "User requested native 250/8 evaluation; preserve original 120/1 helper bytes here while updating the live runtime."
+  }
+}

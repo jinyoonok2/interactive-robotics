@@ -9,6 +9,7 @@ from pathlib import Path
 
 from register_result import register
 from diagnostics.evaluation_scenarios import load_scenarios, DEFAULT_EVALUATION_SEEDS
+from diagnostics.evaluation_protocol import execution_settings, DEFAULT_PROTOCOL_PATH
 
 
 def main():
@@ -48,9 +49,12 @@ def main():
                'evaluation_protocol': 'all_test1_scenarios_fixed_seeds', 'expected_episodes': 149,
                'evaluation_seeds': list(DEFAULT_EVALUATION_SEEDS), 'trials_per_scenario': 3, 'expected_rollouts_per_model': 447}
     request['metadata_sha256'] = hashlib.sha256((data_root / 'episodes_meta_test.json').read_bytes()).hexdigest()
+    request['execution_settings'] = execution_settings('test1')
     request['source_sha256'] = {str(path.relative_to(root)): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in [root / 'part2action/scripts/rollout_partgym.py',
-                     root / 'part2action/diagnostics/evaluation_scenarios.py']}
+                     root / 'part2action/diagnostics/evaluation_scenarios.py',
+                     root / 'part2action/diagnostics/evaluation_protocol.py',DEFAULT_PROTOCOL_PATH,
+                     root / 'PartInstruct/PartInstruct/baselines/evaluation/config/env/env_config.yaml']}
     if not args.dry_run:
         output.mkdir(parents=True)
         register('part2action/evaluations', output)
