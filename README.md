@@ -56,7 +56,6 @@ interactive-robotics/
   PartInstruct/               Upstream framework, PartGym, and official DP/DP3 baselines
   datasets/PartInstruct       Link to the full released dataset
   results/                    Unified experiment and visualization index
-  ManiSkill3/                 Retained source for possible future experiments
   affordance-pipeline/        Historical affordance experiments
 ```
 

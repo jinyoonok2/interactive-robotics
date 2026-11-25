@@ -81,7 +81,6 @@ part2action/storage
 
 # Independently maintained framework clones and local caches
 /PartInstruct/
-/ManiSkill3/
 /cache/
 
 # Experiment outputs and personal analysis stay local; publish the layout guide
